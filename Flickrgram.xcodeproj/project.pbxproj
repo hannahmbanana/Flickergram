@@ -1,0 +1,409 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		768C1DEA1C745A470001EAD1 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 768C1DE91C745A470001EAD1 /* main.m */; };
+		768C1DED1C745A470001EAD1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 768C1DEC1C745A470001EAD1 /* AppDelegate.m */; };
+		768C1DF51C745A470001EAD1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 768C1DF41C745A470001EAD1 /* Assets.xcassets */; };
+		768C1DF81C745A470001EAD1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 768C1DF61C745A470001EAD1 /* LaunchScreen.storyboard */; };
+		768C1E051C7461380001EAD1 /* PhotoTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 768C1E041C7461380001EAD1 /* PhotoTableViewController.m */; };
+		768C1E081C7463450001EAD1 /* PhotoTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 768C1E071C7463450001EAD1 /* PhotoTableViewCell.m */; };
+		768C1E0B1C75AAFB0001EAD1 /* UIImage+UIImage_Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 768C1E0A1C75AAFB0001EAD1 /* UIImage+UIImage_Additions.m */; };
+		76B3B32B98E1FF27C019CEC8 /* libPods-Flickrgram.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B00BEEEFD3C8A3511817FAA9 /* libPods-Flickrgram.a */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		140F5B70170775CCFD25E13E /* Pods-Flickrgram.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Flickrgram.release.xcconfig"; path = "Pods/Target Support Files/Pods-Flickrgram/Pods-Flickrgram.release.xcconfig"; sourceTree = "<group>"; };
+		768C1DE51C745A470001EAD1 /* Flickrgram.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Flickrgram.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		768C1DE91C745A470001EAD1 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		768C1DEB1C745A470001EAD1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		768C1DEC1C745A470001EAD1 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		768C1DF41C745A470001EAD1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		768C1DF71C745A470001EAD1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		768C1DF91C745A470001EAD1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		768C1E031C7461380001EAD1 /* PhotoTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoTableViewController.h; sourceTree = "<group>"; };
+		768C1E041C7461380001EAD1 /* PhotoTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoTableViewController.m; sourceTree = "<group>"; };
+		768C1E061C7463450001EAD1 /* PhotoTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoTableViewCell.h; sourceTree = "<group>"; };
+		768C1E071C7463450001EAD1 /* PhotoTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoTableViewCell.m; sourceTree = "<group>"; };
+		768C1E091C75AAFB0001EAD1 /* UIImage+UIImage_Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+UIImage_Additions.h"; sourceTree = "<group>"; };
+		768C1E0A1C75AAFB0001EAD1 /* UIImage+UIImage_Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+UIImage_Additions.m"; sourceTree = "<group>"; };
+		86E62D171C0AB31E923BAB75 /* Pods-Flickrgram.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Flickrgram.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Flickrgram/Pods-Flickrgram.debug.xcconfig"; sourceTree = "<group>"; };
+		B00BEEEFD3C8A3511817FAA9 /* libPods-Flickrgram.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Flickrgram.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		768C1DE21C745A470001EAD1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				76B3B32B98E1FF27C019CEC8 /* libPods-Flickrgram.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1FFF0FEB3737E924FAA188CB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B00BEEEFD3C8A3511817FAA9 /* libPods-Flickrgram.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		768C1DDC1C745A470001EAD1 = {
+			isa = PBXGroup;
+			children = (
+				768C1DE71C745A470001EAD1 /* Flickrgram */,
+				768C1DE61C745A470001EAD1 /* Products */,
+				AF9EB3E8EE39FF371D013F81 /* Pods */,
+				1FFF0FEB3737E924FAA188CB /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		768C1DE61C745A470001EAD1 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				768C1DE51C745A470001EAD1 /* Flickrgram.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		768C1DE71C745A470001EAD1 /* Flickrgram */ = {
+			isa = PBXGroup;
+			children = (
+				768C1DEB1C745A470001EAD1 /* AppDelegate.h */,
+				768C1DEC1C745A470001EAD1 /* AppDelegate.m */,
+				768C1E011C745C590001EAD1 /* Controller */,
+				768C1E001C745C530001EAD1 /* View */,
+				768C1DFF1C745C440001EAD1 /* Model */,
+				768C1DE81C745A470001EAD1 /* Supporting Files */,
+			);
+			path = Flickrgram;
+			sourceTree = "<group>";
+		};
+		768C1DE81C745A470001EAD1 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				768C1DF41C745A470001EAD1 /* Assets.xcassets */,
+				768C1DF61C745A470001EAD1 /* LaunchScreen.storyboard */,
+				768C1DF91C745A470001EAD1 /* Info.plist */,
+				768C1DE91C745A470001EAD1 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		768C1DFF1C745C440001EAD1 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				768C1E091C75AAFB0001EAD1 /* UIImage+UIImage_Additions.h */,
+				768C1E0A1C75AAFB0001EAD1 /* UIImage+UIImage_Additions.m */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
+		768C1E001C745C530001EAD1 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				768C1E061C7463450001EAD1 /* PhotoTableViewCell.h */,
+				768C1E071C7463450001EAD1 /* PhotoTableViewCell.m */,
+			);
+			name = View;
+			sourceTree = "<group>";
+		};
+		768C1E011C745C590001EAD1 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				768C1E031C7461380001EAD1 /* PhotoTableViewController.h */,
+				768C1E041C7461380001EAD1 /* PhotoTableViewController.m */,
+			);
+			name = Controller;
+			sourceTree = "<group>";
+		};
+		AF9EB3E8EE39FF371D013F81 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				86E62D171C0AB31E923BAB75 /* Pods-Flickrgram.debug.xcconfig */,
+				140F5B70170775CCFD25E13E /* Pods-Flickrgram.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		768C1DE41C745A470001EAD1 /* Flickrgram */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 768C1DFC1C745A470001EAD1 /* Build configuration list for PBXNativeTarget "Flickrgram" */;
+			buildPhases = (
+				6FC3B8F18287EEA63ECDEE1C /* Check Pods Manifest.lock */,
+				768C1DE11C745A470001EAD1 /* Sources */,
+				768C1DE21C745A470001EAD1 /* Frameworks */,
+				768C1DE31C745A470001EAD1 /* Resources */,
+				E88147535E5FC7EAEB314DAC /* Embed Pods Frameworks */,
+				D8114346261F8CA9C7FDD7FF /* Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Flickrgram;
+			productName = Flickrgram;
+			productReference = 768C1DE51C745A470001EAD1 /* Flickrgram.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		768C1DDD1C745A470001EAD1 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0720;
+				ORGANIZATIONNAME = "Hannah Troisi";
+				TargetAttributes = {
+					768C1DE41C745A470001EAD1 = {
+						CreatedOnToolsVersion = 7.2;
+					};
+				};
+			};
+			buildConfigurationList = 768C1DE01C745A470001EAD1 /* Build configuration list for PBXProject "Flickrgram" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 768C1DDC1C745A470001EAD1;
+			productRefGroup = 768C1DE61C745A470001EAD1 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				768C1DE41C745A470001EAD1 /* Flickrgram */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		768C1DE31C745A470001EAD1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				768C1DF81C745A470001EAD1 /* LaunchScreen.storyboard in Resources */,
+				768C1DF51C745A470001EAD1 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		6FC3B8F18287EEA63ECDEE1C /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		D8114346261F8CA9C7FDD7FF /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Flickrgram/Pods-Flickrgram-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E88147535E5FC7EAEB314DAC /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Flickrgram/Pods-Flickrgram-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		768C1DE11C745A470001EAD1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				768C1E081C7463450001EAD1 /* PhotoTableViewCell.m in Sources */,
+				768C1DED1C745A470001EAD1 /* AppDelegate.m in Sources */,
+				768C1E051C7461380001EAD1 /* PhotoTableViewController.m in Sources */,
+				768C1DEA1C745A470001EAD1 /* main.m in Sources */,
+				768C1E0B1C75AAFB0001EAD1 /* UIImage+UIImage_Additions.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		768C1DF61C745A470001EAD1 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				768C1DF71C745A470001EAD1 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		768C1DFA1C745A470001EAD1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		768C1DFB1C745A470001EAD1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		768C1DFD1C745A470001EAD1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 86E62D171C0AB31E923BAB75 /* Pods-Flickrgram.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = Flickrgram/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = HMT.Flickrgram;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		768C1DFE1C745A470001EAD1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 140F5B70170775CCFD25E13E /* Pods-Flickrgram.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = Flickrgram/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = HMT.Flickrgram;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		768C1DE01C745A470001EAD1 /* Build configuration list for PBXProject "Flickrgram" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				768C1DFA1C745A470001EAD1 /* Debug */,
+				768C1DFB1C745A470001EAD1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		768C1DFC1C745A470001EAD1 /* Build configuration list for PBXNativeTarget "Flickrgram" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				768C1DFD1C745A470001EAD1 /* Debug */,
+				768C1DFE1C745A470001EAD1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 768C1DDD1C745A470001EAD1 /* Project object */;
+}
