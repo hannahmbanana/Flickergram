@@ -31,7 +31,9 @@
   
   self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
   
-  self.window.rootViewController = [[PhotoTableViewController alloc] init];
+  PhotoTableViewController *viewController = [[PhotoTableViewController alloc] init];
+  UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:viewController];
+  self.window.rootViewController = navController;
   
   [self.window makeKeyAndVisible];
   

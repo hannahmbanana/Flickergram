@@ -11,18 +11,27 @@
 #import "FlickrKit.h"
 
 
-#define CELL_HEADER_HEIGHT 30
+#define CELL_HEADER_HEIGHT 40
+#define CELL_HEADER_HORIZONTAL_INSET 10
+#define USER_IMAGE_HEIGHT 30
 
 @implementation PhotoTableViewCell
 {
-  UIImageView *_userProfileImageView;
-  UILabel     *_userNameLabel;
-  UILabel     *_photoLocationLabel;
-  UILabel     *_photoTimeIntervalSincePostLabel;
-  UIImageView *_photoImageView;
-  UILabel     *_photoLikesLabel;
-  UILabel     *_photoDescriptionLabel;
-  UILabel     *_photoCommentsLabel;
+  UIImageView  *_userProfileImageView;
+  UILabel      *_userNameLabel;
+  UILabel      *_photoLocationLabel;
+  UILabel      *_photoTimeIntervalSincePostLabel;
+  
+  UIImageView  *_photoImageView;
+  
+  UILabel      *_photoLikesLabel;
+  UILabel      *_photoDescriptionLabel;
+  UILabel      *_photoCommentsLabel;
+  
+  NSURLSessionTask          *_photoDownloadSessionTask;
+  NSURLSessionTask          *_buddyIconDownloadSessionTask;
+  FKFlickrNetworkOperation  *_networkOp;
+
 }
 
 #pragma mark - Class methods
@@ -37,15 +46,20 @@
   self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
   
   if (self) {
-    _photoImageView = [[UIImageView alloc] init];
-    _userProfileImageView = [[UIImageView alloc] init];
-    _userNameLabel = [[UILabel alloc] init];
-    _userNameLabel.textColor = [UIColor whiteColor];
-    _photoLocationLabel = [[UILabel alloc] init];
-    _photoLocationLabel.textColor = [UIColor whiteColor];
-    _photoTimeIntervalSincePostLabel = [[UILabel alloc] init];
-    _photoTimeIntervalSincePostLabel.textColor = [UIColor whiteColor];
+    
+    self.backgroundColor                       = [UIColor lightGrayColor];
+    
+    _userProfileImageView                      = [[UIImageView alloc] init];
+    _userNameLabel                             = [[UILabel alloc] init];
+    _photoLocationLabel                        = [[UILabel alloc] init];
+    _photoTimeIntervalSincePostLabel           = [[UILabel alloc] init];
+    _photoTimeIntervalSincePostLabel.textColor = [UIColor darkGrayColor];
 
+    _photoImageView                            = [[UIImageView alloc] init];
+    
+    _photoLikesLabel                           = [[UILabel alloc] init];
+    _photoDescriptionLabel                     = [[UILabel alloc] init];
+    _photoCommentsLabel                        = [[UILabel alloc] init];
   }
   
   return self;
@@ -53,100 +67,174 @@
 
 - (void)layoutSubviews
 {
-  _photoImageView.frame = self.bounds;
-  _userProfileImageView.frame = CGRectMake(0, 0, 30, 30);
-  [_userNameLabel sizeToFit];
-  _userNameLabel.frame = CGRectMake(30, 0, 200, 40);
+  [super layoutSubviews];
   
-  _photoLocationLabel.frame = CGRectMake(30, 50, 200, 40);
-  _photoTimeIntervalSincePostLabel.frame = CGRectMake(30, 50, 200, 40);
-
-
-  [self addSubview:_photoImageView];
+  // top of cell
+  _userProfileImageView.frame = CGRectMake(CELL_HEADER_HORIZONTAL_INSET,
+                                           (CELL_HEADER_HEIGHT - USER_IMAGE_HEIGHT) / 2,
+                                           USER_IMAGE_HEIGHT,
+                                           USER_IMAGE_HEIGHT);
   [self addSubview:_userProfileImageView];
+
+  
+  [_userNameLabel sizeToFit];
+  _userNameLabel.frame = CGRectMake(CGRectGetMaxX(_userProfileImageView.frame) + CELL_HEADER_HORIZONTAL_INSET,
+                                    (CELL_HEADER_HEIGHT - _userNameLabel.frame.size.height) / 2,
+                                    _userNameLabel.frame.size.width,
+                                    _userNameLabel.frame.size.height);
   [self addSubview:_userNameLabel];
-  [self addSubview:_photoLocationLabel];
+
+  
+  [_photoTimeIntervalSincePostLabel sizeToFit];
+  _photoTimeIntervalSincePostLabel.frame = CGRectMake(self.bounds.size.width - _photoTimeIntervalSincePostLabel.frame.size.width - CELL_HEADER_HORIZONTAL_INSET,
+                                                      (CELL_HEADER_HEIGHT - _photoTimeIntervalSincePostLabel.frame.size.height) / 2,
+                                                      _photoTimeIntervalSincePostLabel.frame.size.width,
+                                                      _photoTimeIntervalSincePostLabel.frame.size.height);
   [self addSubview:_photoTimeIntervalSincePostLabel];
+
+
+  // middle of cell
+  _photoImageView.frame = CGRectMake(0,
+                                     CELL_HEADER_HEIGHT,
+                                     self.bounds.size.width,
+                                     self.bounds.size.width - 3 * CELL_HEADER_HEIGHT);
+  [self addSubview:_photoImageView];
+  
+  // bottom of cell
+//  [_photoLikesLabel sizeToFit];
+//  _photoLikesLabel.frame = CGRectMake(CELL_HEADER_HORIZONTAL_INSET,
+//                                     CGRectGetMaxY(_photoImageView.frame),
+//                                     _photoLikesLabel.frame.size.width,
+//                                     _photoLikesLabel.frame.size.height);
+//  [self addSubview:_photoLikesLabel];
+//  
+//  [_photoDescriptionLabel sizeToFit];
+//  _photoLikesLabel.frame = CGRectMake(CELL_HEADER_HORIZONTAL_INSET,
+//                                      CGRectGetMaxY(_photoLikesLabel.frame) + 5,
+//                                      _photoDescriptionLabel.frame.size.width,
+//                                      _photoDescriptionLabel.frame.size.height);
+////  [self addSubview:_photoDescriptionLabel];
+//  
+//  [_photoCommentsLabel sizeToFit];
+//  [self addSubview:_photoCommentsLabel];
 }
 
 - (void)prepareForReuse
 {
-  _userProfileImageView.image = nil;
+  [super prepareForReuse];
   
-  // put grey placeholders in imageView spots
+  // remove images so that the old content doesn't appear before the new content is loaded
+  _userProfileImageView.image           = nil;
+  _photoImageView.image                 = nil;
+  
+  // remove label text
+  _userNameLabel.text                   = nil;
+  _photoLocationLabel.text              = nil;
+  _photoTimeIntervalSincePostLabel.text = nil;
+  
+  // cancel network operations
+  [_photoDownloadSessionTask cancel];
+  [_buddyIconDownloadSessionTask cancel];
+  [_networkOp cancel];
 }
+
 
 #pragma mark - Instance Methods
 
-- (void)updateCellWithPhotoURL:(NSURL *)photoURL
+- (void)updateCellWithPhotoDictionary:(NSDictionary *)photoDictionary
 {
-  // download the image
-  NSURL *url = [[FlickrKit sharedFlickrKit] photoURLForSize:FKPhotoSizeLargeSquare150 fromPhotoDictionary:photoURL];
-
-  NSURLRequest *request = [NSURLRequest requestWithURL:url];
-  [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+  // async download of photo
+  FlickrKit *fk                     = [FlickrKit sharedFlickrKit];
+  NSURL *photoURL                   = [fk photoURLForSize:FKPhotoSizeLarge1024 fromPhotoDictionary:photoDictionary];
+  NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
+  NSURLSession *session             = [NSURLSession sessionWithConfiguration:config];
+  _photoDownloadSessionTask         = [session dataTaskWithURL:photoURL completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
     
-    _photoImageView.image = [[UIImage alloc] initWithData:data];
-  }];
-  
-  // download the buddy icon
-  NSURL *buddyUrl = [[FlickrKit sharedFlickrKit] buddyIconURLForUser:[photoURL valueForKeyPath:@"owner"]];
-  request = [NSURLRequest requestWithURL:buddyUrl];
-  [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
-    
-    UIImage *roundedBuddyIcon = [[[UIImage alloc] initWithData:data] makeRoundImage];
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-      _userProfileImageView.image = roundedBuddyIcon;
-    });
-    
-  }];
-  
-  
-  // get user name
-  FKFlickrPeopleGetInfo *peopleInfo = [[FKFlickrPeopleGetInfo alloc] init];
-  peopleInfo.user_id = [photoURL valueForKeyPath:@"owner"];
-  
-  [[FlickrKit sharedFlickrKit] call:peopleInfo completion:^(NSDictionary *response, NSError *error) {
-    dispatch_async(dispatch_get_main_queue(), ^{
-      if (response) {
-        
+    if (response) {
+      if (!error) {
         dispatch_async(dispatch_get_main_queue(), ^{
-          _userNameLabel.text = [response valueForKeyPath:@"person.username._content"];
+          _photoImageView.image = [[UIImage alloc] initWithData:data];
         });
       }
-    });
+    }
   }];
+  [_photoDownloadSessionTask resume];
 
-  
-  // get photo info
+  // async download of photo info
   FKFlickrPhotosGetInfo *photoInfo = [[FKFlickrPhotosGetInfo alloc] init];
-  photoInfo.photo_id = [photoURL valueForKeyPath:@"id"];
-  photoInfo.secret = [photoURL valueForKeyPath:@"secret"];
-  
-  [[FlickrKit sharedFlickrKit] call:photoInfo completion:^(NSDictionary *response, NSError *error) {
-    dispatch_async(dispatch_get_main_queue(), ^{
-      if (response) {
-        
+  photoInfo.photo_id               = [photoDictionary valueForKeyPath:@"id"];
+  photoInfo.secret                 = [photoDictionary valueForKeyPath:@"secret"];
+  _networkOp                       = [fk call:photoInfo completion:^(NSDictionary *response, NSError *error) {
+    if (response) {
+      if (!error) {
         dispatch_async(dispatch_get_main_queue(), ^{
-          CFTimeInterval time = [[response valueForKeyPath:@"photo.dateuploaded"] integerValue];
-          CFTimeInterval now = CFAbsoluteTimeGetCurrent();
-          CFGregorianUnits units = CFAbsoluteTimeGetDifferenceAsGregorianUnits(now, time, nil, nil);
-          _photoTimeIntervalSincePostLabel.text = [NSString stringWithFormat:@"%d",units.days];
+          
+          // author name
+          _userNameLabel.text = [response valueForKeyPath:@"photo.owner.username"];
 
+          // photo info
+          _photoDescriptionLabel.text = [response valueForKeyPath:@"photo.description._content"];
+          
+          // photo post age
+          NSTimeInterval postTime = [[response valueForKeyPath:@"photo.dateuploaded"] floatValue];
+          NSDate *postDate        = [NSDate dateWithTimeIntervalSince1970:postTime];
+          NSDate *nowDate         = [NSDate date];
+          
+          NSCalendar *calendar    = [NSCalendar currentCalendar];
+          [calendar rangeOfUnit:NSCalendarUnitDay startDate:&postDate interval:NULL forDate:postDate];
+          [calendar rangeOfUnit:NSCalendarUnitDay startDate:&nowDate interval:NULL forDate:nowDate];
+          
+          NSDateComponents *diffS = [calendar components:NSCalendarUnitSecond fromDate:postDate toDate:nowDate options:0];
+          NSDateComponents *diffM = [calendar components:NSCalendarUnitMinute fromDate:postDate toDate:nowDate options:0];
+          NSDateComponents *diffH = [calendar components:NSCalendarUnitHour fromDate:postDate toDate:nowDate options:0];
+          NSDateComponents *diffD = [calendar components:NSCalendarUnitDay fromDate:postDate toDate:nowDate options:0];
+          
+//          NSLog(@"%lu %lu %lu %lu", [diffS second], [diffM minute], [diffH hour], [diffD day]);
+          
+          NSString *elapsedTime;
+          
+          if ([diffD day] > 0) {
+            elapsedTime = [NSString stringWithFormat:@"%lud", (long)[diffD day]];
+          } else if ([diffH hour] > 0) {
+            elapsedTime = [NSString stringWithFormat:@"%luh", (long)[diffH hour]];
+          } else if ([diffM minute] > 0) {
+            elapsedTime = [NSString stringWithFormat:@"%lum", (long)[diffM minute]];
+          } else if ([diffS second] > 0) {
+            elapsedTime = [NSString stringWithFormat:@"%lus", (long)[diffS second]];
+          }
+          
+//          // remove the "s" if "1 days", etc
+//          if (elapsedTime && [[elapsedTime substringToIndex:1] isEqualToString:@"1"] ) {
+//            elapsedTime = [elapsedTime substringToIndex:[elapsedTime length]-1];
+//          }
+          
+          _photoTimeIntervalSincePostLabel.text = elapsedTime;
+          
+          [self setNeedsLayout];
         });
       }
-    });
+    }
   }];
+
+  // async download of buddy icon
+  NSURL *buddyUrl                   = [fk buddyIconURLForUser:[photoDictionary valueForKeyPath:@"owner"]];
+  config                            = [NSURLSessionConfiguration ephemeralSessionConfiguration];
+  session                           = [NSURLSession sessionWithConfiguration:config];
+  _buddyIconDownloadSessionTask     = [session dataTaskWithURL:buddyUrl completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+    
+    if (response) {
+      if (!error) {
+        UIImage *roundedBuddyIcon = [[[UIImage alloc] initWithData:data] makeRoundImage];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+          _userProfileImageView.image = roundedBuddyIcon;
+        });
+      }
+    }
+  }];
+  [_buddyIconDownloadSessionTask resume];
   
-  // redo the layout
-  [self setNeedsLayout];
+  
 }
-
-
-#pragma mark - Helper Methods
-
-
-
 
 @end

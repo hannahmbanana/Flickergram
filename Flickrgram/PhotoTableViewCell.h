@@ -10,6 +10,6 @@
 
 @interface PhotoTableViewCell : UITableViewCell
 
-- (void)updateCellWithPhotoURL:(NSString *)photoURL;
+- (void)updateCellWithPhotoDictionary:(NSString *)photoURL;
 
 @end

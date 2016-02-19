@@ -13,7 +13,7 @@
 @implementation PhotoTableViewController
 {
   FKFlickrNetworkOperation  *_todaysInterestingOp;
-  NSArray                   *_photoArray;
+  NSArray                   *_photos;
 }
 
 
@@ -25,11 +25,16 @@
   
   if (self) {
     
-    // register UITableViewCell subclass
+    // register custom UITableViewCell subclass
     [self.tableView registerClass:[PhotoTableViewCell class] forCellReuseIdentifier:@"photoCell"];
     
-    // start downloading images for feed
+    // start downloading interesting images for feed
     [self downloadInterestingImages];
+    
+    // navigation bar
+    self.navigationItem.title = @"flickrgram";
+    
+    [self.navigationController.navigationBar setBarTintColor:[UIColor purpleColor]];
   }
   
   return self;
@@ -48,13 +53,14 @@
     dispatch_async(dispatch_get_main_queue(), ^{
       if (response) {
         
-        NSMutableArray *photoURLs = [NSMutableArray array];
+        NSMutableArray *photoDictionaries = [NSMutableArray array];
         
         for (NSDictionary *photoDictionary in [response valueForKeyPath:@"photos.photo"]) {
-          [photoURLs addObject:photoDictionary];
+          [photoDictionaries addObject:photoDictionary];
         }
-        _photoArray = photoURLs;
+        _photos = photoDictionaries;
         
+        // reload table data once _photos data model is populated
         [self.tableView reloadData];
       }
     });				
@@ -66,26 +72,27 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(nonnull NSIndexPath *)indexPath
 {
-  // call class method on cell heightForRowWithDataModel
+  #warning H: call class method on cell heightForRowWithDataModel
   return self.view.bounds.size.width;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-  return [_photoArray count];
+  return [_photos count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+  // dequeue a reusable cell
   PhotoTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"photoCell" forIndexPath:indexPath];
   
+  // create a new PhotoTableViewCell if no reusable ones are available in queue
   if (!cell) {
     cell = [[PhotoTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"photoCell"];
   }
   
-  NSString *photoURL = [_photoArray objectAtIndex:indexPath.row];
-  cell.backgroundColor = [UIColor purpleColor];
-  [cell updateCellWithPhotoURL:photoURL];
+  // configure the cell for the appropriate photo
+  [cell updateCellWithPhotoDictionary:[_photos objectAtIndex:indexPath.row]];
   
   return cell;
 }
