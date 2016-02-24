@@ -25,6 +25,8 @@
   
   if (self) {
     
+    self.tableView.allowsSelection = NO;
+    
     // register custom UITableViewCell subclass
     [self.tableView registerClass:[PhotoTableViewCell class] forCellReuseIdentifier:@"photoCell"];
     
@@ -68,7 +70,7 @@
 }
 
 
-#pragma mark - TableViewDataSource
+#pragma mark - UITableViewDataSource
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(nonnull NSIndexPath *)indexPath
 {
@@ -96,5 +98,13 @@
   
   return cell;
 }
+
+
+#pragma mark - UIScrollViewDelegate
+//
+//- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+//{
+//  
+//}
 
 @end

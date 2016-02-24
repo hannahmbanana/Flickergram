@@ -28,6 +28,11 @@
   // draw the image in the circleRect *AFTER* the context is clipped
   [self drawInRect:circleRect];
   
+  // create a border (for white background pictures)
+  circle.lineWidth = 1;
+  [[UIColor darkGrayColor] set];
+  [circle stroke];
+  
   // get an image from the image context
   UIImage *roundedImage = UIGraphicsGetImageFromCurrentImageContext();
   

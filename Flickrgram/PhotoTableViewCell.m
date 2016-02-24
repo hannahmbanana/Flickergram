@@ -11,7 +11,7 @@
 #import "FlickrKit.h"
 
 
-#define CELL_HEADER_HEIGHT 40
+#define CELL_HEADER_HEIGHT 50
 #define CELL_HEADER_HORIZONTAL_INSET 10
 #define USER_IMAGE_HEIGHT 30
 
@@ -27,6 +27,8 @@
   UILabel      *_photoLikesLabel;
   UILabel      *_photoDescriptionLabel;
   UILabel      *_photoCommentsLabel;
+  
+  NSDictionary              *_photoDictionaryRepresentation;
   
   NSURLSessionTask          *_photoDownloadSessionTask;
   NSURLSessionTask          *_buddyIconDownloadSessionTask;
@@ -46,16 +48,24 @@
   self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
   
   if (self) {
-    
-    self.backgroundColor                       = [UIColor lightGrayColor];
-    
+      
     _userProfileImageView                      = [[UIImageView alloc] init];
+    
     _userNameLabel                             = [[UILabel alloc] init];
+    _userNameLabel.font                        = [_userNameLabel.font fontWithSize:floorf(USER_IMAGE_HEIGHT/2)-1];
+    
     _photoLocationLabel                        = [[UILabel alloc] init];
+    _photoLocationLabel.font                   = [_photoLocationLabel.font fontWithSize:floorf(USER_IMAGE_HEIGHT/2)-1];
+    
     _photoTimeIntervalSincePostLabel           = [[UILabel alloc] init];
-    _photoTimeIntervalSincePostLabel.textColor = [UIColor darkGrayColor];
+    _photoTimeIntervalSincePostLabel.font      = [_photoTimeIntervalSincePostLabel.font fontWithSize:floorf(USER_IMAGE_HEIGHT/2)-1];
+    _photoTimeIntervalSincePostLabel.textColor = [UIColor lightGrayColor];
 
     _photoImageView                            = [[UIImageView alloc] init];
+    
+    // make the UIImage fill the UIImageView correctly
+    _photoImageView.clipsToBounds              = YES;
+    _photoImageView.contentMode                = UIViewContentModeScaleAspectFill;
     
     _photoLikesLabel                           = [[UILabel alloc] init];
     _photoDescriptionLabel                     = [[UILabel alloc] init];
@@ -76,14 +86,30 @@
                                            USER_IMAGE_HEIGHT);
   [self addSubview:_userProfileImageView];
 
-  
   [_userNameLabel sizeToFit];
-  _userNameLabel.frame = CGRectMake(CGRectGetMaxX(_userProfileImageView.frame) + CELL_HEADER_HORIZONTAL_INSET,
-                                    (CELL_HEADER_HEIGHT - _userNameLabel.frame.size.height) / 2,
-                                    _userNameLabel.frame.size.width,
-                                    _userNameLabel.frame.size.height);
-  [self addSubview:_userNameLabel];
+  [_photoLocationLabel sizeToFit];
+  
+  CGFloat x = CGRectGetMaxX(_userProfileImageView.frame) + CELL_HEADER_HORIZONTAL_INSET;
 
+  if (_photoLocationLabel.text) {
+    
+    _userNameLabel.frame = CGRectMake(x,
+                                      CELL_HEADER_HEIGHT / 2 - _userNameLabel.frame.size.height,
+                                      _userNameLabel.frame.size.width,
+                                      _userNameLabel.frame.size.height);
+    _photoLocationLabel.frame = CGRectMake(x,
+                                           CELL_HEADER_HEIGHT / 2,
+                                           _photoLocationLabel.frame.size.width,
+                                           _photoLocationLabel.frame.size.height);
+  } else {
+    _userNameLabel.frame = CGRectMake(x,
+                                      (CELL_HEADER_HEIGHT - _userNameLabel.frame.size.height) / 2,
+                                      _userNameLabel.frame.size.width,
+                                      _userNameLabel.frame.size.height);
+  }
+
+  [self addSubview:_userNameLabel];
+  [self addSubview:_photoLocationLabel];
   
   [_photoTimeIntervalSincePostLabel sizeToFit];
   _photoTimeIntervalSincePostLabel.frame = CGRectMake(self.bounds.size.width - _photoTimeIntervalSincePostLabel.frame.size.width - CELL_HEADER_HORIZONTAL_INSET,
@@ -97,7 +123,7 @@
   _photoImageView.frame = CGRectMake(0,
                                      CELL_HEADER_HEIGHT,
                                      self.bounds.size.width,
-                                     self.bounds.size.width - 3 * CELL_HEADER_HEIGHT);
+                                     self.bounds.size.width - 1 * CELL_HEADER_HEIGHT);
   [self addSubview:_photoImageView];
   
   // bottom of cell
@@ -124,6 +150,7 @@
   [super prepareForReuse];
   
   // remove images so that the old content doesn't appear before the new content is loaded
+  _photoDictionaryRepresentation        = nil;
   _userProfileImageView.image           = nil;
   _photoImageView.image                 = nil;
   
@@ -143,6 +170,8 @@
 
 - (void)updateCellWithPhotoDictionary:(NSDictionary *)photoDictionary
 {
+  _photoDictionaryRepresentation    = photoDictionary;
+  
   // async download of photo
   FlickrKit *fk                     = [FlickrKit sharedFlickrKit];
   NSURL *photoURL                   = [fk photoURLForSize:FKPhotoSizeLarge1024 fromPhotoDictionary:photoDictionary];
@@ -167,6 +196,15 @@
   _networkOp                       = [fk call:photoInfo completion:^(NSDictionary *response, NSError *error) {
     if (response) {
       if (!error) {
+        
+        // photo location
+        NSDictionary *photoLocationDictionary = [response valueForKeyPath:@"photo.location"];
+        NSString *photoLocationString         = [self locationStringFromPhotoLocationDictionary:photoLocationDictionary];
+        
+        // photo post age
+        NSString *elapsedTimeString = [response valueForKeyPath:@"photo.dateuploaded"];
+        NSString *photoPostTimeString = [self elapsedTimeStringSinceDate:elapsedTimeString];
+        
         dispatch_async(dispatch_get_main_queue(), ^{
           
           // author name
@@ -175,40 +213,14 @@
           // photo info
           _photoDescriptionLabel.text = [response valueForKeyPath:@"photo.description._content"];
           
+          // photo location
+          _photoLocationLabel.text = photoLocationString;
+          
           // photo post age
-          NSTimeInterval postTime = [[response valueForKeyPath:@"photo.dateuploaded"] floatValue];
-          NSDate *postDate        = [NSDate dateWithTimeIntervalSince1970:postTime];
-          NSDate *nowDate         = [NSDate date];
-          
-          NSCalendar *calendar    = [NSCalendar currentCalendar];
-          [calendar rangeOfUnit:NSCalendarUnitDay startDate:&postDate interval:NULL forDate:postDate];
-          [calendar rangeOfUnit:NSCalendarUnitDay startDate:&nowDate interval:NULL forDate:nowDate];
-          
-          NSDateComponents *diffS = [calendar components:NSCalendarUnitSecond fromDate:postDate toDate:nowDate options:0];
-          NSDateComponents *diffM = [calendar components:NSCalendarUnitMinute fromDate:postDate toDate:nowDate options:0];
-          NSDateComponents *diffH = [calendar components:NSCalendarUnitHour fromDate:postDate toDate:nowDate options:0];
-          NSDateComponents *diffD = [calendar components:NSCalendarUnitDay fromDate:postDate toDate:nowDate options:0];
-          
-//          NSLog(@"%lu %lu %lu %lu", [diffS second], [diffM minute], [diffH hour], [diffD day]);
-          
-          NSString *elapsedTime;
-          
-          if ([diffD day] > 0) {
-            elapsedTime = [NSString stringWithFormat:@"%lud", (long)[diffD day]];
-          } else if ([diffH hour] > 0) {
-            elapsedTime = [NSString stringWithFormat:@"%luh", (long)[diffH hour]];
-          } else if ([diffM minute] > 0) {
-            elapsedTime = [NSString stringWithFormat:@"%lum", (long)[diffM minute]];
-          } else if ([diffS second] > 0) {
-            elapsedTime = [NSString stringWithFormat:@"%lus", (long)[diffS second]];
+          if (!elapsedTimeString) {
+            NSLog(@"ERROR: %@", [response valueForKeyPath:@"photo"]);
           }
-          
-//          // remove the "s" if "1 days", etc
-//          if (elapsedTime && [[elapsedTime substringToIndex:1] isEqualToString:@"1"] ) {
-//            elapsedTime = [elapsedTime substringToIndex:[elapsedTime length]-1];
-//          }
-          
-          _photoTimeIntervalSincePostLabel.text = elapsedTime;
+          _photoTimeIntervalSincePostLabel.text = photoPostTimeString;
           
           [self setNeedsLayout];
         });
@@ -235,6 +247,84 @@
   [_buddyIconDownloadSessionTask resume];
   
   
+}
+
+
+#pragma mark - Helper Methods
+
+- (nullable NSString *)locationStringFromPhotoLocationDictionary:(NSDictionary *)photoLocationDictionary
+{
+  // early return if no location info
+  if (!photoLocationDictionary)
+  {
+    return nil;
+  }
+  
+  NSString *country       = [photoLocationDictionary valueForKeyPath:@"country._content"];
+  NSString *county        = [photoLocationDictionary valueForKeyPath:@"county._content"];
+  NSString *locality      = [photoLocationDictionary valueForKeyPath:@"locality._content"];
+  NSString *neighbourhood = [photoLocationDictionary valueForKeyPath:@"neighbourhood._content"];
+  NSString *region        = [photoLocationDictionary valueForKeyPath:@"region._content"];
+
+  NSString *locationString;
+
+  if (neighbourhood) {
+    locationString = [NSString stringWithFormat:@"%@", neighbourhood];
+  } else if (locality && county) {
+    locationString = [NSString stringWithFormat:@"%@, %@", locality, county];
+  } else if (region) {
+    locationString = [NSString stringWithFormat:@"%@, %@", region, country];
+  } else if (country) {
+    locationString = [NSString stringWithFormat:@"%@", country];
+  } else {
+    locationString = @"ERROR";
+  }
+  
+//  NSLog(@"%@", photoLocationDictionary);
+//  NSLog(@"%@, %@, %@, %@, %@", neighbourhood, locality, county, region, country);
+//  NSLog(@"%@", locationString);
+
+  return locationString;
+}
+
+- (NSString *)elapsedTimeStringSinceDate:(NSString *)stringWithTimeIntervalSince1970
+{
+  // early return if no post date string
+  if (!stringWithTimeIntervalSince1970)
+  {
+    return @"NO POST DATE";
+  }
+  
+  NSTimeInterval postInterval = [stringWithTimeIntervalSince1970 floatValue];
+  NSDate *postDate            = [NSDate dateWithTimeIntervalSince1970:postInterval];
+  NSDate *currentDate         = [NSDate date];
+  
+  NSCalendar *calendar        = [NSCalendar currentCalendar];
+  [calendar rangeOfUnit:NSCalendarUnitDay startDate:&postDate    interval:NULL forDate:postDate];
+  [calendar rangeOfUnit:NSCalendarUnitDay startDate:&currentDate interval:NULL forDate:currentDate];
+  
+  NSUInteger seconds = [[calendar components:NSCalendarUnitSecond fromDate:postDate toDate:currentDate options:0] second];
+  NSUInteger minutes = [[calendar components:NSCalendarUnitMinute fromDate:postDate toDate:currentDate options:0] minute];
+  NSUInteger hours   = [[calendar components:NSCalendarUnitHour   fromDate:postDate toDate:currentDate options:0] hour];
+  NSUInteger days    = [[calendar components:NSCalendarUnitDay    fromDate:postDate toDate:currentDate options:0] day];
+
+  NSString *elapsedTime;
+  
+  if (days > 7) {
+    elapsedTime = [NSString stringWithFormat:@"%luw", (long)ceil(days/7.0)];
+  } else if (days > 0) {
+    elapsedTime = [NSString stringWithFormat:@"%lud", (long)days];
+  } else if (hours > 0) {
+    elapsedTime = [NSString stringWithFormat:@"%luh", (long)hours];
+  } else if (minutes > 0) {
+    elapsedTime = [NSString stringWithFormat:@"%lum", (long)minutes];
+  } else if (seconds > 0) {
+    elapsedTime = [NSString stringWithFormat:@"%lus", (long)seconds];
+  } else {
+    elapsedTime = @"ERROR";
+  }
+
+  return elapsedTime;
 }
 
 @end

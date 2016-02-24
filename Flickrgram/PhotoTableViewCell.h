@@ -8,6 +8,14 @@
 
 #import <UIKit/UIKit.h>
 
+@interface PhotoTableViewCellProtocol : NSObject
+- (void)userProfileWasTouched;
+- (void)photoLocationWasTouched;
+- (void)photoWasTouched;
+- (void)photoLikesWasTouched;
+@end
+
+
 @interface PhotoTableViewCell : UITableViewCell
 
 - (void)updateCellWithPhotoDictionary:(NSString *)photoURL;
