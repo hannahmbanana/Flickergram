@@ -9,6 +9,8 @@
 #import "PhotoTableViewCell.h"
 #import "UIImage+UIImage_Additions.h"
 #import "FlickrKit.h"
+#import "PINImageView+PINRemoteImage.h"
+#import "PINButton+PINRemoteImage.h"
 
 
 #define CELL_HEADER_HEIGHT 50
@@ -17,9 +19,14 @@
 
 @implementation PhotoTableViewCell
 {
+  UIButton     *_userProfileImageBtn;
   UIImageView  *_userProfileImageView;
+  
   UILabel      *_userNameLabel;
+  
   UILabel      *_photoLocationLabel;
+  UIButton     *_photoLocationBtn;
+
   UILabel      *_photoTimeIntervalSincePostLabel;
   
   UIImageView  *_photoImageView;
@@ -29,6 +36,7 @@
   UILabel      *_photoCommentsLabel;
   
   NSDictionary              *_photoDictionaryRepresentation;
+  NSDictionary              *_photoInfoDictionaryRepresentation;
   
   NSURLSessionTask          *_photoDownloadSessionTask;
   NSURLSessionTask          *_buddyIconDownloadSessionTask;
@@ -48,7 +56,11 @@
   self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
   
   if (self) {
-      
+    
+    _userProfileImageBtn                       = [UIButton buttonWithType:UIButtonTypeCustom];
+    [_userProfileImageBtn addTarget:self action:@selector(userProfileImageTouched) forControlEvents:UIControlEventTouchUpInside];
+    _userProfileImageBtn.adjustsImageWhenHighlighted = NO;
+    
     _userProfileImageView                      = [[UIImageView alloc] init];
     
     _userNameLabel                             = [[UILabel alloc] init];
@@ -57,11 +69,18 @@
     _photoLocationLabel                        = [[UILabel alloc] init];
     _photoLocationLabel.font                   = [_photoLocationLabel.font fontWithSize:floorf(USER_IMAGE_HEIGHT/2)-1];
     
+    _photoLocationBtn                          = [UIButton buttonWithType:UIButtonTypeCustom];
+    _photoLocationLabel.font                   = _userNameLabel.font;
+    
+    [_photoLocationBtn setTitleColor:self.tintColor forState:UIControlStateNormal];
+    [_photoLocationBtn addTarget:self action:@selector(photoLocationWasTouched) forControlEvents:UIControlEventTouchUpInside];
+    
     _photoTimeIntervalSincePostLabel           = [[UILabel alloc] init];
     _photoTimeIntervalSincePostLabel.font      = [_photoTimeIntervalSincePostLabel.font fontWithSize:floorf(USER_IMAGE_HEIGHT/2)-1];
     _photoTimeIntervalSincePostLabel.textColor = [UIColor lightGrayColor];
 
     _photoImageView                            = [[UIImageView alloc] init];
+    [_photoImageView setPin_updateWithProgress:YES];
     
     // make the UIImage fill the UIImageView correctly
     _photoImageView.clipsToBounds              = YES;
@@ -80,27 +99,30 @@
   [super layoutSubviews];
   
   // top of cell
-  _userProfileImageView.frame = CGRectMake(CELL_HEADER_HORIZONTAL_INSET,
+  _userProfileImageBtn.frame = CGRectMake(CELL_HEADER_HORIZONTAL_INSET,
                                            (CELL_HEADER_HEIGHT - USER_IMAGE_HEIGHT) / 2,
                                            USER_IMAGE_HEIGHT,
                                            USER_IMAGE_HEIGHT);
-  [self addSubview:_userProfileImageView];
+  [self addSubview:_userProfileImageBtn];
 
   [_userNameLabel sizeToFit];
   [_photoLocationLabel sizeToFit];
-  
-  CGFloat x = CGRectGetMaxX(_userProfileImageView.frame) + CELL_HEADER_HORIZONTAL_INSET;
+  [_photoLocationBtn sizeToFit];
 
-  if (_photoLocationLabel.text) {
+  
+  CGFloat x = CGRectGetMaxX(_userProfileImageBtn.frame) + CELL_HEADER_HORIZONTAL_INSET;
+
+  if (_photoLocationBtn.titleLabel.text) {
     
     _userNameLabel.frame = CGRectMake(x,
                                       CELL_HEADER_HEIGHT / 2 - _userNameLabel.frame.size.height,
                                       _userNameLabel.frame.size.width,
                                       _userNameLabel.frame.size.height);
-    _photoLocationLabel.frame = CGRectMake(x,
+    
+    _photoLocationBtn.frame = CGRectMake(x,
                                            CELL_HEADER_HEIGHT / 2,
-                                           _photoLocationLabel.frame.size.width,
-                                           _photoLocationLabel.frame.size.height);
+                                           _photoLocationBtn.frame.size.width,
+                                           _photoLocationBtn.frame.size.height);
   } else {
     _userNameLabel.frame = CGRectMake(x,
                                       (CELL_HEADER_HEIGHT - _userNameLabel.frame.size.height) / 2,
@@ -109,7 +131,7 @@
   }
 
   [self addSubview:_userNameLabel];
-  [self addSubview:_photoLocationLabel];
+  [self addSubview:_photoLocationBtn];
   
   [_photoTimeIntervalSincePostLabel sizeToFit];
   _photoTimeIntervalSincePostLabel.frame = CGRectMake(self.bounds.size.width - _photoTimeIntervalSincePostLabel.frame.size.width - CELL_HEADER_HORIZONTAL_INSET,
@@ -150,13 +172,16 @@
   [super prepareForReuse];
   
   // remove images so that the old content doesn't appear before the new content is loaded
+  [_userProfileImageBtn setBackgroundImage:nil forState:UIControlStateSelected];
+  [_userProfileImageBtn setBackgroundImage:nil forState:UIControlStateNormal];
+  
   _photoDictionaryRepresentation        = nil;
   _userProfileImageView.image           = nil;
   _photoImageView.image                 = nil;
   
   // remove label text
   _userNameLabel.text                   = nil;
-  _photoLocationLabel.text              = nil;
+  _photoLocationBtn.titleLabel.text     = nil;
   _photoTimeIntervalSincePostLabel.text = nil;
   
   // cancel network operations
@@ -170,24 +195,35 @@
 
 - (void)updateCellWithPhotoDictionary:(NSDictionary *)photoDictionary
 {
-  _photoDictionaryRepresentation    = photoDictionary;
+  // author name
+  _userNameLabel.text = [photoDictionary objectForKey:@"ownername"];
   
-  // async download of photo
-  FlickrKit *fk                     = [FlickrKit sharedFlickrKit];
-  NSURL *photoURL                   = [fk photoURLForSize:FKPhotoSizeLarge1024 fromPhotoDictionary:photoDictionary];
-  NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
-  NSURLSession *session             = [NSURLSession sessionWithConfiguration:config];
-  _photoDownloadSessionTask         = [session dataTaskWithURL:photoURL completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+  // photo post age
+  NSString *elapsedTimeString = [photoDictionary objectForKey:@"dateupload"];
+  NSString *photoPostTimeString = [self elapsedTimeStringSinceDate:elapsedTimeString];
+  // photo post age
+  if (!elapsedTimeString) {
+    NSLog(@"ERROR: %@", photoDictionary);
+  }
+  _photoTimeIntervalSincePostLabel.text = photoPostTimeString;
+
+  
+  FlickrKit *fk   = [FlickrKit sharedFlickrKit];
+
+  // async download of photo using PINRemoteImage
+  NSURL *photoURL = [fk photoURLForSize:FKPhotoSizeLarge1024 fromPhotoDictionary:photoDictionary];
+  
+  [_photoImageView pin_setImageFromURL:photoURL];
+  
+  // async download of buddy icon using PINRemoteImage
+  NSURL *buddyUrl = [fk buddyIconURLForUser:[photoDictionary valueForKeyPath:@"owner"]];
+  
+  [_userProfileImageBtn pin_setImageFromURL:buddyUrl processorKey:@"rounded" processor:^UIImage * _Nullable(PINRemoteImageManagerResult * _Nonnull result, NSUInteger * _Nonnull cost) {
     
-    if (response) {
-      if (!error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-          _photoImageView.image = [[UIImage alloc] initWithData:data];
-        });
-      }
-    }
+    // make the buddy icon image round
+    return [result.image makeRoundImage];
   }];
-  [_photoDownloadSessionTask resume];
+  
 
   // async download of photo info
   FKFlickrPhotosGetInfo *photoInfo = [[FKFlickrPhotosGetInfo alloc] init];
@@ -197,56 +233,26 @@
     if (response) {
       if (!error) {
         
+        _photoInfoDictionaryRepresentation = [response valueForKeyPath:@"photo"];;
+        
         // photo location
         NSDictionary *photoLocationDictionary = [response valueForKeyPath:@"photo.location"];
         NSString *photoLocationString         = [self locationStringFromPhotoLocationDictionary:photoLocationDictionary];
         
-        // photo post age
-        NSString *elapsedTimeString = [response valueForKeyPath:@"photo.dateuploaded"];
-        NSString *photoPostTimeString = [self elapsedTimeStringSinceDate:elapsedTimeString];
-        
         dispatch_async(dispatch_get_main_queue(), ^{
           
-          // author name
-          _userNameLabel.text = [response valueForKeyPath:@"photo.owner.username"];
-
           // photo info
           _photoDescriptionLabel.text = [response valueForKeyPath:@"photo.description._content"];
           
           // photo location
-          _photoLocationLabel.text = photoLocationString;
+          [_photoLocationBtn setTitle:photoLocationString forState:UIControlStateNormal];
           
-          // photo post age
-          if (!elapsedTimeString) {
-            NSLog(@"ERROR: %@", [response valueForKeyPath:@"photo"]);
-          }
-          _photoTimeIntervalSincePostLabel.text = photoPostTimeString;
           
           [self setNeedsLayout];
         });
       }
     }
   }];
-
-  // async download of buddy icon
-  NSURL *buddyUrl                   = [fk buddyIconURLForUser:[photoDictionary valueForKeyPath:@"owner"]];
-  config                            = [NSURLSessionConfiguration ephemeralSessionConfiguration];
-  session                           = [NSURLSession sessionWithConfiguration:config];
-  _buddyIconDownloadSessionTask     = [session dataTaskWithURL:buddyUrl completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-    
-    if (response) {
-      if (!error) {
-        UIImage *roundedBuddyIcon = [[[UIImage alloc] initWithData:data] makeRoundImage];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-          _userProfileImageView.image = roundedBuddyIcon;
-        });
-      }
-    }
-  }];
-  [_buddyIconDownloadSessionTask resume];
-  
-  
 }
 
 
@@ -325,6 +331,22 @@
   }
 
   return elapsedTime;
+}
+
+#pragma mark - Gesture Handling
+
+- (void)userProfileImageTouched
+{
+  NSString *userID = [_photoDictionaryRepresentation valueForKeyPath:@"owner"];
+  [self.delegate userProfileWasTouchedWithUserID:userID];
+}
+
+- (void)photoLocationWasTouched
+{
+  CLLocationDegrees latitude = [[_photoInfoDictionaryRepresentation valueForKeyPath:@"location.latitude"] integerValue];
+  CLLocationDegrees longitude = [[_photoInfoDictionaryRepresentation valueForKeyPath:@"location.longitude"] integerValue];
+  CLLocationCoordinate2D photoCoordinates = CLLocationCoordinate2DMake(latitude, longitude);
+  [self.delegate photoLocationWasTouchedWithCoordinate:photoCoordinates];
 }
 
 @end

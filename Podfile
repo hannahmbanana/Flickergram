@@ -4,6 +4,7 @@
 # use_frameworks!
 
 target 'Flickrgram' do
-  pod ‘FlickrKit’
+  pod ‘FlickrKit’, :inhibit_warnings => true
+  pod 'PINRemoteImage', :inhibit_warnings => true
 end
 

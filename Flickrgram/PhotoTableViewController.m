@@ -7,8 +7,13 @@
 //
 
 #import "PhotoTableViewController.h"
+//#import "UserProfileCollectionViewController.h"
 #import "FlickrKit.h"
 #import "PhotoTableViewCell.h"
+#import "LocationViewController.h"
+
+@interface PhotoTableViewController () <PhotoTableViewCellProtocol>
+@end
 
 @implementation PhotoTableViewController
 {
@@ -26,6 +31,10 @@
   if (self) {
     
     self.tableView.allowsSelection = NO;
+    
+    // enable pull-to-refresh
+    self.refreshControl = [[UIRefreshControl alloc] init];
+    [self.refreshControl addTarget:self action:@selector(downloadInterestingImages) forControlEvents:UIControlEventValueChanged];
     
     // register custom UITableViewCell subclass
     [self.tableView registerClass:[PhotoTableViewCell class] forCellReuseIdentifier:@"photoCell"];
@@ -48,8 +57,8 @@
 - (void)downloadInterestingImages
 {
   FKFlickrInterestingnessGetList *interesting = [[FKFlickrInterestingnessGetList alloc] init];
-  interesting.per_page = @"100";
-  interesting.extras = @"<code>description</code>, <code>date_upload</code>, <code>owner_name</code>, <code>geo</code>, <code>tags</code>, <code>machine_tags</code>, <code>url_q</code>";
+  interesting.per_page = @"5";
+  interesting.extras = @"description, date_upload, owner_name, geo, tags, machine_tags, url_q";
   
   _todaysInterestingOp = [[FlickrKit sharedFlickrKit] call:interesting completion:^(NSDictionary *response, NSError *error) {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -65,8 +74,13 @@
         // reload table data once _photos data model is populated
         [self.tableView reloadData];
       }
-    });				
+      
+      
+    });
   }];
+  
+  // end spinner
+  [self.refreshControl endRefreshing];
 }
 
 
@@ -91,20 +105,33 @@
   // create a new PhotoTableViewCell if no reusable ones are available in queue
   if (!cell) {
     cell = [[PhotoTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"photoCell"];
+    cell.delegate = self;
   }
   
   // configure the cell for the appropriate photo
+  cell.delegate = self;
   [cell updateCellWithPhotoDictionary:[_photos objectAtIndex:indexPath.row]];
   
   return cell;
 }
 
 
-#pragma mark - UIScrollViewDelegate
-//
-//- (void)scrollViewDidScroll:(UIScrollView *)scrollView
-//{
+#pragma mark - PhotoTableViewCellProtocol
+
+- (void)userProfileWasTouchedWithUserID:(NSString *)userID;
+{
+//  UserProfileCollectionViewController *userProfileView = [[UserProfileCollectionViewController alloc] initWithUserID:userID];
+//  userProfileView.view.backgroundColor = [UIColor redColor];
 //  
-//}
+//  [self.navigationController pushViewController:userProfileView animated:YES];
+}
+
+- (void)photoLocationWasTouchedWithCoordinate:(CLLocationCoordinate2D)coordiantes
+{
+  LocationViewController *locationVC = [[LocationViewController alloc] init];
+  locationVC.coordinate = coordiantes;
+  
+  [self.navigationController pushViewController:locationVC animated:YES];
+}
 
 @end

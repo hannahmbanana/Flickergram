@@ -14,6 +14,9 @@
 		768C1E051C7461380001EAD1 /* PhotoTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 768C1E041C7461380001EAD1 /* PhotoTableViewController.m */; };
 		768C1E081C7463450001EAD1 /* PhotoTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 768C1E071C7463450001EAD1 /* PhotoTableViewCell.m */; };
 		768C1E0B1C75AAFB0001EAD1 /* UIImage+UIImage_Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 768C1E0A1C75AAFB0001EAD1 /* UIImage+UIImage_Additions.m */; };
+		768C1E0E1C7E7DF20001EAD1 /* UserProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 768C1E0D1C7E7DF20001EAD1 /* UserProfileViewController.m */; };
+		768C1E141C7E84020001EAD1 /* UserProfileCollectionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 768C1E131C7E84020001EAD1 /* UserProfileCollectionView.m */; };
+		768C1E171C80F2550001EAD1 /* LocationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 768C1E161C80F2550001EAD1 /* LocationViewController.m */; };
 		76B3B32B98E1FF27C019CEC8 /* libPods-Flickrgram.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B00BEEEFD3C8A3511817FAA9 /* libPods-Flickrgram.a */; };
 /* End PBXBuildFile section */
 
@@ -32,6 +35,12 @@
 		768C1E071C7463450001EAD1 /* PhotoTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoTableViewCell.m; sourceTree = "<group>"; };
 		768C1E091C75AAFB0001EAD1 /* UIImage+UIImage_Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+UIImage_Additions.h"; sourceTree = "<group>"; };
 		768C1E0A1C75AAFB0001EAD1 /* UIImage+UIImage_Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+UIImage_Additions.m"; sourceTree = "<group>"; };
+		768C1E0C1C7E7DF20001EAD1 /* UserProfileViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserProfileViewController.h; sourceTree = "<group>"; };
+		768C1E0D1C7E7DF20001EAD1 /* UserProfileViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserProfileViewController.m; sourceTree = "<group>"; };
+		768C1E121C7E84020001EAD1 /* UserProfileCollectionView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserProfileCollectionView.h; sourceTree = "<group>"; };
+		768C1E131C7E84020001EAD1 /* UserProfileCollectionView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserProfileCollectionView.m; sourceTree = "<group>"; };
+		768C1E151C80F2550001EAD1 /* LocationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocationViewController.h; sourceTree = "<group>"; };
+		768C1E161C80F2550001EAD1 /* LocationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationViewController.m; sourceTree = "<group>"; };
 		86E62D171C0AB31E923BAB75 /* Pods-Flickrgram.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Flickrgram.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Flickrgram/Pods-Flickrgram.debug.xcconfig"; sourceTree = "<group>"; };
 		B00BEEEFD3C8A3511817FAA9 /* libPods-Flickrgram.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Flickrgram.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -110,6 +119,8 @@
 		768C1E001C745C530001EAD1 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				768C1E121C7E84020001EAD1 /* UserProfileCollectionView.h */,
+				768C1E131C7E84020001EAD1 /* UserProfileCollectionView.m */,
 				768C1E061C7463450001EAD1 /* PhotoTableViewCell.h */,
 				768C1E071C7463450001EAD1 /* PhotoTableViewCell.m */,
 			);
@@ -121,6 +132,10 @@
 			children = (
 				768C1E031C7461380001EAD1 /* PhotoTableViewController.h */,
 				768C1E041C7461380001EAD1 /* PhotoTableViewController.m */,
+				768C1E0C1C7E7DF20001EAD1 /* UserProfileViewController.h */,
+				768C1E0D1C7E7DF20001EAD1 /* UserProfileViewController.m */,
+				768C1E151C80F2550001EAD1 /* LocationViewController.h */,
+				768C1E161C80F2550001EAD1 /* LocationViewController.m */,
 			);
 			name = Controller;
 			sourceTree = "<group>";
@@ -257,6 +272,9 @@
 				768C1E081C7463450001EAD1 /* PhotoTableViewCell.m in Sources */,
 				768C1DED1C745A470001EAD1 /* AppDelegate.m in Sources */,
 				768C1E051C7461380001EAD1 /* PhotoTableViewController.m in Sources */,
+				768C1E171C80F2550001EAD1 /* LocationViewController.m in Sources */,
+				768C1E0E1C7E7DF20001EAD1 /* UserProfileViewController.m in Sources */,
+				768C1E141C7E84020001EAD1 /* UserProfileCollectionView.m in Sources */,
 				768C1DEA1C745A470001EAD1 /* main.m in Sources */,
 				768C1E0B1C75AAFB0001EAD1 /* UIImage+UIImage_Additions.m in Sources */,
 			);

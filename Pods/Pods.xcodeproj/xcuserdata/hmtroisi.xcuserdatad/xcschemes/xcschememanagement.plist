@@ -4,7 +4,22 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
+		<key>FLAnimatedImage.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>FlickrKit.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>PINCache.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>PINRemoteImage.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -17,12 +32,27 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>1A79BA86DB198181905CBBFC1F1E6701</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>373EAA51049355BE5FE80C53B351E65C</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>FC3C08B18A07EFF6533108ABC1618BD8</key>
+		<key>7E1AAD8379EDCDB74BB5AFA56BCA333E</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>E5BD7DB5429C9BFBBE579170D8516936</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>F959808AA8CF6544930DC79DB377C884</key>
 		<dict>
 			<key>primary</key>
 			<true/>

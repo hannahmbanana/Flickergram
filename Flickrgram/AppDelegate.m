@@ -31,9 +31,46 @@
   
   self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
   
+  // create Home Feed viewController & navController
   PhotoTableViewController *viewController = [[PhotoTableViewController alloc] init];
-  UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:viewController];
-  self.window.rootViewController = navController;
+  UINavigationController *homeFeedNavCtrl  = [[UINavigationController alloc] initWithRootViewController:viewController];
+  homeFeedNavCtrl.tabBarItem               = [[UITabBarItem alloc] initWithTitle:@"Home Feed"
+                                                                           image:[UIImage imageNamed:@"home"]
+                                                                             tag:0];
+  
+  // create Profile viewController & navController
+  UIViewController *VC                         = [[UIViewController alloc] init];
+  VC.view.backgroundColor                      = [UIColor purpleColor];
+  
+  UINavigationController *profileNavController = [[UINavigationController alloc] initWithRootViewController:VC];
+  profileNavController.tabBarItem              = [[UITabBarItem alloc] initWithTitle:@"Profile"
+                                                                               image:[UIImage imageNamed:@"profile"]
+                                                                                 tag:0];
+
+  // create Photo Upload viewController & navController
+  UIViewController *VC1                      = [[UIViewController alloc] init];
+  VC1.view.backgroundColor                   = [UIColor redColor];
+  
+  UINavigationController *photoUploadNavCtrl = [[UINavigationController alloc] initWithRootViewController:VC1];
+  photoUploadNavCtrl.tabBarItem              = [[UITabBarItem alloc] initWithTitle:@"Upload"
+                                                                             image:[UIImage imageNamed:@"camera"]
+                                                                               tag:0];
+
+  // create Photos Near Me viewController & navController
+  UIViewController *VC2                      = [[UIViewController alloc] init];
+  VC2.view.backgroundColor                   = [UIColor greenColor];
+  
+  UINavigationController *photoNearMeNavCtrl = [[UINavigationController alloc] initWithRootViewController:VC2];
+  photoNearMeNavCtrl.tabBarItem              = [[UITabBarItem alloc] initWithTitle:@"Near Me"
+                                                                             image:[UIImage imageNamed:@"earth"]
+                                                                               tag:0];
+  
+  // create UITabBarController and add viewControllers
+  UITabBarController *tabBarController    = [[UITabBarController alloc] init];
+  tabBarController.viewControllers        = @[homeFeedNavCtrl, photoNearMeNavCtrl, photoUploadNavCtrl, profileNavController];
+  tabBarController.selectedViewController = homeFeedNavCtrl;
+  
+  self.window.rootViewController = tabBarController;
   
   [self.window makeKeyAndVisible];
   

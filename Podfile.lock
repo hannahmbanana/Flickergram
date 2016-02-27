@@ -1,10 +1,23 @@
 PODS:
+  - FLAnimatedImage (1.0.12)
   - FlickrKit (1.0.7)
+  - PINCache (2.2.1)
+  - PINRemoteImage (2.0.1):
+    - PINRemoteImage/FLAnimatedImage (= 2.0.1)
+  - PINRemoteImage/Core (2.0.1):
+    - PINCache (>= 2.1)
+  - PINRemoteImage/FLAnimatedImage (2.0.1):
+    - FLAnimatedImage (>= 1.0)
+    - PINRemoteImage/Core
 
 DEPENDENCIES:
   - FlickrKit
+  - PINRemoteImage
 
 SPEC CHECKSUMS:
+  FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
   FlickrKit: 907da468d679233a27d66dd88c6dcd024074b0f0
+  PINCache: ed1f07a85cc6fbf488f8ecc1980b07b49b7b85b5
+  PINRemoteImage: 6feb6da5db9a6cc5e3b9006c8f7b749a7e61be49
 
 COCOAPODS: 0.39.0

@@ -7,16 +7,18 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <CoreLocation/CLLocation.h>
 
-@interface PhotoTableViewCellProtocol : NSObject
-- (void)userProfileWasTouched;
-- (void)photoLocationWasTouched;
-- (void)photoWasTouched;
-- (void)photoLikesWasTouched;
+@protocol PhotoTableViewCellProtocol <NSObject>
+- (void)userProfileWasTouchedWithUserID:(NSString *)userID;
+- (void)photoLocationWasTouchedWithCoordinate:(CLLocationCoordinate2D)coordiantes;
+//- (void)photoLikesWasTouched;
 @end
 
 
 @interface PhotoTableViewCell : UITableViewCell
+
+@property (nonatomic, strong, readwrite) id<PhotoTableViewCellProtocol> delegate;
 
 - (void)updateCellWithPhotoDictionary:(NSString *)photoURL;
 
