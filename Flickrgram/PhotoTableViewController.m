@@ -7,8 +7,8 @@
 //
 
 #import "PhotoTableViewController.h"
-//#import "UserProfileCollectionViewController.h"
 #import "FlickrKit.h"
+#import "PhotoModel.h"
 #import "PhotoTableViewCell.h"
 #import "LocationViewController.h"
 
@@ -18,7 +18,7 @@
 @implementation PhotoTableViewController
 {
   FKFlickrNetworkOperation  *_todaysInterestingOp;
-  NSArray                   *_photos;
+  NSArray                   *_photos;                 // of PhotoModel Objects
 }
 
 
@@ -30,9 +30,10 @@
   
   if (self) {
     
+    // disable tableView cell selection
     self.tableView.allowsSelection = NO;
     
-    // enable pull-to-refresh
+    // enable tableView pull-to-refresh & add target-action pair
     self.refreshControl = [[UIRefreshControl alloc] init];
     [self.refreshControl addTarget:self action:@selector(downloadInterestingImages) forControlEvents:UIControlEventValueChanged];
     
@@ -42,11 +43,9 @@
     // start downloading interesting images for feed
     [self downloadInterestingImages];
     
-    // navigation bar
+    // navBar title
     self.navigationItem.title = @"flickrgram";
-    
-    [self.navigationController.navigationBar setBarTintColor:[UIColor purpleColor]];
-  }
+      }
   
   return self;
 }
@@ -67,20 +66,20 @@
         NSMutableArray *photoDictionaries = [NSMutableArray array];
         
         for (NSDictionary *photoDictionary in [response valueForKeyPath:@"photos.photo"]) {
-          [photoDictionaries addObject:photoDictionary];
+          
+          PhotoModel *photo = [[PhotoModel alloc] initWithFlickPhoto:photoDictionary];
+          [photoDictionaries addObject:photo];
         }
         _photos = photoDictionaries;
         
         // reload table data once _photos data model is populated
         [self.tableView reloadData];
       }
-      
-      
+
+      // end spinner
+      [self.refreshControl endRefreshing];
     });
   }];
-  
-  // end spinner
-  [self.refreshControl endRefreshing];
 }
 
 
@@ -110,7 +109,7 @@
   
   // configure the cell for the appropriate photo
   cell.delegate = self;
-  [cell updateCellWithPhotoDictionary:[_photos objectAtIndex:indexPath.row]];
+  [cell updateCellWithPhotoObject:[_photos objectAtIndex:indexPath.row]];
   
   return cell;
 }

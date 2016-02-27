@@ -19,6 +19,8 @@
 
 @implementation PhotoTableViewCell
 {
+  PhotoModel   *_photoModel;
+  
   UIButton     *_userProfileImageBtn;
   UIImageView  *_userProfileImageView;
   
@@ -193,145 +195,32 @@
 
 #pragma mark - Instance Methods
 
-- (void)updateCellWithPhotoDictionary:(NSDictionary *)photoDictionary
+- (void)updateCellWithPhotoObject:(PhotoModel *)photo
 {
-  // author name
-  _userNameLabel.text = [photoDictionary objectForKey:@"ownername"];
+  _photoModel = photo;
   
-  // photo post age
-  NSString *elapsedTimeString = [photoDictionary objectForKey:@"dateupload"];
-  NSString *photoPostTimeString = [self elapsedTimeStringSinceDate:elapsedTimeString];
-  // photo post age
-  if (!elapsedTimeString) {
-    NSLog(@"ERROR: %@", photoDictionary);
-  }
-  _photoTimeIntervalSincePostLabel.text = photoPostTimeString;
-
+  _userNameLabel.text                   = photo.ownerUserProfile.userName;
+  _photoTimeIntervalSincePostLabel.text = photo.uploadDateString;
+  _photoDescriptionLabel.text           = photo.title;
   
-  FlickrKit *fk   = [FlickrKit sharedFlickrKit];
+  [_photoLocationBtn setTitle:photo.location.userFriendlyLocationString forState:UIControlStateNormal];
 
   // async download of photo using PINRemoteImage
-  NSURL *photoURL = [fk photoURLForSize:FKPhotoSizeLarge1024 fromPhotoDictionary:photoDictionary];
-  
-  [_photoImageView pin_setImageFromURL:photoURL];
+  [_photoImageView pin_setImageFromURL:photo.URL];
   
   // async download of buddy icon using PINRemoteImage
-  NSURL *buddyUrl = [fk buddyIconURLForUser:[photoDictionary valueForKeyPath:@"owner"]];
-  
-  [_userProfileImageBtn pin_setImageFromURL:buddyUrl processorKey:@"rounded" processor:^UIImage * _Nullable(PINRemoteImageManagerResult * _Nonnull result, NSUInteger * _Nonnull cost) {
+  [_userProfileImageBtn pin_setImageFromURL:photo.ownerUserProfile.photoURL processorKey:@"rounded" processor:^UIImage * _Nullable(PINRemoteImageManagerResult * _Nonnull result, NSUInteger * _Nonnull cost) {
     
-    // make the buddy icon image round
+    // make user profile image round
     return [result.image makeRoundImage];
-  }];
-  
-
-  // async download of photo info
-  FKFlickrPhotosGetInfo *photoInfo = [[FKFlickrPhotosGetInfo alloc] init];
-  photoInfo.photo_id               = [photoDictionary valueForKeyPath:@"id"];
-  photoInfo.secret                 = [photoDictionary valueForKeyPath:@"secret"];
-  _networkOp                       = [fk call:photoInfo completion:^(NSDictionary *response, NSError *error) {
-    if (response) {
-      if (!error) {
-        
-        _photoInfoDictionaryRepresentation = [response valueForKeyPath:@"photo"];;
-        
-        // photo location
-        NSDictionary *photoLocationDictionary = [response valueForKeyPath:@"photo.location"];
-        NSString *photoLocationString         = [self locationStringFromPhotoLocationDictionary:photoLocationDictionary];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-          
-          // photo info
-          _photoDescriptionLabel.text = [response valueForKeyPath:@"photo.description._content"];
-          
-          // photo location
-          [_photoLocationBtn setTitle:photoLocationString forState:UIControlStateNormal];
-          
-          
-          [self setNeedsLayout];
-        });
-      }
-    }
   }];
 }
 
 
 #pragma mark - Helper Methods
 
-- (nullable NSString *)locationStringFromPhotoLocationDictionary:(NSDictionary *)photoLocationDictionary
-{
-  // early return if no location info
-  if (!photoLocationDictionary)
-  {
-    return nil;
-  }
-  
-  NSString *country       = [photoLocationDictionary valueForKeyPath:@"country._content"];
-  NSString *county        = [photoLocationDictionary valueForKeyPath:@"county._content"];
-  NSString *locality      = [photoLocationDictionary valueForKeyPath:@"locality._content"];
-  NSString *neighbourhood = [photoLocationDictionary valueForKeyPath:@"neighbourhood._content"];
-  NSString *region        = [photoLocationDictionary valueForKeyPath:@"region._content"];
 
-  NSString *locationString;
 
-  if (neighbourhood) {
-    locationString = [NSString stringWithFormat:@"%@", neighbourhood];
-  } else if (locality && county) {
-    locationString = [NSString stringWithFormat:@"%@, %@", locality, county];
-  } else if (region) {
-    locationString = [NSString stringWithFormat:@"%@, %@", region, country];
-  } else if (country) {
-    locationString = [NSString stringWithFormat:@"%@", country];
-  } else {
-    locationString = @"ERROR";
-  }
-  
-//  NSLog(@"%@", photoLocationDictionary);
-//  NSLog(@"%@, %@, %@, %@, %@", neighbourhood, locality, county, region, country);
-//  NSLog(@"%@", locationString);
-
-  return locationString;
-}
-
-- (NSString *)elapsedTimeStringSinceDate:(NSString *)stringWithTimeIntervalSince1970
-{
-  // early return if no post date string
-  if (!stringWithTimeIntervalSince1970)
-  {
-    return @"NO POST DATE";
-  }
-  
-  NSTimeInterval postInterval = [stringWithTimeIntervalSince1970 floatValue];
-  NSDate *postDate            = [NSDate dateWithTimeIntervalSince1970:postInterval];
-  NSDate *currentDate         = [NSDate date];
-  
-  NSCalendar *calendar        = [NSCalendar currentCalendar];
-  [calendar rangeOfUnit:NSCalendarUnitDay startDate:&postDate    interval:NULL forDate:postDate];
-  [calendar rangeOfUnit:NSCalendarUnitDay startDate:&currentDate interval:NULL forDate:currentDate];
-  
-  NSUInteger seconds = [[calendar components:NSCalendarUnitSecond fromDate:postDate toDate:currentDate options:0] second];
-  NSUInteger minutes = [[calendar components:NSCalendarUnitMinute fromDate:postDate toDate:currentDate options:0] minute];
-  NSUInteger hours   = [[calendar components:NSCalendarUnitHour   fromDate:postDate toDate:currentDate options:0] hour];
-  NSUInteger days    = [[calendar components:NSCalendarUnitDay    fromDate:postDate toDate:currentDate options:0] day];
-
-  NSString *elapsedTime;
-  
-  if (days > 7) {
-    elapsedTime = [NSString stringWithFormat:@"%luw", (long)ceil(days/7.0)];
-  } else if (days > 0) {
-    elapsedTime = [NSString stringWithFormat:@"%lud", (long)days];
-  } else if (hours > 0) {
-    elapsedTime = [NSString stringWithFormat:@"%luh", (long)hours];
-  } else if (minutes > 0) {
-    elapsedTime = [NSString stringWithFormat:@"%lum", (long)minutes];
-  } else if (seconds > 0) {
-    elapsedTime = [NSString stringWithFormat:@"%lus", (long)seconds];
-  } else {
-    elapsedTime = @"ERROR";
-  }
-
-  return elapsedTime;
-}
 
 #pragma mark - Gesture Handling
 

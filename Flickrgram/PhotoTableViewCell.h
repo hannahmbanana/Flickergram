@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CLLocation.h>
+#import "PhotoModel.h"
 
 @protocol PhotoTableViewCellProtocol <NSObject>
 - (void)userProfileWasTouchedWithUserID:(NSString *)userID;
@@ -20,6 +21,6 @@
 
 @property (nonatomic, strong, readwrite) id<PhotoTableViewCellProtocol> delegate;
 
-- (void)updateCellWithPhotoDictionary:(NSString *)photoURL;
+- (void)updateCellWithPhotoObject:(PhotoModel *)photo;
 
 @end
