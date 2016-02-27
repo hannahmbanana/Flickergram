@@ -13,7 +13,6 @@
 @protocol PhotoTableViewCellProtocol <NSObject>
 - (void)userProfileWasTouchedWithUserID:(NSString *)userID;
 - (void)photoLocationWasTouchedWithCoordinate:(CLLocationCoordinate2D)coordiantes;
-//- (void)photoLikesWasTouched;
 @end
 
 

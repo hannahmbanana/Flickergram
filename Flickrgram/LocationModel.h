@@ -12,6 +12,7 @@
 @interface LocationModel : NSObject
 
 @property (nonatomic, assign, readonly) CLLocationCoordinate2D coordinates;
+@property (nonatomic, strong, readonly) CLPlacemark            *placemark;
 @property (nonatomic, strong, readonly) NSString               *userFriendlyLocationString;
 
 - (instancetype)init NS_UNAVAILABLE;

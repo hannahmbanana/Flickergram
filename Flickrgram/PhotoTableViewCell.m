@@ -21,13 +21,11 @@
 {
   PhotoModel   *_photoModel;
   
-  UIButton     *_userProfileImageBtn;
   UIImageView  *_userProfileImageView;
   
   UILabel      *_userNameLabel;
   
   UILabel      *_photoLocationLabel;
-  UIButton     *_photoLocationBtn;
 
   UILabel      *_photoTimeIntervalSincePostLabel;
   
@@ -36,14 +34,6 @@
   UILabel      *_photoLikesLabel;
   UILabel      *_photoDescriptionLabel;
   UILabel      *_photoCommentsLabel;
-  
-  NSDictionary              *_photoDictionaryRepresentation;
-  NSDictionary              *_photoInfoDictionaryRepresentation;
-  
-  NSURLSessionTask          *_photoDownloadSessionTask;
-  NSURLSessionTask          *_buddyIconDownloadSessionTask;
-  FKFlickrNetworkOperation  *_networkOp;
-
 }
 
 #pragma mark - Class methods
@@ -59,9 +49,9 @@
   
   if (self) {
     
-    _userProfileImageBtn                       = [UIButton buttonWithType:UIButtonTypeCustom];
-    [_userProfileImageBtn addTarget:self action:@selector(userProfileImageTouched) forControlEvents:UIControlEventTouchUpInside];
-    _userProfileImageBtn.adjustsImageWhenHighlighted = NO;
+    // tap gesture recognizer
+    UITapGestureRecognizer *tgr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(cellWasTapped:)];
+    [self addGestureRecognizer:tgr];
     
     _userProfileImageView                      = [[UIImageView alloc] init];
     
@@ -70,12 +60,6 @@
     
     _photoLocationLabel                        = [[UILabel alloc] init];
     _photoLocationLabel.font                   = [_photoLocationLabel.font fontWithSize:floorf(USER_IMAGE_HEIGHT/2)-1];
-    
-    _photoLocationBtn                          = [UIButton buttonWithType:UIButtonTypeCustom];
-    _photoLocationLabel.font                   = _userNameLabel.font;
-    
-    [_photoLocationBtn setTitleColor:self.tintColor forState:UIControlStateNormal];
-    [_photoLocationBtn addTarget:self action:@selector(photoLocationWasTouched) forControlEvents:UIControlEventTouchUpInside];
     
     _photoTimeIntervalSincePostLabel           = [[UILabel alloc] init];
     _photoTimeIntervalSincePostLabel.font      = [_photoTimeIntervalSincePostLabel.font fontWithSize:floorf(USER_IMAGE_HEIGHT/2)-1];
@@ -101,30 +85,28 @@
   [super layoutSubviews];
   
   // top of cell
-  _userProfileImageBtn.frame = CGRectMake(CELL_HEADER_HORIZONTAL_INSET,
+  _userProfileImageView.frame = CGRectMake(CELL_HEADER_HORIZONTAL_INSET,
                                            (CELL_HEADER_HEIGHT - USER_IMAGE_HEIGHT) / 2,
                                            USER_IMAGE_HEIGHT,
                                            USER_IMAGE_HEIGHT);
-  [self addSubview:_userProfileImageBtn];
+  [self addSubview:_userProfileImageView];
 
   [_userNameLabel sizeToFit];
   [_photoLocationLabel sizeToFit];
-  [_photoLocationBtn sizeToFit];
-
   
-  CGFloat x = CGRectGetMaxX(_userProfileImageBtn.frame) + CELL_HEADER_HORIZONTAL_INSET;
+  CGFloat x = CGRectGetMaxX(_userProfileImageView.frame) + CELL_HEADER_HORIZONTAL_INSET;
 
-  if (_photoLocationBtn.titleLabel.text) {
+  if (_photoLocationLabel.text) {
     
     _userNameLabel.frame = CGRectMake(x,
                                       CELL_HEADER_HEIGHT / 2 - _userNameLabel.frame.size.height,
                                       _userNameLabel.frame.size.width,
                                       _userNameLabel.frame.size.height);
     
-    _photoLocationBtn.frame = CGRectMake(x,
+    _photoLocationLabel.frame = CGRectMake(x,
                                            CELL_HEADER_HEIGHT / 2,
-                                           _photoLocationBtn.frame.size.width,
-                                           _photoLocationBtn.frame.size.height);
+                                           _photoLocationLabel.frame.size.width,
+                                           _photoLocationLabel.frame.size.height);
   } else {
     _userNameLabel.frame = CGRectMake(x,
                                       (CELL_HEADER_HEIGHT - _userNameLabel.frame.size.height) / 2,
@@ -133,7 +115,7 @@
   }
 
   [self addSubview:_userNameLabel];
-  [self addSubview:_photoLocationBtn];
+  [self addSubview:_photoLocationLabel];
   
   [_photoTimeIntervalSincePostLabel sizeToFit];
   _photoTimeIntervalSincePostLabel.frame = CGRectMake(self.bounds.size.width - _photoTimeIntervalSincePostLabel.frame.size.width - CELL_HEADER_HORIZONTAL_INSET,
@@ -174,22 +156,14 @@
   [super prepareForReuse];
   
   // remove images so that the old content doesn't appear before the new content is loaded
-  [_userProfileImageBtn setBackgroundImage:nil forState:UIControlStateSelected];
-  [_userProfileImageBtn setBackgroundImage:nil forState:UIControlStateNormal];
-  
-  _photoDictionaryRepresentation        = nil;
   _userProfileImageView.image           = nil;
   _photoImageView.image                 = nil;
   
   // remove label text
   _userNameLabel.text                   = nil;
-  _photoLocationBtn.titleLabel.text     = nil;
+  _photoLocationLabel.text              = nil;
   _photoTimeIntervalSincePostLabel.text = nil;
   
-  // cancel network operations
-  [_photoDownloadSessionTask cancel];
-  [_buddyIconDownloadSessionTask cancel];
-  [_networkOp cancel];
 }
 
 
@@ -197,19 +171,17 @@
 
 - (void)updateCellWithPhotoObject:(PhotoModel *)photo
 {
-  _photoModel = photo;
-  
+  _photoModel                           = photo;
   _userNameLabel.text                   = photo.ownerUserProfile.userName;
   _photoTimeIntervalSincePostLabel.text = photo.uploadDateString;
   _photoDescriptionLabel.text           = photo.title;
-  
-  [_photoLocationBtn setTitle:photo.location.userFriendlyLocationString forState:UIControlStateNormal];
+  _photoLocationLabel.text              = photo.location.userFriendlyLocationString;
 
   // async download of photo using PINRemoteImage
   [_photoImageView pin_setImageFromURL:photo.URL];
   
   // async download of buddy icon using PINRemoteImage
-  [_userProfileImageBtn pin_setImageFromURL:photo.ownerUserProfile.photoURL processorKey:@"rounded" processor:^UIImage * _Nullable(PINRemoteImageManagerResult * _Nonnull result, NSUInteger * _Nonnull cost) {
+  [_userProfileImageView pin_setImageFromURL:photo.ownerUserProfile.photoURL processorKey:@"rounded" processor:^UIImage * _Nullable(PINRemoteImageManagerResult * _Nonnull result, NSUInteger * _Nonnull cost) {
     
     // make user profile image round
     return [result.image makeRoundImage];
@@ -220,22 +192,40 @@
 #pragma mark - Helper Methods
 
 
-
-
 #pragma mark - Gesture Handling
 
-- (void)userProfileImageTouched
+- (void)cellWasTapped:(UIGestureRecognizer *)sender
 {
-  NSString *userID = [_photoDictionaryRepresentation valueForKeyPath:@"owner"];
-  [self.delegate userProfileWasTouchedWithUserID:userID];
-}
-
-- (void)photoLocationWasTouched
-{
-  CLLocationDegrees latitude = [[_photoInfoDictionaryRepresentation valueForKeyPath:@"location.latitude"] integerValue];
-  CLLocationDegrees longitude = [[_photoInfoDictionaryRepresentation valueForKeyPath:@"location.longitude"] integerValue];
-  CLLocationCoordinate2D photoCoordinates = CLLocationCoordinate2DMake(latitude, longitude);
-  [self.delegate photoLocationWasTouchedWithCoordinate:photoCoordinates];
+  // determine which area of cell was tapped
+  CGPoint tapPoint = [sender locationInView:self];
+  
+  if (tapPoint.y > CELL_HEADER_HEIGHT) {    // photo
+    
+    NSLog(@"TAP: photo");
+    
+  } else if (tapPoint.x <= CGRectGetMaxX(_userProfileImageView.frame)) {
+    
+    NSLog(@"TAP: Buddy Icon");
+    [self.delegate userProfileWasTouchedWithUserID:_photoModel.ownerUserProfile.user];
+    
+  } else if (tapPoint.x < CGRectGetMinX(_photoTimeIntervalSincePostLabel.frame)) {
+    
+    // check if location exists
+    if (_photoLocationLabel.text) {
+      
+      if (tapPoint.y > CGRectGetMinY(_photoLocationLabel.frame)) {
+        NSLog(@"TAP: Location Label");
+        [self.delegate photoLocationWasTouchedWithCoordinate:_photoModel.location.coordinates];
+        
+      } else {
+        
+        NSLog(@"Tap: Username Label");
+      }
+      
+    } else {
+      NSLog(@"Tap: Username Label");
+    }
+  }
 }
 
 @end

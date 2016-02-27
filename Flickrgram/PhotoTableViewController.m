@@ -18,7 +18,7 @@
 @implementation PhotoTableViewController
 {
   FKFlickrNetworkOperation  *_todaysInterestingOp;
-  NSArray                   *_photos;                 // of PhotoModel Objects
+  NSMutableArray            *_photos;                 // of PhotoModel Objects
 }
 
 
@@ -29,6 +29,8 @@
   self = [super initWithStyle:style];
   
   if (self) {
+    
+    _photos = [NSMutableArray array];
     
     // disable tableView cell selection
     self.tableView.allowsSelection = NO;
@@ -51,6 +53,8 @@
 }
 
 
+
+
 #pragma mark - Helper Methods
 
 - (void)downloadInterestingImages
@@ -60,7 +64,7 @@
   interesting.extras = @"description, date_upload, owner_name, geo, tags, machine_tags, url_q";
   
   _todaysInterestingOp = [[FlickrKit sharedFlickrKit] call:interesting completion:^(NSDictionary *response, NSError *error) {
-    dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
       if (response) {
         
         NSMutableArray *photoDictionaries = [NSMutableArray array];
@@ -70,14 +74,18 @@
           PhotoModel *photo = [[PhotoModel alloc] initWithFlickPhoto:photoDictionary];
           [photoDictionaries addObject:photo];
         }
-        _photos = photoDictionaries;
         
-        // reload table data once _photos data model is populated
-        [self.tableView reloadData];
+        dispatch_async(dispatch_get_main_queue(), ^{
+          
+          [_photos addObjectsFromArray:photoDictionaries];
+          
+          // reload table data once _photos data model is populated
+          [self.tableView reloadData];
+          
+          // end spinner
+          [self.refreshControl endRefreshing];
+        });
       }
-
-      // end spinner
-      [self.refreshControl endRefreshing];
     });
   }];
 }
