@@ -32,6 +32,9 @@
     
     _photos = [NSMutableArray array];
     
+    UIBarButtonItem *clearItem = [[UIBarButtonItem alloc] initWithTitle:@"clear" style:UIBarButtonItemStylePlain target:self action:@selector(clearPhotos)];
+    self.navigationItem.rightBarButtonItem = clearItem;
+    
     // disable tableView cell selection
     self.tableView.allowsSelection = NO;
     
@@ -56,6 +59,13 @@
 
 
 #pragma mark - Helper Methods
+
+- (void)clearPhotos
+{
+  _photos = [NSMutableArray array];
+  [self.tableView reloadData];
+}
+
 
 - (void)downloadInterestingImages
 {
@@ -88,6 +98,26 @@
       }
     });
   }];
+}
+
+
+#pragma mark - UITableViewDelegate
+
+//////***** JUST COPIED THIS FROM THE INTERNET - what to do??**** /////////
+-(void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+  if (scrollView == self.tableView) {
+    CGFloat currentOffsetX = scrollView.contentOffset.x;
+    CGFloat currentOffSetY = scrollView.contentOffset.y;
+    CGFloat contentHeight = scrollView.contentSize.height;
+    
+    if (currentOffSetY < (contentHeight / 6.0f)) {
+      scrollView.contentOffset = CGPointMake(currentOffsetX,(currentOffSetY + (contentHeight/2)));
+    }
+    if (currentOffSetY > ((contentHeight * 4)/ 6.0f)) {
+      scrollView.contentOffset = CGPointMake(currentOffsetX,(currentOffSetY - (contentHeight/2)));
+    }
+  }
 }
 
 
