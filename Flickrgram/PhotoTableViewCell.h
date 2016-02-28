@@ -7,9 +7,19 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <CoreLocation/CLLocation.h>
+#import "PhotoModel.h"
+
+@protocol PhotoTableViewCellProtocol <NSObject>
+- (void)userProfileWasTouchedWithUserID:(NSString *)userID;
+- (void)photoLocationWasTouchedWithCoordinate:(CLLocationCoordinate2D)coordiantes;
+@end
+
 
 @interface PhotoTableViewCell : UITableViewCell
 
-- (void)updateCellWithPhotoURL:(NSString *)photoURL;
+@property (nonatomic, strong, readwrite) id<PhotoTableViewCellProtocol> delegate;
+
+- (void)updateCellWithPhotoObject:(PhotoModel *)photo;
 
 @end

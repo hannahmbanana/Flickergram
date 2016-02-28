@@ -8,12 +8,17 @@
 
 #import "PhotoTableViewController.h"
 #import "FlickrKit.h"
+#import "PhotoModel.h"
 #import "PhotoTableViewCell.h"
+#import "LocationViewController.h"
+
+@interface PhotoTableViewController () <PhotoTableViewCellProtocol>
+@end
 
 @implementation PhotoTableViewController
 {
   FKFlickrNetworkOperation  *_todaysInterestingOp;
-  NSArray                   *_photoArray;
+  NSMutableArray            *_photos;                 // of PhotoModel Objects
 }
 
 
@@ -25,69 +30,145 @@
   
   if (self) {
     
-    // register UITableViewCell subclass
+    _photos = [NSMutableArray array];
+    
+    UIBarButtonItem *clearItem = [[UIBarButtonItem alloc] initWithTitle:@"clear" style:UIBarButtonItemStylePlain target:self action:@selector(clearPhotos)];
+    self.navigationItem.rightBarButtonItem = clearItem;
+    
+    // disable tableView cell selection
+    self.tableView.allowsSelection = NO;
+    
+    // enable tableView pull-to-refresh & add target-action pair
+    self.refreshControl = [[UIRefreshControl alloc] init];
+    [self.refreshControl addTarget:self action:@selector(downloadInterestingImages) forControlEvents:UIControlEventValueChanged];
+    
+    // register custom UITableViewCell subclass
     [self.tableView registerClass:[PhotoTableViewCell class] forCellReuseIdentifier:@"photoCell"];
     
-    // start downloading images for feed
+    // start downloading interesting images for feed
     [self downloadInterestingImages];
-  }
+    
+    // navBar title
+    self.navigationItem.title = @"flickrgram";
+      }
   
   return self;
 }
 
 
+
+
 #pragma mark - Helper Methods
+
+- (void)clearPhotos
+{
+  _photos = [NSMutableArray array];
+  [self.tableView reloadData];
+}
+
 
 - (void)downloadInterestingImages
 {
   FKFlickrInterestingnessGetList *interesting = [[FKFlickrInterestingnessGetList alloc] init];
-  interesting.per_page = @"100";
-  interesting.extras = @"<code>description</code>, <code>date_upload</code>, <code>owner_name</code>, <code>geo</code>, <code>tags</code>, <code>machine_tags</code>, <code>url_q</code>";
+  interesting.per_page = @"5";
+  interesting.extras = @"description, date_upload, owner_name, geo, tags, machine_tags, url_q";
   
   _todaysInterestingOp = [[FlickrKit sharedFlickrKit] call:interesting completion:^(NSDictionary *response, NSError *error) {
-    dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
       if (response) {
         
-        NSMutableArray *photoURLs = [NSMutableArray array];
+        NSMutableArray *photoDictionaries = [NSMutableArray array];
         
         for (NSDictionary *photoDictionary in [response valueForKeyPath:@"photos.photo"]) {
-          [photoURLs addObject:photoDictionary];
+          
+          PhotoModel *photo = [[PhotoModel alloc] initWithFlickPhoto:photoDictionary];
+          [photoDictionaries addObject:photo];
         }
-        _photoArray = photoURLs;
         
-        [self.tableView reloadData];
+        dispatch_async(dispatch_get_main_queue(), ^{
+          
+          [_photos addObjectsFromArray:photoDictionaries];
+          
+          // reload table data once _photos data model is populated
+          [self.tableView reloadData];
+          
+          // end spinner
+          [self.refreshControl endRefreshing];
+        });
       }
-    });				
+    });
   }];
 }
 
 
-#pragma mark - TableViewDataSource
+#pragma mark - UITableViewDelegate
+
+//////***** JUST COPIED THIS FROM THE INTERNET - what to do??**** /////////
+-(void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+  if (scrollView == self.tableView) {
+    CGFloat currentOffsetX = scrollView.contentOffset.x;
+    CGFloat currentOffSetY = scrollView.contentOffset.y;
+    CGFloat contentHeight = scrollView.contentSize.height;
+    
+    if (currentOffSetY < (contentHeight / 6.0f)) {
+      scrollView.contentOffset = CGPointMake(currentOffsetX,(currentOffSetY + (contentHeight/2)));
+    }
+    if (currentOffSetY > ((contentHeight * 4)/ 6.0f)) {
+      scrollView.contentOffset = CGPointMake(currentOffsetX,(currentOffSetY - (contentHeight/2)));
+    }
+  }
+}
+
+
+#pragma mark - UITableViewDataSource
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(nonnull NSIndexPath *)indexPath
 {
-  // call class method on cell heightForRowWithDataModel
+  #warning H: call class method on cell heightForRowWithDataModel
   return self.view.bounds.size.width;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-  return [_photoArray count];
+  return [_photos count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+  // dequeue a reusable cell
   PhotoTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"photoCell" forIndexPath:indexPath];
   
+  // create a new PhotoTableViewCell if no reusable ones are available in queue
   if (!cell) {
     cell = [[PhotoTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"photoCell"];
+    cell.delegate = self;
   }
   
-  NSString *photoURL = [_photoArray objectAtIndex:indexPath.row];
-  cell.backgroundColor = [UIColor purpleColor];
-  [cell updateCellWithPhotoURL:photoURL];
+  // configure the cell for the appropriate photo
+  cell.delegate = self;
+  [cell updateCellWithPhotoObject:[_photos objectAtIndex:indexPath.row]];
   
   return cell;
+}
+
+
+#pragma mark - PhotoTableViewCellProtocol
+
+- (void)userProfileWasTouchedWithUserID:(NSString *)userID;
+{
+//  UserProfileCollectionViewController *userProfileView = [[UserProfileCollectionViewController alloc] initWithUserID:userID];
+//  userProfileView.view.backgroundColor = [UIColor redColor];
+//  
+//  [self.navigationController pushViewController:userProfileView animated:YES];
+}
+
+- (void)photoLocationWasTouchedWithCoordinate:(CLLocationCoordinate2D)coordiantes
+{
+  LocationViewController *locationVC = [[LocationViewController alloc] init];
+  locationVC.coordinate = coordiantes;
+  
+  [self.navigationController pushViewController:locationVC animated:YES];
 }
 
 @end

@@ -10,7 +10,6 @@
 #import "PhotoTableViewController.h"
 #import "FlickrKit.h"
 
-
 @interface AppDelegate ()
 
 @end
@@ -31,7 +30,46 @@
   
   self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
   
-  self.window.rootViewController = [[PhotoTableViewController alloc] init];
+  // create Home Feed viewController & navController
+  PhotoTableViewController *viewController = [[PhotoTableViewController alloc] init];
+  UINavigationController *homeFeedNavCtrl  = [[UINavigationController alloc] initWithRootViewController:viewController];
+  homeFeedNavCtrl.tabBarItem               = [[UITabBarItem alloc] initWithTitle:@"Home Feed"
+                                                                           image:[UIImage imageNamed:@"home"]
+                                                                             tag:0];
+  
+  // create Profile viewController & navController
+  UIViewController *VC                         = [[UIViewController alloc] init];
+  VC.view.backgroundColor                      = [UIColor purpleColor];
+  
+  UINavigationController *profileNavController = [[UINavigationController alloc] initWithRootViewController:VC];
+  profileNavController.tabBarItem              = [[UITabBarItem alloc] initWithTitle:@"Profile"
+                                                                               image:[UIImage imageNamed:@"profile"]
+                                                                                 tag:0];
+
+  // create Photo Upload viewController & navController
+  UIViewController *VC1                      = [[UIViewController alloc] init];
+  VC1.view.backgroundColor                   = [UIColor redColor];
+  
+  UINavigationController *photoUploadNavCtrl = [[UINavigationController alloc] initWithRootViewController:VC1];
+  photoUploadNavCtrl.tabBarItem              = [[UITabBarItem alloc] initWithTitle:@"Upload"
+                                                                             image:[UIImage imageNamed:@"camera"]
+                                                                               tag:0];
+
+  // create Photos Near Me viewController & navController
+  UIViewController *VC2                      = [[UIViewController alloc] init];
+  VC2.view.backgroundColor                   = [UIColor greenColor];
+  
+  UINavigationController *photoNearMeNavCtrl = [[UINavigationController alloc] initWithRootViewController:VC2];
+  photoNearMeNavCtrl.tabBarItem              = [[UITabBarItem alloc] initWithTitle:@"Near Me"
+                                                                             image:[UIImage imageNamed:@"earth"]
+                                                                               tag:0];
+  
+  // create UITabBarController and add viewControllers
+  UITabBarController *tabBarController    = [[UITabBarController alloc] init];
+  tabBarController.viewControllers        = @[homeFeedNavCtrl, photoNearMeNavCtrl, photoUploadNavCtrl, profileNavController];
+  tabBarController.selectedViewController = homeFeedNavCtrl;
+  
+  self.window.rootViewController = tabBarController;
   
   [self.window makeKeyAndVisible];
   
@@ -46,18 +84,36 @@
 - (void)applicationDidEnterBackground:(UIApplication *)application {
   // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
   // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+  
+  [self saveData];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
   // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
+  
+  [self getData];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
   // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+  
+  [self getData];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
   // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+  
+  [self saveData];
+}
+
+#pragma mark - HelperMethods
+
+-(void)saveData
+{
+}
+
+-(void)getData
+{
 }
 
 @end
