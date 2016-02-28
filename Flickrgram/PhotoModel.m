@@ -19,26 +19,26 @@
 
 #pragma mark - Lifecycle
 
-- (instancetype)initWithFlickPhoto:(NSDictionary *)flickrPhotoDictionary
+- (instancetype)initWith500pxPhoto:(NSDictionary *)photoDictionary
 {
   self = [super init];
   
   if (self) {
     
-    _dictionaryRepresentation   = flickrPhotoDictionary;
+    _dictionaryRepresentation   = photoDictionary;
     
-    FlickrKit *fk               = [FlickrKit sharedFlickrKit];
-    _URL                        = [fk photoURLForSize:FKPhotoSizeLarge1024 fromPhotoDictionary:flickrPhotoDictionary];
+    NSString *urlString         = [photoDictionary objectForKey:@"image_url"];
+    _URL                        = urlString ? [NSURL URLWithString:urlString] : nil;
     
-    _ownerUserProfile           = [[UserModel alloc] initWithFlickPhoto:flickrPhotoDictionary];
+    _ownerUserProfile           = [[UserModel alloc] initWith500pxPhoto:photoDictionary];
     
-    _uploadDate                 = [[flickrPhotoDictionary objectForKey:@"dateupload"] floatValue];
+//    _uploadDate                 = [photoDictionary objectForKey:@"created_at"];
     
-    _title                      = [flickrPhotoDictionary objectForKey:@"title"];
-    _descriptionText            = [flickrPhotoDictionary valueForKeyPath:@"description._content"];
+//    _title                      = [photoDictionary objectForKey:@"title"];
+//    _descriptionText            = [photoDictionary valueForKeyPath:@"description._content"];
     
     // photo location
-    _location                   = [[LocationModel alloc] initWithFlickPhoto:flickrPhotoDictionary];
+    _location                   = [[LocationModel alloc] initWith500pxPhoto:photoDictionary];
     
     // calculate dateString off the main thread
     dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -47,6 +47,7 @@
   }
   
   return self;
+
 }
 
   

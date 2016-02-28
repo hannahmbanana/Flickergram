@@ -10,11 +10,15 @@
 
 @interface UserModel : NSObject
 
-@property (nonatomic, strong, readonly) NSURL    *photoURL;  // change to profilePhotoURL
-@property (nonatomic, strong, readonly) NSString *userName;
-@property (nonatomic, strong, readonly) NSString *user;       // change to userID
+@property (nonatomic, strong, readonly) NSString *userID;
+@property (nonatomic, strong, readonly) NSString *username;
+@property (nonatomic, strong, readonly) NSString *userFirstName;
+@property (nonatomic, strong, readonly) NSString *userLastName;
+@property (nonatomic, strong, readonly) NSString *userCity;
+@property (nonatomic, strong, readonly) NSString *userCountry;
+@property (nonatomic, strong, readonly) NSURL    *userPicURL;
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithFlickPhoto:(NSDictionary *)flickrPhotoDictionary NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWith500pxPhoto:(NSDictionary *)dictionary NS_DESIGNATED_INITIALIZER;
 
 @end

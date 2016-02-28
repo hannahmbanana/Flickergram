@@ -16,13 +16,13 @@
 
 #pragma mark - Lifecycle
 
-- (nullable instancetype)initWithFlickPhoto:(NSDictionary *)flickrPhotoDictionary
+- (nullable instancetype)initWith500pxPhoto:(NSDictionary *)dictionary
 {
-  CGFloat latitude  = [[flickrPhotoDictionary objectForKey:@"latitude"] floatValue];
-  CGFloat longitude = [[flickrPhotoDictionary objectForKey:@"longitude"] floatValue];
+  NSNumber *latitude  = [dictionary objectForKey:@"latitude"];
+  NSNumber *longitude = [dictionary objectForKey:@"longitude"];
   
-  // early return if no location info
-  if (latitude == 0.0 && longitude == 0.0) {
+  // early return if location is "<null>"
+  if (![latitude isKindOfClass:[NSNumber class]] || ![longitude isKindOfClass:[NSNumber class]]) {
     return nil;
   }
   
@@ -30,8 +30,8 @@
   
   if (self) {
     
-    CLLocationDegrees latitudeDegrees = latitude;
-    CLLocationDegrees longitudeDegrees = longitude;
+    CLLocationDegrees latitudeDegrees = [latitude floatValue];
+    CLLocationDegrees longitudeDegrees = [longitude floatValue];
     _coordinates = CLLocationCoordinate2DMake(latitudeDegrees, longitudeDegrees);
     
     // calculate user friendly location string off the main thread
@@ -47,27 +47,6 @@
 
 
 #pragma mark - Helper Methods
-
-- (void)downloadPhotoLocationWithFlickrPhotoDictionary:(NSDictionary *)flickrPhotoDictionary
-{
-  // async download of photo info
-  FlickrKit *fk                    = [FlickrKit sharedFlickrKit];
-  FKFlickrPhotosGetInfo *photoInfo = [[FKFlickrPhotosGetInfo alloc] init];
-  photoInfo.photo_id               = [flickrPhotoDictionary valueForKeyPath:@"id"];
-  photoInfo.secret                 = [flickrPhotoDictionary valueForKeyPath:@"secret"];
-    
-  FKFlickrNetworkOperation *networkOp = [fk call:photoInfo completion:^(NSDictionary *response, NSError *error) {
-    
-    if (response) {
-      if (!error) {
-        
-        // photo location
-        NSDictionary *photoLocationDictionary = [response valueForKeyPath:@"photo.location"];
-        _userFriendlyLocationString = [self locationStringFromPhotoLocationDictionary:photoLocationDictionary];
-      }
-    }
-  }];
-}
 
 - (nullable NSString *)locationStringFromPhotoLocationDictionary:(NSDictionary *)photoLocationDictionary
 {

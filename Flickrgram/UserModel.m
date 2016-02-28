@@ -14,17 +14,26 @@
 
 #pragma mark - Lifecycle
 
-- (instancetype)initWithFlickPhoto:(NSDictionary *)flickrPhotoDictionary
+- (instancetype)initWith500pxPhoto:(NSDictionary *)dictionary
 {
   self = [super init];
   
   if (self) {
     
-    FlickrKit *fk = [FlickrKit sharedFlickrKit];
+    NSDictionary *userDictionary = [dictionary objectForKey:@"user"];
     
-    _photoURL = [fk buddyIconURLForUser:[flickrPhotoDictionary valueForKeyPath:@"owner"]];
-    _userName     = [flickrPhotoDictionary objectForKey:@"ownername"];
-    _user         = [flickrPhotoDictionary objectForKey:@"owner"];
+    if ([userDictionary isKindOfClass:[NSDictionary class]]) {
+      
+      _userID         = [userDictionary objectForKey:@"id"];
+      _username       = [userDictionary objectForKey:@"username"];
+      _userFirstName  = [userDictionary objectForKey:@"firstname"];
+      _userLastName   = [userDictionary objectForKey:@"lastname"];
+      _userCity       = [userDictionary objectForKey:@"city"];
+      _userCountry    = [userDictionary objectForKey:@"country"];
+      
+      NSString *urlString = [userDictionary objectForKey:@"userpic_url"];  //FIXME: create data model for mult sizes
+      _userPicURL         = urlString ? [NSURL URLWithString:urlString] : nil;
+    }
   }
   
   return self;

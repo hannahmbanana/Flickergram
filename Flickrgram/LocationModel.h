@@ -16,6 +16,6 @@
 @property (nonatomic, strong, readonly) NSString               *userFriendlyLocationString;
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithFlickPhoto:(NSDictionary *)flickrPhotoDictionary NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWith500pxPhoto:(NSDictionary *)dictionary NS_DESIGNATED_INITIALIZER;
 
 @end

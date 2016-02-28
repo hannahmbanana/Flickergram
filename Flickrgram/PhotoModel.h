@@ -21,6 +21,6 @@
 @property (nonatomic, strong, readonly) UserModel              *ownerUserProfile;
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithFlickPhoto:(NSDictionary *)flickrPhotoDictionary NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWith500pxPhoto:(NSDictionary *)photoDictionary NS_DESIGNATED_INITIALIZER;
 
 @end

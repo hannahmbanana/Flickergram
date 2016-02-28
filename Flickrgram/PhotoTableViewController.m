@@ -69,56 +69,73 @@
 
 - (void)downloadInterestingImages
 {
-  FKFlickrInterestingnessGetList *interesting = [[FKFlickrInterestingnessGetList alloc] init];
-  interesting.per_page = @"5";
-  interesting.extras = @"description, date_upload, owner_name, geo, tags, machine_tags, url_q";
-  
-  _todaysInterestingOp = [[FlickrKit sharedFlickrKit] call:interesting completion:^(NSDictionary *response, NSError *error) {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-      if (response) {
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    
+    NSURL *url = [NSURL URLWithString:@"https://api.500px.com/v1/photos?feature=popular&sort=created_at&image_size=3&include_store=store_download&include_states=voted&consumer_key=Fi13GVb8g53sGvHICzlram7QkKOlSDmAmp9s9aqC"];
+    
+    NSData *data = [NSData dataWithContentsOfURL:url];
+    
+    NSMutableArray *newPhotos = [NSMutableArray array];
+    
+    if (data) {
+      
+      NSDictionary *response = [NSJSONSerialization JSONObjectWithData:data options:0 error:NULL];
+      
+      if ([response isKindOfClass:[NSDictionary class]]) {
         
-        NSMutableArray *photoDictionaries = [NSMutableArray array];
+        NSArray *photos = [response valueForKeyPath:@"photos"];
         
-        for (NSDictionary *photoDictionary in [response valueForKeyPath:@"photos.photo"]) {
+        if ([photos isKindOfClass:[NSArray class]]) {
           
-          PhotoModel *photo = [[PhotoModel alloc] initWithFlickPhoto:photoDictionary];
-          [photoDictionaries addObject:photo];
+          for (NSDictionary *photoDictionary in photos) {
+            
+            if ([response isKindOfClass:[NSDictionary class]]) {
+
+              PhotoModel *photo = [[PhotoModel alloc] initWith500pxPhoto:photoDictionary];
+              
+              // addObject: will crash with nil (NSArray, NSSet, NSDictionary, URLWithString - most foundation things)
+              if (photo) {
+                
+                [newPhotos addObject:photo];
+              }
+            }
+          }
         }
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-          
-          [_photos addObjectsFromArray:photoDictionaries];
-          
-          // reload table data once _photos data model is populated
-          [self.tableView reloadData];
-          
-          // end spinner
-          [self.refreshControl endRefreshing];
-        });
       }
+    }
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+      
+      [_photos addObjectsFromArray:newPhotos];
+      
+      // reload table data once _photos data model is populated
+      [self.tableView reloadData];
+      
+      // end spinner
+      [self.refreshControl endRefreshing];
     });
-  }];
+  });
 }
 
 
 #pragma mark - UITableViewDelegate
 
 //////***** JUST COPIED THIS FROM THE INTERNET - what to do??**** /////////
--(void)scrollViewDidScroll:(UIScrollView *)scrollView
-{
-  if (scrollView == self.tableView) {
-    CGFloat currentOffsetX = scrollView.contentOffset.x;
-    CGFloat currentOffSetY = scrollView.contentOffset.y;
-    CGFloat contentHeight = scrollView.contentSize.height;
-    
-    if (currentOffSetY < (contentHeight / 6.0f)) {
-      scrollView.contentOffset = CGPointMake(currentOffsetX,(currentOffSetY + (contentHeight/2)));
-    }
-    if (currentOffSetY > ((contentHeight * 4)/ 6.0f)) {
-      scrollView.contentOffset = CGPointMake(currentOffsetX,(currentOffSetY - (contentHeight/2)));
-    }
-  }
-}
+//-(void)scrollViewDidScroll:(UIScrollView *)scrollView
+//{
+//  if (scrollView == self.tableView) {
+//    CGFloat currentOffsetX = scrollView.contentOffset.x;
+//    CGFloat currentOffSetY = scrollView.contentOffset.y;
+//    CGFloat contentHeight = scrollView.contentSize.height;
+//    
+//    if (currentOffSetY < (contentHeight / 6.0f)) {
+//      scrollView.contentOffset = CGPointMake(currentOffsetX,(currentOffSetY + (contentHeight/2)));
+//    }
+//    if (currentOffSetY > ((contentHeight * 4)/ 6.0f)) {
+//      scrollView.contentOffset = CGPointMake(currentOffsetX,(currentOffSetY - (contentHeight/2)));
+//    }
+//  }
+//}
 
 
 #pragma mark - UITableViewDataSource

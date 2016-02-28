@@ -12,18 +12,19 @@
 
 #pragma mark - Lifecycle
 
-/*- (instancetype)initWithUserID:(NSString *)userID
-{
-  UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
-  
-  self = [super initWithCollectionViewLayout:layout];
-  
-  if (self) {
-    
-  }
-  
-  return self;
-}*/
+//- (instancetype)initWithUserID:(NSString *)userID
+//{
+//  
+////  UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
+////  
+////  self = [super initWithCollectionViewLayout:layout];
+////  
+////  if (self) {
+////    
+////  }
+//  
+//  return self;
+//}
 
 
 

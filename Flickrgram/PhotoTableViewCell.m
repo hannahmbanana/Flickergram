@@ -172,7 +172,7 @@
 - (void)updateCellWithPhotoObject:(PhotoModel *)photo
 {
   _photoModel                           = photo;
-  _userNameLabel.text                   = photo.ownerUserProfile.userName;
+  _userNameLabel.text                   = photo.ownerUserProfile.username;
   _photoTimeIntervalSincePostLabel.text = photo.uploadDateString;
   _photoDescriptionLabel.text           = photo.title;
   _photoLocationLabel.text              = photo.location.userFriendlyLocationString;
@@ -181,7 +181,7 @@
   [_photoImageView pin_setImageFromURL:photo.URL];
   
   // async download of buddy icon using PINRemoteImage
-  [_userProfileImageView pin_setImageFromURL:photo.ownerUserProfile.photoURL processorKey:@"rounded" processor:^UIImage * _Nullable(PINRemoteImageManagerResult * _Nonnull result, NSUInteger * _Nonnull cost) {
+  [_userProfileImageView pin_setImageFromURL:photo.ownerUserProfile.userPicURL processorKey:@"rounded" processor:^UIImage * _Nullable(PINRemoteImageManagerResult * _Nonnull result, NSUInteger * _Nonnull cost) {
     
     // make user profile image round
     return [result.image makeRoundImage];
@@ -206,7 +206,7 @@
   } else if (tapPoint.x <= CGRectGetMaxX(_userProfileImageView.frame)) {
     
     NSLog(@"TAP: Buddy Icon");
-    [self.delegate userProfileWasTouchedWithUserID:_photoModel.ownerUserProfile.user];
+    [self.delegate userProfileWasTouchedWithUserID:_photoModel.ownerUserProfile.userID];
     
   } else if (tapPoint.x < CGRectGetMinX(_photoTimeIntervalSincePostLabel.frame)) {
     
