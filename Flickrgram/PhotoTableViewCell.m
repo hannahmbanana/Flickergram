@@ -36,9 +36,14 @@
   UILabel      *_photoCommentsLabel;
 }
 
+
 #pragma mark - Class methods
 
-//- (CGFloat)heightForCellWithPhotoObject:
++ (CGFloat)cellHeaderFooterHeightForDataModel:(PhotoModel *)photo
+{
+  CGFloat height = CELL_HEADER_HEIGHT;
+  return height;
+}
 
 
 #pragma mark - Lifecycle
@@ -58,10 +63,12 @@
     
     _userNameLabel                             = [[UILabel alloc] init];
     _userNameLabel.font                        = [_userNameLabel.font fontWithSize:floorf(USER_IMAGE_HEIGHT/2)-1];
+    _userNameLabel.textColor                   = [UIColor colorWithRed:18.0/255.0 green:86.0/255.0 blue:136.0/255.0 alpha:1.0];
 //    _userNameLabel.backgroundColor             = [UIColor purpleColor];
 
     _photoLocationLabel                        = [[UILabel alloc] init];
     _photoLocationLabel.font                   = [_photoLocationLabel.font fontWithSize:floorf(USER_IMAGE_HEIGHT/2)-1];
+    _photoLocationLabel.textColor              = [UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0];
 //    _photoLocationLabel.backgroundColor             = [UIColor greenColor];
 
     _photoTimeIntervalSincePostLabel           = [[UILabel alloc] init];
@@ -141,7 +148,7 @@
   _photoImageView.frame = CGRectMake(0,
                                      CELL_HEADER_HEIGHT,
                                      self.bounds.size.width,
-                                     self.bounds.size.width - 1 * CELL_HEADER_HEIGHT);
+                                     self.bounds.size.width);
   [self addSubview:_photoImageView];
   
   // bottom of cell
@@ -222,14 +229,17 @@
   // determine which area of cell was tapped
   CGPoint tapPoint = [sender locationInView:self];
   
-  if (tapPoint.y > CELL_HEADER_HEIGHT) {    // photo
+  if (tapPoint.y > CELL_HEADER_HEIGHT) {
     
+    // photo tapped
     NSLog(@"TAP: photo");
     
   } else if (tapPoint.x <= CGRectGetMaxX(_userProfileImageView.frame)) {
     
+    // user avatar tapped
     NSLog(@"TAP: Buddy Icon");
-    [self.delegate userProfileWasTouchedWithUserID:_photoModel.ownerUserProfile.userID];
+    
+    [self.delegate userProfileWasTouchedWithUser:_photoModel.ownerUserProfile];
     
   } else if (tapPoint.x < CGRectGetMinX(_photoTimeIntervalSincePostLabel.frame)) {
     
@@ -238,15 +248,21 @@
       
       if (tapPoint.y > CGRectGetMinY(_photoLocationLabel.frame)) {
         NSLog(@"TAP: Location Label");
-        [self.delegate photoLocationWasTouchedWithCoordinate:_photoModel.location.coordinates];
+        [self.delegate photoLocationWasTouchedWithCoordinate:_photoModel.location.coordinates name:_photoLocationLabel.text];
         
       } else {
         
         NSLog(@"Tap: Username Label");
+        
+        [self.delegate userProfileWasTouchedWithUser:_photoModel.ownerUserProfile];
       }
       
     } else {
+      
+      // username tapped
       NSLog(@"Tap: Username Label");
+      
+      [self.delegate userProfileWasTouchedWithUser:_photoModel.ownerUserProfile];
     }
   }
 }

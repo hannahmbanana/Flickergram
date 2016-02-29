@@ -10,7 +10,8 @@
 #import "FlickrKit.h"
 #import "PhotoModel.h"
 #import "PhotoTableViewCell.h"
-#import "LocationViewController.h"
+#import "UserProfileViewController.h"
+#import "LocationCollectionViewController.h"
 
 @interface PhotoTableViewController () <PhotoTableViewCellProtocol>
 @end
@@ -20,7 +21,6 @@
   FKFlickrNetworkOperation  *_todaysInterestingOp;
   NSMutableArray            *_photos;                 // of PhotoModel Objects
 }
-
 
 #pragma mark - Lifecycle
 
@@ -142,8 +142,9 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(nonnull NSIndexPath *)indexPath
 {
-  #warning H: call class method on cell heightForRowWithDataModel
-  return self.view.bounds.size.width;
+  PhotoModel *photoModel = [_photos objectAtIndex:indexPath.row];
+  CGFloat headerFooterCombinedHeight = [PhotoTableViewCell cellHeaderFooterHeightForDataModel:photoModel];
+  return headerFooterCombinedHeight + self.view.bounds.size.width; // + square photo height
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -172,20 +173,28 @@
 
 #pragma mark - PhotoTableViewCellProtocol
 
-- (void)userProfileWasTouchedWithUserID:(NSString *)userID;
+- (void)userProfileWasTouchedWithUser:(UserModel *)user;
 {
-//  UserProfileCollectionViewController *userProfileView = [[UserProfileCollectionViewController alloc] initWithUserID:userID];
-//  userProfileView.view.backgroundColor = [UIColor redColor];
-//  
-//  [self.navigationController pushViewController:userProfileView animated:YES];
+  UserProfileViewController *userProfileView = [[UserProfileViewController alloc] initWithUser:user];
+  
+  [self.navigationController pushViewController:userProfileView animated:YES];
 }
 
-- (void)photoLocationWasTouchedWithCoordinate:(CLLocationCoordinate2D)coordiantes
+- (void)photoLocationWasTouchedWithCoordinate:(CLLocationCoordinate2D)coordiantes name:(NSString *)name
 {
-  LocationViewController *locationVC = [[LocationViewController alloc] init];
-  locationVC.coordinate = coordiantes;
+  UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
+  layout.minimumInteritemSpacing = 1;
+  layout.minimumLineSpacing = 1;
+  layout.headerReferenceSize = CGSizeMake(self.view.bounds.size.width, 200);
   
-  [self.navigationController pushViewController:locationVC animated:YES];
+  CGFloat numItemsLine = 5;
+  layout.itemSize = CGSizeMake((self.view.bounds.size.width - (numItemsLine - 1)) / numItemsLine,
+                               (self.view.bounds.size.width - (numItemsLine - 1)) / numItemsLine);
+  
+  LocationCollectionViewController *locationCVC = [[LocationCollectionViewController alloc] initWithCollectionViewLayout:layout coordinates:coordiantes];
+  locationCVC.navigationItem.title = name;
+  
+  [self.navigationController pushViewController:locationCVC animated:YES];
 }
 
 @end
