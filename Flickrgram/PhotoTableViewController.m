@@ -7,7 +7,6 @@
 //
 
 #import "PhotoTableViewController.h"
-#import "FlickrKit.h"
 #import "PhotoModel.h"
 #import "PhotoTableViewCell.h"
 #import "UserProfileViewController.h"
@@ -18,7 +17,6 @@
 
 @implementation PhotoTableViewController
 {
-  FKFlickrNetworkOperation  *_todaysInterestingOp;
   NSMutableArray            *_photos;                 // of PhotoModel Objects
 }
 

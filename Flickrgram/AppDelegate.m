@@ -8,7 +8,6 @@
 
 #import "AppDelegate.h"
 #import "PhotoTableViewController.h"
-#import "FlickrKit.h"
 
 @interface AppDelegate ()
 
@@ -18,16 +17,7 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-  
-  // Initialise FlickrKit with your flickr api key and shared secret
-  NSString *apiKey = @"0b2ff1cdfd5254ec6a21bcd8542dabea";
-  NSString *secret = @"65d8e07f422ad680";
-  if (!apiKey) {
-    NSLog(@"\n----------------------------------\nYou need to enter your own 'apiKey' and 'secret' in FKAppDelegate for the demo to run. \n\nYou can get these from your Flickr account settings.\n----------------------------------\n");
-    exit(0);
-  }
-  [[FlickrKit sharedFlickrKit] initializeWithAPIKey:apiKey sharedSecret:secret];
-  
+    
   self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
   
   // create Home Feed viewController & navController

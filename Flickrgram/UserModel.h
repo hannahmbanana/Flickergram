@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 @interface UserModel : NSObject
 
@@ -33,6 +34,7 @@
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWith500pxPhoto:(NSDictionary *)dictionary NS_DESIGNATED_INITIALIZER;
 
+- (void)fetchAvatarImageWithCompletionBlock:(void(^)(UserModel *, UIImage *))block;
 - (void)downloadCompleteUserDataWithCompletionBlock:(void(^)(UserModel *))block;
 
 @end

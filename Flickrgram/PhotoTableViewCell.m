@@ -8,7 +8,6 @@
 
 #import "PhotoTableViewCell.h"
 #import "UIImage+UIImage_Additions.h"
-#import "FlickrKit.h"
 #import "PINImageView+PINRemoteImage.h"
 #import "PINButton+PINRemoteImage.h"
 

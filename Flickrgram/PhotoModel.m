@@ -8,7 +8,6 @@
 
 #import "PhotoModel.h"
 #import <UIKit/UIKit.h>
-#import "FlickrKit.h"
 
 @implementation PhotoModel
 {

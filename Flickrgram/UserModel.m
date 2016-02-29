@@ -8,7 +8,6 @@
 
 #import "UserModel.h"
 #import <UIKit/UIKit.h>
-#import "FlickrKit.h"
 
 @implementation UserModel
 {
@@ -37,6 +36,23 @@
 
 
 #pragma mark - Instance Methods
+
+- (void)fetchAvatarImageWithCompletionBlock:(void(^)(UserModel *, UIImage *))block
+{
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    
+    NSData *data   = [NSData dataWithContentsOfURL:_userPicURL];
+    UIImage *image = [UIImage imageWithData:data];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+      
+      if (block) {
+        block(self, image);
+      }
+    });
+    
+  });
+}
 
 - (void)downloadCompleteUserDataWithCompletionBlock:(void(^)(UserModel *))block;
 {

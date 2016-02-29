@@ -8,7 +8,6 @@
 
 #import "LocationModel.h"
 #import <UIKit/UIKit.h>
-#import "FlickrKit.h"
 #import <CoreLocation/CLGeocoder.h>
 
 @implementation LocationModel
