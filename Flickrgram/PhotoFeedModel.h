@@ -9,7 +9,15 @@
 #import <Foundation/Foundation.h>
 #import "PhotoModel.h"
 
+typedef NS_ENUM(NSInteger, PhotoFeedModelType) {
+  PhotoFeedModelTypePopular,
+  PhotoFeedModelTypePopular2
+};
+
 @interface PhotoFeedModel : NSObject
+
+- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)initWithPhotoFeedModelType:(PhotoFeedModelType)type NS_DESIGNATED_INITIALIZER;
 
 - (NSUInteger)numberOfItemsInFeed;
 - (PhotoModel *)objectAtIndex:(NSUInteger)index;
