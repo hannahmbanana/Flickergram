@@ -7,8 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "PhotoModel.h"
 
 @interface PhotoFeedModel : NSObject
 
+- (NSUInteger)numberOfItemsInFeed;
+- (PhotoModel *)objectAtIndex:(NSUInteger)index;
+- (void)fetchPageWithCompletionBlock:(void (^)())block;
 
 @end
