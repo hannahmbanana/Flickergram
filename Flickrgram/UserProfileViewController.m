@@ -29,6 +29,13 @@
   UILabel      *_photoCountLabel;
 }
 
+//- (instancetype)initWithMe
+//{
+//  UserModel *me = [[UserModel alloc] initWithMe];
+//  
+//  [self initWithUser:me];
+//}
+
 - (instancetype)initWithUser:(UserModel *)user
 {
   self = [super initWithNibName:nil bundle:nil];

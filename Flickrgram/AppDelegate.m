@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import "PhotoTableViewController.h"
+#import "UserProfileViewController.h"
 
 @interface AppDelegate ()
 
@@ -28,6 +29,7 @@
                                                                              tag:0];
   
   // create Profile viewController & navController
+//  UserProfileViewController *myProfileVC   = [[UserProfileViewController alloc] initWithMe];
   UIViewController *VC                         = [[UIViewController alloc] init];
   VC.view.backgroundColor                      = [UIColor purpleColor];
   

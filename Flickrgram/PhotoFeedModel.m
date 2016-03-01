@@ -9,5 +9,31 @@
 #import "PhotoFeedModel.h"
 
 @implementation PhotoFeedModel
+{
+  NSMutableArray *_photoArray;
+}
+
+#pragma mark - Lifecycle
+
+- (instancetype)init
+{
+  self = [super init];
+  
+  if (self) {
+  
+    _photoArray = [[NSMutableArray alloc] init];
+  
+  }
+  
+  return self;
+}
+
+
+#pragma mark - Instance Methods
+
+
+
+#pragma mark - Helper Methods
+
 
 @end
