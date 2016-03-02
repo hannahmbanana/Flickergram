@@ -14,6 +14,7 @@
 @interface PhotoModel : NSObject
 
 @property (nonatomic, strong, readonly) NSURL                  *URL;
+@property (nonatomic, strong, readonly) NSString               *photoID;
 @property (nonatomic, strong, readonly) NSString               *uploadDateString;
 @property (nonatomic, strong, readonly) NSString               *title;
 @property (nonatomic, strong, readonly) NSString               *descriptionText;

@@ -21,6 +21,9 @@ typedef NS_ENUM(NSInteger, PhotoFeedModelType) {
 
 - (NSUInteger)numberOfItemsInFeed;
 - (PhotoModel *)objectAtIndex:(NSUInteger)index;
-- (void)fetchPageWithCompletionBlock:(void (^)())block;
+
+- (void)clearFeed;
+- (void)requestPageWithCompletionBlock:(void (^)(NSArray *))block;
+- (void)refreshFeedWithCompletionBlock:(void (^)(NSArray *))block;
 
 @end

@@ -34,17 +34,13 @@
     _photoFeed = [[PhotoFeedModel alloc] initWithPhotoFeedModelType:PhotoFeedModelTypePopular];
     
     // start first small fetch
-    [_photoFeed fetchPageWithCompletionBlock:^{
+    [_photoFeed refreshFeedWithCompletionBlock:^(NSArray *newPhotos){
       
       // update the tableView
       [self.tableView reloadData];
       
       // immediately start second larger fetch
-      [_photoFeed fetchPageWithCompletionBlock:^{
-        
-        // update the tableView
-        [self.tableView reloadData];
-      }];
+//      [self loadPage];
     }];
     
     
@@ -59,8 +55,11 @@
     self.refreshControl = [[UIRefreshControl alloc] init];
     [self.refreshControl addTarget:self action:@selector(refreshFeed) forControlEvents:UIControlEventValueChanged];
     
-    UIBarButtonItem *test = [[UIBarButtonItem alloc] initWithTitle:@"load data" style:UIBarButtonItemStylePlain target:self action:@selector(refreshFeed)];
-    self.navigationItem.rightBarButtonItem = test;
+    UIBarButtonItem *loadData = [[UIBarButtonItem alloc] initWithTitle:@"load data" style:UIBarButtonItemStylePlain target:self action:@selector(loadPage)];
+    self.navigationItem.rightBarButtonItem = loadData;
+    
+    UIBarButtonItem *clear = [[UIBarButtonItem alloc] initWithTitle:@"clear" style:UIBarButtonItemStylePlain target:self action:@selector(clearFeed)];
+    self.navigationItem.leftBarButtonItem = clear;
     
     // navBar title
     self.navigationItem.title = @"500pixergram";
@@ -72,32 +71,80 @@
 
 #pragma mark - Gesture Handling
 
+- (void)clearFeed
+{
+  [_photoFeed clearFeed];
+  [self.tableView reloadData];
+}
+
 - (void)refreshFeed
 {
-  NSLog(@"_photoFeed number of items = %lu", [_photoFeed numberOfItemsInFeed]);
-  [_photoFeed fetchPageWithCompletionBlock:^{
+  [_photoFeed refreshFeedWithCompletionBlock:^(NSArray *newPhotos){
+    
     [self.tableView reloadData];
+    
+    NSLog(@"_photoFeed number of items = %lu", [_photoFeed numberOfItemsInFeed]);
     
     [self.refreshControl endRefreshing];
   }];
 }
 
+- (void)loadPage
+{
+  NSLog(@"_photoFeed number of items = %lu", [_photoFeed numberOfItemsInFeed]);
+  
+  [self logPhotoIDsInPhotoFeed];
+
+  [_photoFeed requestPageWithCompletionBlock:^(NSArray *newPhotos){
+    
+    [self insertNewRowsInTableView:newPhotos];
+    
+    [self logPhotoIDsInPhotoFeed];
+
+  }];
+}
+
+- (void)logPhotoIDsInPhotoFeed
+{
+  NSLog(@"_photoFeed number of items = %lu", [_photoFeed numberOfItemsInFeed]);
+  
+  for (int i = 0; i < [_photoFeed numberOfItemsInFeed]; i++) {
+    if (i % 4 == 0 && i > 0) {
+      NSLog(@"\t-----");
+    }
+    
+//    [_photoFeed return]
+//    NSString *duplicate =  ? @"(DUPLICATE)" : @"";
+    NSLog(@"\t%@  %@", [[_photoFeed objectAtIndex:i] photoID], @"");
+  }
+}
+
+- (void)insertNewRowsInTableView:(NSArray *)newPhotos
+{
+ // instead of doing tableView reloadData, use table editing commands
+  NSMutableArray *indexPaths = [NSMutableArray array];
+  
+  NSInteger section = 0;
+  NSUInteger newTotalNumberOfPhotos = [_photoFeed numberOfItemsInFeed];
+  for (NSUInteger row = newTotalNumberOfPhotos - newPhotos.count; row < newTotalNumberOfPhotos; row++) {
+    
+    NSIndexPath *path = [NSIndexPath indexPathForRow:row inSection:section];
+    [indexPaths addObject:path];
+  }
+  
+  [self.tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
+}
 
 #pragma mark - UITableViewDelegate
-
-//////***** JUST COPIED THIS FROM THE INTERNET - what to do??**** /////////
+//
 //-(void)scrollViewDidScroll:(UIScrollView *)scrollView
 //{
 //  if (scrollView == self.tableView) {
-//    CGFloat currentOffsetX = scrollView.contentOffset.x;
 //    CGFloat currentOffSetY = scrollView.contentOffset.y;
 //    CGFloat contentHeight = scrollView.contentSize.height;
 //    
-//    if (currentOffSetY < (contentHeight / 6.0f)) {
-//      scrollView.contentOffset = CGPointMake(currentOffsetX,(currentOffSetY + (contentHeight/2)));
-//    }
-//    if (currentOffSetY > ((contentHeight * 4)/ 6.0f)) {
-//      scrollView.contentOffset = CGPointMake(currentOffsetX,(currentOffSetY - (contentHeight/2)));
+//    if (currentOffSetY > (contentHeight * 3.0 / 4.0)) {
+//      [self loadPage];
 //    }
 //  }
 //}
@@ -161,5 +208,31 @@
   
   [self.navigationController pushViewController:locationCVC animated:YES];
 }
+
+- (void)cellWasLongPressedWithPhoto:(PhotoModel *)photo
+{
+//  UIAlertAction *savePhotoAction = [UIAlertAction actionWithTitle:@"Save Photo"
+//                                                            style:UIAlertActionStyleDefault
+//                                                          handler:^(UIAlertAction * _Nonnull action) {
+//                                                            NSLog(@"hi");
+//                                                          }];
+//  
+//  UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
+//                                                         style:UIAlertActionStyleCancel
+//                                                       handler:^(UIAlertAction * _Nonnull action) {
+//                                                         
+//                                                       }];
+//  UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil
+//                                                                 message:nil
+//                                                          preferredStyle:UIAlertControllerStyleActionSheet];
+//  
+//  [alert addAction:savePhotoAction];
+//  [alert addAction:cancelAction];
+//  
+//  [self presentViewController:alert animated:YES completion:^{
+//    NSLog(@"HI");
+//  }];
+}
+
 
 @end

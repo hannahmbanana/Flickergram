@@ -132,6 +132,11 @@
 
   _userID                   = [[self guardJSONElement:[userDictionary objectForKey:@"id"]] integerValue];
   _username                 = [self guardJSONElement:[userDictionary objectForKey:@"username"]];
+  
+  if ([_username isKindOfClass:[NSNumber class]]) {
+    _username               = @"Anonymous";
+  }
+  
   _firstName                = [self guardJSONElement:[userDictionary objectForKey:@"firstname"]];
   _lastName                 = [self guardJSONElement:[userDictionary objectForKey:@"lastname"]];
   _fullName                 = [self guardJSONElement:[userDictionary objectForKey:@"fullname"]];

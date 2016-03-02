@@ -16,6 +16,9 @@
 #define CELL_HEADER_HORIZONTAL_INSET 10
 #define USER_IMAGE_HEIGHT 30
 
+@interface PhotoTableViewCell () <UIActionSheetDelegate>
+@end
+
 @implementation PhotoTableViewCell
 {
   PhotoModel   *_photoModel;
@@ -56,6 +59,9 @@
     // tap gesture recognizer
     UITapGestureRecognizer *tgr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(cellWasTapped:)];
     [self addGestureRecognizer:tgr];
+    
+    UILongPressGestureRecognizer *lpgr = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(cellWasLongPressed:)];
+    [self addGestureRecognizer:lpgr];
     
     _userProfileImageView                      = [[UIImageView alloc] init];
 //    _userProfileImageView.backgroundColor      = [UIColor redColor];
@@ -223,6 +229,17 @@
 
 #pragma mark - Gesture Handling
 
+- (void)cellWasLongPressed:(UIGestureRecognizer *)sender
+{
+  // need a 2nd method to be able to pass photo model
+  [self longPressRecognized];
+}
+
+- (void)longPressRecognized
+{
+  [self.delegate cellWasLongPressedWithPhoto:_photoModel];
+}
+
 - (void)cellWasTapped:(UIGestureRecognizer *)sender
 {
   // determine which area of cell was tapped
@@ -265,5 +282,9 @@
     }
   }
 }
+
+
+#pragma mark - UIActionSheetDelegate 
+
 
 @end

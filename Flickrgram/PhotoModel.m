@@ -33,6 +33,8 @@
     
     _uploadDateRaw              = [photoDictionary objectForKey:@"created_at"];
     
+    _photoID                    = [[photoDictionary objectForKey:@"id"] description];
+    
 //    _title                      = [photoDictionary objectForKey:@"title"];
 //    _descriptionText            = [photoDictionary valueForKeyPath:@"description._content"];
     
