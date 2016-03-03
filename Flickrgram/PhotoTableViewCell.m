@@ -56,15 +56,9 @@
   
   if (self) {
     
-    // tap gesture recognizer
-    UITapGestureRecognizer *tgr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(cellWasTapped:)];
-    [self addGestureRecognizer:tgr];
-    
-    UILongPressGestureRecognizer *lpgr = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(cellWasLongPressed:)];
-    [self addGestureRecognizer:lpgr];
-    
     _userProfileImageView                      = [[UIImageView alloc] init];
 //    _userProfileImageView.backgroundColor      = [UIColor redColor];
+  
     
     _userNameLabel                             = [[UILabel alloc] init];
     _userNameLabel.font                        = [_userNameLabel.font fontWithSize:floorf(USER_IMAGE_HEIGHT/2)-1];
@@ -92,6 +86,13 @@
     _photoLikesLabel                           = [[UILabel alloc] init];
     _photoDescriptionLabel                     = [[UILabel alloc] init];
     _photoCommentsLabel                        = [[UILabel alloc] init];
+    
+    UILongPressGestureRecognizer *lpgr = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(cellWasLongPressed:)];
+    [self addGestureRecognizer:lpgr];
+    
+    // tap gesture recognizer
+    UITapGestureRecognizer *tgr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(cellWasTapped:)];
+    [self addGestureRecognizer:tgr];
   }
   
   return self;
@@ -231,8 +232,20 @@
 
 - (void)cellWasLongPressed:(UIGestureRecognizer *)sender
 {
-  // need a 2nd method to be able to pass photo model
-  [self longPressRecognized];
+  if (sender.state == UIGestureRecognizerStateBegan) {
+    
+    // determine which area of cell was tapped
+    CGPoint tapPoint = [sender locationInView:_photoImageView];
+    
+    if (tapPoint.y > 0) {
+    
+      // photo long pressed
+      NSLog(@"LONG PRESS");
+      
+      // need a 2nd method to be able to pass photo model
+      [self longPressRecognized];
+    }
+  }
 }
 
 - (void)longPressRecognized

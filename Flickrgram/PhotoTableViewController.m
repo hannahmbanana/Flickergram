@@ -211,27 +211,25 @@
 
 - (void)cellWasLongPressedWithPhoto:(PhotoModel *)photo
 {
-//  UIAlertAction *savePhotoAction = [UIAlertAction actionWithTitle:@"Save Photo"
-//                                                            style:UIAlertActionStyleDefault
-//                                                          handler:^(UIAlertAction * _Nonnull action) {
-//                                                            NSLog(@"hi");
-//                                                          }];
-//  
-//  UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
-//                                                         style:UIAlertActionStyleCancel
-//                                                       handler:^(UIAlertAction * _Nonnull action) {
-//                                                         
-//                                                       }];
-//  UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil
-//                                                                 message:nil
-//                                                          preferredStyle:UIAlertControllerStyleActionSheet];
-//  
-//  [alert addAction:savePhotoAction];
-//  [alert addAction:cancelAction];
-//  
-//  [self presentViewController:alert animated:YES completion:^{
-//    NSLog(@"HI");
-//  }];
+  UIAlertAction *savePhotoAction = [UIAlertAction actionWithTitle:@"Save Photo"
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * _Nonnull action) {
+                                                            NSLog(@"hi");
+                                                          }];
+  
+  UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
+                                                         style:UIAlertActionStyleCancel
+                                                       handler:^(UIAlertAction * _Nonnull action) {
+                                                         
+                                                       }];
+  UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil
+                                                                 message:nil
+                                                          preferredStyle:UIAlertControllerStyleActionSheet];
+  
+  [alert addAction:savePhotoAction];
+  [alert addAction:cancelAction];
+  
+  [self presentViewController:alert animated:YES completion:^{}];
 }
 
 
