@@ -11,6 +11,7 @@
 
 @interface UserModel : NSObject
 
+@property (nonatomic, assign, readonly) NSDictionary *dictionaryRepresentation;
 @property (nonatomic, assign, readonly) NSUInteger   userID;
 @property (nonatomic, strong, readonly) NSString     *username;
 @property (nonatomic, strong, readonly) NSString     *firstName;
@@ -28,13 +29,12 @@
 @property (nonatomic, assign, readonly) NSUInteger   friendsCount;
 @property (nonatomic, assign, readonly) NSUInteger   followersCount;
 @property (nonatomic, assign, readonly) BOOL         following;
-@property (nonatomic, assign, readonly) NSDictionary *dictionaryRepresentation;
-
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWith500pxPhoto:(NSDictionary *)dictionary NS_DESIGNATED_INITIALIZER;
 
 - (void)fetchAvatarImageWithCompletionBlock:(void(^)(UserModel *, UIImage *))block;
+
 - (void)downloadCompleteUserDataWithCompletionBlock:(void(^)(UserModel *))block;
 
 @end

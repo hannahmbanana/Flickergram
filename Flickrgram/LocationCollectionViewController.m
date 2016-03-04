@@ -33,7 +33,8 @@
 
   if (self) {
     
-    _photoFeed = [[PhotoFeedModel alloc] initWithPhotoFeedModelType:PhotoFeedModelTypePopular];
+    _photoFeed = [[PhotoFeedModel alloc] initWithPhotoFeedModelType:PhotoFeedModelTypeLocation];
+    [_photoFeed updatePhotoFeedModelTypeLocationCoordinates:coordiantes radiusInMiles:10];
     [_photoFeed refreshFeedWithCompletionBlock:^(NSArray *newPhotos) {
       [self.collectionView reloadData];
     }];
