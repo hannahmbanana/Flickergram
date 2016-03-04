@@ -8,64 +8,89 @@
 
 #import "PhotoModel.h"
 #import <UIKit/UIKit.h>
-#import "FlickrKit.h"
 
 @implementation PhotoModel
 {
   NSDictionary *_dictionaryRepresentation;
-  CGFloat      _uploadDate;
+  NSString     *_uploadDateRaw;
 }
 
 
 #pragma mark - Lifecycle
 
-- (instancetype)initWithFlickPhoto:(NSDictionary *)flickrPhotoDictionary
+- (instancetype)initWith500pxPhoto:(NSDictionary *)photoDictionary
 {
   self = [super init];
   
   if (self) {
     
-    _dictionaryRepresentation   = flickrPhotoDictionary;
+    _dictionaryRepresentation   = photoDictionary;
     
-    FlickrKit *fk               = [FlickrKit sharedFlickrKit];
-    _URL                        = [fk photoURLForSize:FKPhotoSizeLarge1024 fromPhotoDictionary:flickrPhotoDictionary];
+    NSString *urlString         = [photoDictionary objectForKey:@"image_url"];
+    _URL                        = urlString ? [NSURL URLWithString:urlString] : nil;
     
-    _ownerUserProfile           = [[UserModel alloc] initWithFlickPhoto:flickrPhotoDictionary];
+    _ownerUserProfile           = [[UserModel alloc] initWith500pxPhoto:photoDictionary];
     
-    _uploadDate                 = [[flickrPhotoDictionary objectForKey:@"dateupload"] floatValue];
+    _uploadDateRaw              = [photoDictionary objectForKey:@"created_at"];
     
-    _title                      = [flickrPhotoDictionary objectForKey:@"title"];
-    _descriptionText            = [flickrPhotoDictionary valueForKeyPath:@"description._content"];
+    _photoID                    = [[photoDictionary objectForKey:@"id"] description];
+    
+//    _title                      = [photoDictionary objectForKey:@"title"];
+//    _descriptionText            = [photoDictionary valueForKeyPath:@"description._content"];
     
     // photo location
-    _location                   = [[LocationModel alloc] initWithFlickPhoto:flickrPhotoDictionary];
-    
+    _location                   = [[LocationModel alloc] initWith500pxPhoto:photoDictionary];
+
     // calculate dateString off the main thread
-    dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-      _uploadDateString = [self elapsedTimeStringSinceDate:_uploadDate];
-    });
+    _uploadDateString = [self elapsedTimeStringSinceDate:_uploadDateRaw];
   }
   
   return self;
+
 }
 
   
 #pragma mark - Helper Methods
 
-- (NSString *)elapsedTimeStringSinceDate:(CGFloat)timeIntervalSince1970
+// Returns a user-visible date time string that corresponds to the
+// specified RFC 3339 date time string. Note that this does not handle
+// all possible RFC 3339 date time strings, just one of the most common
+// styles.
+- (NSDate *)userVisibleDateTimeStringForRFC3339DateTimeString:(NSString *)rfc3339DateTimeString
+{
+  NSDateFormatter *   rfc3339DateFormatter;
+  NSLocale *          enUSPOSIXLocale;
+  
+  // Convert the RFC 3339 date time string to an NSDate.
+  
+  rfc3339DateFormatter = [[NSDateFormatter alloc] init];
+  
+  enUSPOSIXLocale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+  
+  [rfc3339DateFormatter setLocale:enUSPOSIXLocale];
+  [rfc3339DateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ssZ'"];
+  [rfc3339DateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+  
+  return [rfc3339DateFormatter dateFromString:rfc3339DateTimeString];
+}
+
+- (NSString *)elapsedTimeStringSinceDate:(NSString *)uploadDateString
 {
   // early return if no post date string
-  if (!timeIntervalSince1970)
+  if (!uploadDateString)
   {
     return @"NO POST DATE";
   }
   
-  NSDate *postDate            = [NSDate dateWithTimeIntervalSince1970:timeIntervalSince1970];
+  NSDate *postDate = [self userVisibleDateTimeStringForRFC3339DateTimeString:uploadDateString];
+
+  if (!postDate) {
+    return @"DATE CONVERSION ERROR";
+  }
+  
   NSDate *currentDate         = [NSDate date];
   
   NSCalendar *calendar        = [NSCalendar currentCalendar];
-  [calendar rangeOfUnit:NSCalendarUnitDay startDate:&postDate    interval:NULL forDate:postDate];
-  [calendar rangeOfUnit:NSCalendarUnitDay startDate:&currentDate interval:NULL forDate:currentDate];
   
   NSUInteger seconds = [[calendar components:NSCalendarUnitSecond fromDate:postDate toDate:currentDate options:0] second];
   NSUInteger minutes = [[calendar components:NSCalendarUnitMinute fromDate:postDate toDate:currentDate options:0] minute];
@@ -84,6 +109,8 @@
     elapsedTime = [NSString stringWithFormat:@"%lum", (long)minutes];
   } else if (seconds > 0) {
     elapsedTime = [NSString stringWithFormat:@"%lus", (long)seconds];
+  } else if (seconds == 0) {
+    elapsedTime = @"1s";
   } else {
     elapsedTime = @"ERROR";
   }

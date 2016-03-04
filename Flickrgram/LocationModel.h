@@ -13,9 +13,11 @@
 
 @property (nonatomic, assign, readonly) CLLocationCoordinate2D coordinates;
 @property (nonatomic, strong, readonly) CLPlacemark            *placemark;
-@property (nonatomic, strong, readonly) NSString               *userFriendlyLocationString;
+@property (nonatomic, strong, readonly) NSString               *locationString;
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithFlickPhoto:(NSDictionary *)flickrPhotoDictionary NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWith500pxPhoto:(NSDictionary *)dictionary NS_DESIGNATED_INITIALIZER;
+
+- (void)reverseGeocodedLocationWithCompletionBlock:(void (^)(LocationModel *))blockName;
 
 @end

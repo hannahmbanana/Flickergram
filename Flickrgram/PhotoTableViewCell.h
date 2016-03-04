@@ -11,14 +11,17 @@
 #import "PhotoModel.h"
 
 @protocol PhotoTableViewCellProtocol <NSObject>
-- (void)userProfileWasTouchedWithUserID:(NSString *)userID;
-- (void)photoLocationWasTouchedWithCoordinate:(CLLocationCoordinate2D)coordiantes;
+- (void)userProfileWasTouchedWithUser:(UserModel *)user;
+- (void)photoLocationWasTouchedWithCoordinate:(CLLocationCoordinate2D)coordiantes name:(NSString *)name;
+- (void)cellWasLongPressedWithPhoto:(PhotoModel *)photo;
 @end
 
 
 @interface PhotoTableViewCell : UITableViewCell
 
 @property (nonatomic, strong, readwrite) id<PhotoTableViewCellProtocol> delegate;
+
++ (CGFloat)cellHeaderFooterHeightForDataModel:(PhotoModel *)photo;
 
 - (void)updateCellWithPhotoObject:(PhotoModel *)photo;
 

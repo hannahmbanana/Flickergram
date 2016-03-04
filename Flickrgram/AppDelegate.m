@@ -8,7 +8,8 @@
 
 #import "AppDelegate.h"
 #import "PhotoTableViewController.h"
-#import "FlickrKit.h"
+#import "UserProfileViewController.h"
+#import "PhotoMapViewController.h"
 
 @interface AppDelegate ()
 
@@ -18,16 +19,7 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-  
-  // Initialise FlickrKit with your flickr api key and shared secret
-  NSString *apiKey = @"0b2ff1cdfd5254ec6a21bcd8542dabea";
-  NSString *secret = @"65d8e07f422ad680";
-  if (!apiKey) {
-    NSLog(@"\n----------------------------------\nYou need to enter your own 'apiKey' and 'secret' in FKAppDelegate for the demo to run. \n\nYou can get these from your Flickr account settings.\n----------------------------------\n");
-    exit(0);
-  }
-  [[FlickrKit sharedFlickrKit] initializeWithAPIKey:apiKey sharedSecret:secret];
-  
+    
   self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
   
   // create Home Feed viewController & navController
@@ -38,6 +30,7 @@
                                                                              tag:0];
   
   // create Profile viewController & navController
+//  UserProfileViewController *myProfileVC   = [[UserProfileViewController alloc] initWithMe];
   UIViewController *VC                         = [[UIViewController alloc] init];
   VC.view.backgroundColor                      = [UIColor purpleColor];
   
@@ -56,10 +49,9 @@
                                                                                tag:0];
 
   // create Photos Near Me viewController & navController
-  UIViewController *VC2                      = [[UIViewController alloc] init];
-  VC2.view.backgroundColor                   = [UIColor greenColor];
+  PhotoMapViewController *photoNearMeVC      = [[PhotoMapViewController alloc] init];
   
-  UINavigationController *photoNearMeNavCtrl = [[UINavigationController alloc] initWithRootViewController:VC2];
+  UINavigationController *photoNearMeNavCtrl = [[UINavigationController alloc] initWithRootViewController:photoNearMeVC];
   photoNearMeNavCtrl.tabBarItem              = [[UITabBarItem alloc] initWithTitle:@"Near Me"
                                                                              image:[UIImage imageNamed:@"earth"]
                                                                                tag:0];

@@ -7,18 +7,18 @@
 //
 
 #import "PhotoTableViewController.h"
-#import "FlickrKit.h"
 #import "PhotoModel.h"
 #import "PhotoTableViewCell.h"
-#import "LocationViewController.h"
+#import "UserProfileViewController.h"
+#import "LocationCollectionViewController.h"
+#import "PhotoFeedModel.h"
 
 @interface PhotoTableViewController () <PhotoTableViewCellProtocol>
 @end
 
 @implementation PhotoTableViewController
 {
-  FKFlickrNetworkOperation  *_todaysInterestingOp;
-  NSMutableArray            *_photos;                 // of PhotoModel Objects
+  PhotoFeedModel *_photoFeed;
 }
 
 
@@ -30,108 +30,131 @@
   
   if (self) {
     
-    _photos = [NSMutableArray array];
+    // PHOTO FEED OBJECT
+    _photoFeed = [[PhotoFeedModel alloc] initWithPhotoFeedModelType:PhotoFeedModelTypePopular];
     
-    UIBarButtonItem *clearItem = [[UIBarButtonItem alloc] initWithTitle:@"clear" style:UIBarButtonItemStylePlain target:self action:@selector(clearPhotos)];
-    self.navigationItem.rightBarButtonItem = clearItem;
+    // start first small fetch
+    [_photoFeed refreshFeedWithCompletionBlock:^(NSArray *newPhotos){
+      
+      // update the tableView
+      [self.tableView reloadData];
+      
+      // immediately start second larger fetch
+//      [self loadPage];
+    }];
     
+    
+    // TABLEVIEW CONFIG
     // disable tableView cell selection
     self.tableView.allowsSelection = NO;
-    
-    // enable tableView pull-to-refresh & add target-action pair
-    self.refreshControl = [[UIRefreshControl alloc] init];
-    [self.refreshControl addTarget:self action:@selector(downloadInterestingImages) forControlEvents:UIControlEventValueChanged];
     
     // register custom UITableViewCell subclass
     [self.tableView registerClass:[PhotoTableViewCell class] forCellReuseIdentifier:@"photoCell"];
     
-    // start downloading interesting images for feed
-    [self downloadInterestingImages];
+    // enable tableView pull-to-refresh & add target-action pair
+    self.refreshControl = [[UIRefreshControl alloc] init];
+    [self.refreshControl addTarget:self action:@selector(refreshFeed) forControlEvents:UIControlEventValueChanged];
+    
+    UIBarButtonItem *loadData = [[UIBarButtonItem alloc] initWithTitle:@"load data" style:UIBarButtonItemStylePlain target:self action:@selector(loadPage)];
+    self.navigationItem.rightBarButtonItem = loadData;
+    
+    UIBarButtonItem *clear = [[UIBarButtonItem alloc] initWithTitle:@"clear" style:UIBarButtonItemStylePlain target:self action:@selector(clearFeed)];
+    self.navigationItem.leftBarButtonItem = clear;
     
     // navBar title
-    self.navigationItem.title = @"flickrgram";
-      }
+    self.navigationItem.title = @"500pixgram";
+  }
   
   return self;
 }
 
 
+#pragma mark - Gesture Handling
 
-
-#pragma mark - Helper Methods
-
-- (void)clearPhotos
+- (void)clearFeed
 {
-  _photos = [NSMutableArray array];
+  [_photoFeed clearFeed];
   [self.tableView reloadData];
 }
 
-
-- (void)downloadInterestingImages
+- (void)refreshFeed
 {
-  FKFlickrInterestingnessGetList *interesting = [[FKFlickrInterestingnessGetList alloc] init];
-  interesting.per_page = @"5";
-  interesting.extras = @"description, date_upload, owner_name, geo, tags, machine_tags, url_q";
-  
-  _todaysInterestingOp = [[FlickrKit sharedFlickrKit] call:interesting completion:^(NSDictionary *response, NSError *error) {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-      if (response) {
-        
-        NSMutableArray *photoDictionaries = [NSMutableArray array];
-        
-        for (NSDictionary *photoDictionary in [response valueForKeyPath:@"photos.photo"]) {
-          
-          PhotoModel *photo = [[PhotoModel alloc] initWithFlickPhoto:photoDictionary];
-          [photoDictionaries addObject:photo];
-        }
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-          
-          [_photos addObjectsFromArray:photoDictionaries];
-          
-          // reload table data once _photos data model is populated
-          [self.tableView reloadData];
-          
-          // end spinner
-          [self.refreshControl endRefreshing];
-        });
-      }
-    });
+  [_photoFeed refreshFeedWithCompletionBlock:^(NSArray *newPhotos){
+    
+    [self.tableView reloadData];
+    
+    NSLog(@"_photoFeed number of items = %lu", [_photoFeed numberOfItemsInFeed]);
+    
+    [self.refreshControl endRefreshing];
   }];
 }
 
-
-#pragma mark - UITableViewDelegate
-
-//////***** JUST COPIED THIS FROM THE INTERNET - what to do??**** /////////
--(void)scrollViewDidScroll:(UIScrollView *)scrollView
+- (void)loadPage
 {
-  if (scrollView == self.tableView) {
-    CGFloat currentOffsetX = scrollView.contentOffset.x;
-    CGFloat currentOffSetY = scrollView.contentOffset.y;
-    CGFloat contentHeight = scrollView.contentSize.height;
+  NSLog(@"_photoFeed number of items = %lu", [_photoFeed numberOfItemsInFeed]);
+  
+  [self logPhotoIDsInPhotoFeed];
+
+  [_photoFeed requestPageWithCompletionBlock:^(NSArray *newPhotos){
     
-    if (currentOffSetY < (contentHeight / 6.0f)) {
-      scrollView.contentOffset = CGPointMake(currentOffsetX,(currentOffSetY + (contentHeight/2)));
+    [self insertNewRowsInTableView:newPhotos];
+    
+    [self logPhotoIDsInPhotoFeed];
+
+  }];
+}
+
+- (void)logPhotoIDsInPhotoFeed
+{
+  NSLog(@"_photoFeed number of items = %lu", [_photoFeed numberOfItemsInFeed]);
+  
+  for (int i = 0; i < [_photoFeed numberOfItemsInFeed]; i++) {
+    if (i % 4 == 0 && i > 0) {
+      NSLog(@"\t-----");
     }
-    if (currentOffSetY > ((contentHeight * 4)/ 6.0f)) {
-      scrollView.contentOffset = CGPointMake(currentOffsetX,(currentOffSetY - (contentHeight/2)));
-    }
+    
+//    [_photoFeed return]
+//    NSString *duplicate =  ? @"(DUPLICATE)" : @"";
+    NSLog(@"\t%@  %@", [[_photoFeed objectAtIndex:i] photoID], @"");
   }
 }
+
+- (void)insertNewRowsInTableView:(NSArray *)newPhotos
+{
+ // instead of doing tableView reloadData, use table editing commands
+  NSMutableArray *indexPaths = [NSMutableArray array];
+  
+  NSInteger section = 0;
+  NSUInteger newTotalNumberOfPhotos = [_photoFeed numberOfItemsInFeed];
+  for (NSUInteger row = newTotalNumberOfPhotos - newPhotos.count; row < newTotalNumberOfPhotos; row++) {
+    
+    NSIndexPath *path = [NSIndexPath indexPathForRow:row inSection:section];
+    [indexPaths addObject:path];
+  }
+  
+  [self.tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
+}
+
+#pragma mark - UITableViewDelegate
+//
+//-(void)scrollViewDidScroll:(UIScrollView *)scrollView
+//{
+//  if (scrollView == self.tableView) {
+//    CGFloat currentOffSetY = scrollView.contentOffset.y;
+//    CGFloat contentHeight = scrollView.contentSize.height;
+//    
+//    if (currentOffSetY > (contentHeight * 3.0 / 4.0)) {
+//      [self loadPage];
+//    }
+//  }
+//}
 
 
 #pragma mark - UITableViewDataSource
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(nonnull NSIndexPath *)indexPath
-{
-  #warning H: call class method on cell heightForRowWithDataModel
-  return self.view.bounds.size.width;
-}
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-  return [_photos count];
+  return [_photoFeed numberOfItemsInFeed];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -147,28 +170,67 @@
   
   // configure the cell for the appropriate photo
   cell.delegate = self;
-  [cell updateCellWithPhotoObject:[_photos objectAtIndex:indexPath.row]];
+  [cell updateCellWithPhotoObject:[_photoFeed objectAtIndex:indexPath.row]];
   
   return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(nonnull NSIndexPath *)indexPath
+{
+  PhotoModel *photoModel = [_photoFeed objectAtIndex:indexPath.row];
+  CGFloat headerFooterCombinedHeight = [PhotoTableViewCell cellHeaderFooterHeightForDataModel:photoModel];
+  return headerFooterCombinedHeight + self.view.bounds.size.width; // + square photo height
 }
 
 
 #pragma mark - PhotoTableViewCellProtocol
 
-- (void)userProfileWasTouchedWithUserID:(NSString *)userID;
+- (void)userProfileWasTouchedWithUser:(UserModel *)user;
 {
-//  UserProfileCollectionViewController *userProfileView = [[UserProfileCollectionViewController alloc] initWithUserID:userID];
-//  userProfileView.view.backgroundColor = [UIColor redColor];
-//  
-//  [self.navigationController pushViewController:userProfileView animated:YES];
+  UserProfileViewController *userProfileView = [[UserProfileViewController alloc] initWithUser:user];
+  
+  [self.navigationController pushViewController:userProfileView animated:YES];
 }
 
-- (void)photoLocationWasTouchedWithCoordinate:(CLLocationCoordinate2D)coordiantes
+- (void)photoLocationWasTouchedWithCoordinate:(CLLocationCoordinate2D)coordiantes name:(NSString *)name
 {
-  LocationViewController *locationVC = [[LocationViewController alloc] init];
-  locationVC.coordinate = coordiantes;
+  UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
+  layout.minimumInteritemSpacing = 1;
+  layout.minimumLineSpacing = 1;
+  layout.headerReferenceSize = CGSizeMake(self.view.bounds.size.width, 200);
   
-  [self.navigationController pushViewController:locationVC animated:YES];
+  CGFloat numItemsLine = 5;
+  layout.itemSize = CGSizeMake((self.view.bounds.size.width - (numItemsLine - 1)) / numItemsLine,
+                               (self.view.bounds.size.width - (numItemsLine - 1)) / numItemsLine);
+  
+  LocationCollectionViewController *locationCVC = [[LocationCollectionViewController alloc] initWithCollectionViewLayout:layout coordinates:coordiantes];
+  locationCVC.navigationItem.title = name;
+  
+  [self.navigationController pushViewController:locationCVC animated:YES];
 }
+
+- (void)cellWasLongPressedWithPhoto:(PhotoModel *)photo
+{
+  UIAlertAction *savePhotoAction = [UIAlertAction actionWithTitle:@"Save Photo"
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * _Nonnull action) {
+                                                            NSLog(@"hi");
+                                                          }];
+  
+  UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
+                                                         style:UIAlertActionStyleCancel
+                                                       handler:^(UIAlertAction * _Nonnull action) {
+                                                         
+                                                       }];
+  UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil
+                                                                 message:nil
+                                                          preferredStyle:UIAlertControllerStyleActionSheet];
+  
+  [alert addAction:savePhotoAction];
+  [alert addAction:cancelAction];
+  
+  [self presentViewController:alert animated:YES completion:^{}];
+}
+
 
 @end
