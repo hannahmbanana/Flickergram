@@ -62,7 +62,7 @@
     self.navigationItem.leftBarButtonItem = clear;
     
     // navBar title
-    self.navigationItem.title = @"500pixergram";
+    self.navigationItem.title = @"500pixgram";
   }
   
   return self;

@@ -7,6 +7,8 @@
 //
 
 #import "LocationCollectionViewController.h"
+#import "PhotoCollectionViewCell.h"
+#import "PhotoFeedModel.h"
 #import <MapKit/MKMapView.h>
 #import <MapKit/MKPointAnnotation.h>
 
@@ -17,6 +19,7 @@
 {
   CLLocationCoordinate2D  _coordinates;
   MKMapView              *_mapView;
+  PhotoFeedModel         *_photoFeed;
 }
 
 
@@ -30,6 +33,11 @@
 
   if (self) {
     
+    _photoFeed = [[PhotoFeedModel alloc] initWithPhotoFeedModelType:PhotoFeedModelTypePopular];
+    [_photoFeed refreshFeedWithCompletionBlock:^(NSArray *newPhotos) {
+      [self.collectionView reloadData];
+    }];
+    
     // set collection view dataSource and delegate
     self.collectionView.delegate = self;
     self.collectionView.dataSource = self;
@@ -37,7 +45,7 @@
     self.collectionView.backgroundColor = [UIColor whiteColor];
     
     // register cell class
-    [self.collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"photoCell"];
+    [self.collectionView registerClass:[PhotoCollectionViewCell class] forCellWithReuseIdentifier:@"photo"];
     [self.collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"headerView"];
     
     // configure MKMapView & add as subview
@@ -85,21 +93,16 @@
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-  return 40;
+  return [_photoFeed numberOfItemsInFeed];
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-  // check for cell in reuse queue
-  UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"photoCell" forIndexPath:indexPath];
+  // dequeue a reusable cell
+  PhotoCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"photo" forIndexPath:indexPath];
   
-  // if no reusable cell, create a new one
-  if (!cell) {
-    cell = [[UICollectionViewCell alloc] init];
-  }
-  
-  // configure celld
-  cell.backgroundColor = [UIColor purpleColor];
+  // configure the cell for the appropriate photo
+  [cell updateCellWithPhotoObject:[_photoFeed objectAtIndex:indexPath.row]];
   
   return cell;
 }

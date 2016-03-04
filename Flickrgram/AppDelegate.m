@@ -9,6 +9,7 @@
 #import "AppDelegate.h"
 #import "PhotoTableViewController.h"
 #import "UserProfileViewController.h"
+#import "PhotoMapViewController.h"
 
 @interface AppDelegate ()
 
@@ -48,10 +49,9 @@
                                                                                tag:0];
 
   // create Photos Near Me viewController & navController
-  UIViewController *VC2                      = [[UIViewController alloc] init];
-  VC2.view.backgroundColor                   = [UIColor greenColor];
+  PhotoMapViewController *photoNearMeVC      = [[PhotoMapViewController alloc] init];
   
-  UINavigationController *photoNearMeNavCtrl = [[UINavigationController alloc] initWithRootViewController:VC2];
+  UINavigationController *photoNearMeNavCtrl = [[UINavigationController alloc] initWithRootViewController:photoNearMeVC];
   photoNearMeNavCtrl.tabBarItem              = [[UITabBarItem alloc] initWithTitle:@"Near Me"
                                                                              image:[UIImage imageNamed:@"earth"]
                                                                                tag:0];

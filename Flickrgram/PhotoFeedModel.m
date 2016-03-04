@@ -12,11 +12,11 @@
 {
   NSMutableArray *_photos;    // array of PhotoModel objects
   NSMutableArray *_ids;
+  
   NSString       *_urlString;
   NSUInteger     _currentPage;
   NSUInteger     _totalPages;
   NSUInteger     _totalItems;
-  
   BOOL           _fetchPageInProgress;
   BOOL           _refreshFeedInProgress;
 
@@ -77,6 +77,7 @@
 - (void)clearFeed
 {
   _photos = [[NSMutableArray alloc] init];
+  _ids    = [[NSMutableArray alloc] init];
 }
 
 - (void)requestPageWithCompletionBlock:(void (^)(NSArray *))block
@@ -148,7 +149,7 @@
     
       NSUInteger nextPage = _currentPage + 1;
       
-      NSString *urlAdditions = [NSString stringWithFormat:@"&page=%lu&rpp=4", (unsigned long)nextPage];
+      NSString *urlAdditions = [NSString stringWithFormat:@"&page=%lu&rpp=40", (unsigned long)nextPage];
       
       NSURL *url = [NSURL URLWithString:[_urlString stringByAppendingString:urlAdditions]];
       
