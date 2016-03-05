@@ -1,34 +1,42 @@
 //
-//  PhotoTableViewController.m
+//  PhotoFeedViewController.m
 //  Flickrgram
 //
 //  Created by Hannah Troisi on 2/17/16.
 //  Copyright © 2016 Hannah Troisi. All rights reserved.
 //
 
-#import "PhotoTableViewController.h"
+#import "PhotoFeedViewController.h"
 #import "PhotoModel.h"
 #import "PhotoTableViewCell.h"
 #import "UserProfileViewController.h"
 #import "LocationCollectionViewController.h"
 #import "PhotoFeedModel.h"
+#import <AsyncDisplayKit/AsyncDisplayKit.h>
 
-@interface PhotoTableViewController () <PhotoTableViewCellProtocol>
+@interface PhotoFeedViewController () <ASTableDelegate, ASTableDataSource, PhotoTableViewCellProtocol>
 @end
 
-@implementation PhotoTableViewController
+@implementation PhotoFeedViewController
 {
   PhotoFeedModel *_photoFeed;
+  ASTableView    *_tableView;
 }
 
 
 #pragma mark - Lifecycle
 
-- (instancetype)initWithStyle:(UITableViewStyle)style
+- (instancetype)initWithNibName:(nullable NSString *)nibNameOrNil bundle:(nullable NSBundle *)nibBundleOrNil
 {
-  self = [super initWithStyle:style];
+  self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
   
   if (self) {
+    
+    
+    // ASTABLEVIEW
+    _tableView = [[ASTableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain asyncDataFetching:YES];
+    _tableView.asyncDataSource = self;
+    _tableView.asyncDelegate = self;
     
     // PHOTO FEED OBJECT
     _photoFeed = [[PhotoFeedModel alloc] initWithPhotoFeedModelType:PhotoFeedModelTypePopular];
@@ -37,7 +45,7 @@
     [_photoFeed refreshFeedWithCompletionBlock:^(NSArray *newPhotos){
       
       // update the tableView
-      [self.tableView reloadData];
+      [_tableView reloadData];
       
       // immediately start second larger fetch
 //      [self loadPage];
@@ -46,14 +54,14 @@
     
     // TABLEVIEW CONFIG
     // disable tableView cell selection
-    self.tableView.allowsSelection = NO;
+    _tableView.allowsSelection = NO;
     
     // register custom UITableViewCell subclass
-    [self.tableView registerClass:[PhotoTableViewCell class] forCellReuseIdentifier:@"photoCell"];
+//    [_tableView registerClass:[PhotoTableViewCell class] forCellReuseIdentifier:@"photoCell"]; // not available in ASDK ASTableView
     
     // enable tableView pull-to-refresh & add target-action pair
-    self.refreshControl = [[UIRefreshControl alloc] init];
-    [self.refreshControl addTarget:self action:@selector(refreshFeed) forControlEvents:UIControlEventValueChanged];
+//    self.refreshControl = [[UIRefreshControl alloc] init];
+//    [self.refreshControl addTarget:self action:@selector(refreshFeed) forControlEvents:UIControlEventValueChanged];
     
     UIBarButtonItem *loadData = [[UIBarButtonItem alloc] initWithTitle:@"load data" style:UIBarButtonItemStylePlain target:self action:@selector(loadPage)];
     self.navigationItem.rightBarButtonItem = loadData;
@@ -68,24 +76,38 @@
   return self;
 }
 
+- (void)loadView
+{
+  [super loadView];
+  
+  [self.view addSubview:_tableView];  //FIXME: move these to loadView
+  self.view.backgroundColor = [UIColor whiteColor]; //ditto
+}
+
+- (void)viewWillLayoutSubviews
+{
+  [super viewWillLayoutSubviews];
+  
+  _tableView.frame = self.view.bounds;
+}
 
 #pragma mark - Gesture Handling
 
 - (void)clearFeed
 {
   [_photoFeed clearFeed];
-  [self.tableView reloadData];
+  [_tableView reloadData];
 }
 
 - (void)refreshFeed
 {
   [_photoFeed refreshFeedWithCompletionBlock:^(NSArray *newPhotos){
     
-    [self.tableView reloadData];
+    [_tableView reloadData];
     
     NSLog(@"_photoFeed number of items = %lu", [_photoFeed numberOfItemsInFeed]);
     
-    [self.refreshControl endRefreshing];
+//    [self.refreshControl endRefreshing];
   }];
 }
 
@@ -132,14 +154,14 @@
     [indexPaths addObject:path];
   }
   
-  [self.tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
+  [_tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
 }
 
-#pragma mark - UITableViewDelegate
+#pragma mark - ASTableDelegate protocol methods
 //
 //-(void)scrollViewDidScroll:(UIScrollView *)scrollView
 //{
-//  if (scrollView == self.tableView) {
+//  if (scrollView == _tableView) {
 //    CGFloat currentOffSetY = scrollView.contentOffset.y;
 //    CGFloat contentHeight = scrollView.contentSize.height;
 //    
@@ -150,38 +172,29 @@
 //}
 
 
-#pragma mark - UITableViewDataSource
+#pragma mark - ASTableDataSource protocol methods
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
   return [_photoFeed numberOfItemsInFeed];
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+- (ASCellNode *)tableView:(ASTableView *)tableView nodeForRowAtIndexPath:(NSIndexPath *)indexPath;
 {
   // dequeue a reusable cell
-  PhotoTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"photoCell" forIndexPath:indexPath];
+//  PhotoTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"photoCell" forIndexPath:indexPath];
   
   // create a new PhotoTableViewCell if no reusable ones are available in queue
-  if (!cell) {
-    cell = [[PhotoTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"photoCell"];
-    cell.delegate = self;
-  }
+//  if (!cell) {
+  PhotoTableViewCell *cell = [[PhotoTableViewCell alloc] init];
+  cell.delegate = self;
+//  }
   
   // configure the cell for the appropriate photo
-  cell.delegate = self;
   [cell updateCellWithPhotoObject:[_photoFeed objectAtIndex:indexPath.row]];
   
   return cell;
 }
-
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(nonnull NSIndexPath *)indexPath
-{
-  PhotoModel *photoModel = [_photoFeed objectAtIndex:indexPath.row];
-  CGFloat headerFooterCombinedHeight = [PhotoTableViewCell cellHeaderFooterHeightForDataModel:photoModel];
-  return headerFooterCombinedHeight + self.view.bounds.size.width; // + square photo height
-}
-
 
 #pragma mark - PhotoTableViewCellProtocol
 

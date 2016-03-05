@@ -7,7 +7,7 @@
 //
 
 #import "AppDelegate.h"
-#import "PhotoTableViewController.h"
+#import "PhotoFeedViewController.h"
 #import "UserProfileViewController.h"
 #import "PhotoMapViewController.h"
 
@@ -23,7 +23,7 @@
   self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
   
   // create Home Feed viewController & navController
-  PhotoTableViewController *viewController = [[PhotoTableViewController alloc] init];
+  PhotoFeedViewController *viewController  = [[PhotoFeedViewController alloc] initWithNibName:nil bundle:nil];
   UINavigationController *homeFeedNavCtrl  = [[UINavigationController alloc] initWithRootViewController:viewController];
   homeFeedNavCtrl.tabBarItem               = [[UITabBarItem alloc] initWithTitle:@"Home Feed"
                                                                            image:[UIImage imageNamed:@"home"]

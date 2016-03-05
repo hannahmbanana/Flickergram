@@ -5,5 +5,6 @@ platform :ios, '7.0'
 
 target 'Flickrgram' do
   pod 'PINRemoteImage', :inhibit_warnings => true
+  pod 'AsyncDisplayKit', :path => '/Users/hmtroisi/Desktop/AsyncDisplayKit'
 end
 

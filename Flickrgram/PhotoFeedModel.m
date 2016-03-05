@@ -9,7 +9,7 @@
 #import "PhotoFeedModel.h"
 
 #define fiveHundredPX_ENDPOINT_HOST      @"https://api.500px.com/v1/"
-#define fiveHundredPX_ENDPOINT_POPULAR   @"photos?feature=popular&sort=rating&image_size=3&include_store=store_download&include_states=voted"
+#define fiveHundredPX_ENDPOINT_POPULAR   @"photos?feature=popular&sort=rating&image_size=4&include_store=store_download&include_states=voted"
 #define fiveHundredPX_ENDPOINT_SEARCH    @"photos/search?geo="    //latitude,longitude,radius<units>
 #define fiveHundredPX_ENDPOINT_USER      @"photos?user_id="
 #define fiveHundredPX_CONSUMER_KEY_PARAM @"&consumer_key=Fi13GVb8g53sGvHICzlram7QkKOlSDmAmp9s9aqC"

@@ -1,4 +1,10 @@
 PODS:
+  - AsyncDisplayKit (1.9.7):
+    - AsyncDisplayKit/PINRemoteImage (= 1.9.7)
+  - AsyncDisplayKit/ASDealloc2MainObject (1.9.7)
+  - AsyncDisplayKit/PINRemoteImage (1.9.7):
+    - AsyncDisplayKit/ASDealloc2MainObject
+    - PINRemoteImage/iOS (>= 2)
   - FLAnimatedImage (1.0.12)
   - PINCache (2.2.1)
   - PINRemoteImage (2.0.1):
@@ -8,11 +14,19 @@ PODS:
   - PINRemoteImage/FLAnimatedImage (2.0.1):
     - FLAnimatedImage (>= 1.0)
     - PINRemoteImage/Core
+  - PINRemoteImage/iOS (2.0.1):
+    - PINRemoteImage/Core
 
 DEPENDENCIES:
+  - AsyncDisplayKit (from `/Users/hmtroisi/Desktop/AsyncDisplayKit`)
   - PINRemoteImage
 
+EXTERNAL SOURCES:
+  AsyncDisplayKit:
+    :path: /Users/hmtroisi/Desktop/AsyncDisplayKit
+
 SPEC CHECKSUMS:
+  AsyncDisplayKit: eb762d3bfd3896b2901909ebc24b54c97f32d43c
   FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
   PINCache: ed1f07a85cc6fbf488f8ecc1980b07b49b7b85b5
   PINRemoteImage: 6feb6da5db9a6cc5e3b9006c8f7b749a7e61be49
