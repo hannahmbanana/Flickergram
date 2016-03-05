@@ -199,7 +199,7 @@
   layout.minimumLineSpacing = 1;
   layout.headerReferenceSize = CGSizeMake(self.view.bounds.size.width, 200);
   
-  CGFloat numItemsLine = 5;
+  CGFloat numItemsLine = 3;
   layout.itemSize = CGSizeMake((self.view.bounds.size.width - (numItemsLine - 1)) / numItemsLine,
                                (self.view.bounds.size.width - (numItemsLine - 1)) / numItemsLine);
   

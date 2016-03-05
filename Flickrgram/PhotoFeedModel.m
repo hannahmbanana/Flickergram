@@ -8,8 +8,17 @@
 
 #import "PhotoFeedModel.h"
 
+#define fiveHundredPX_ENDPOINT_HOST      @"https://api.500px.com/v1/"
+#define fiveHundredPX_ENDPOINT_POPULAR   @"photos?feature=popular&sort=rating&image_size=3&include_store=store_download&include_states=voted"
+#define fiveHundredPX_ENDPOINT_SEARCH    @"photos/search?geo="    //latitude,longitude,radius<units>
+#define fiveHundredPX_ENDPOINT_USER      @"photos?user_id="
+#define fiveHundredPX_CONSUMER_KEY_PARAM @"&consumer_key=Fi13GVb8g53sGvHICzlram7QkKOlSDmAmp9s9aqC"
+
+
 @implementation PhotoFeedModel
 {
+  PhotoFeedModelType _feedType;
+  
   NSMutableArray *_photos;    // array of PhotoModel objects
   NSMutableArray *_ids;
   
@@ -19,7 +28,10 @@
   NSUInteger     _totalItems;
   BOOL           _fetchPageInProgress;
   BOOL           _refreshFeedInProgress;
-
+  
+  CLLocationCoordinate2D    _location;
+  NSUInteger    _locationRadius;
+  NSUInteger    _userID;
 }
 
 
@@ -39,23 +51,33 @@
   
   if (self) {
   
+    _feedType    = type;
     _photos      = [[NSMutableArray alloc] init];
     _ids         = [[NSMutableArray alloc] init];
     _currentPage = 0;
     
+
+    NSString *apiEndpointString;
+    
     switch (type) {
       case (PhotoFeedModelTypePopular):
-        _urlString = @"https://api.500px.com/v1/photos?feature=popular&sort=created_at&image_size=3&include_store=store_download&include_states=voted&consumer_key=Fi13GVb8g53sGvHICzlram7QkKOlSDmAmp9s9aqC";
+        apiEndpointString = fiveHundredPX_ENDPOINT_POPULAR;
         break;
         
-//      case (PhotoFeedModelTypePopular2):
-//        urlString =
-//        break;
+      case (PhotoFeedModelTypeLocation):
+        apiEndpointString = fiveHundredPX_ENDPOINT_SEARCH;
+        break;
+        
+      case (PhotoFeedModelTypeUserPhotos):
+        apiEndpointString = fiveHundredPX_ENDPOINT_USER;
+        break;
         
       default:
-        _urlString = @"https://api.500px.com/v1/photos?feature=popular&sort=created_at&image_size=3&include_store=store_download&include_states=voted&consumer_key=Fi13GVb8g53sGvHICzlram7QkKOlSDmAmp9s9aqC";
+        
         break;
     }
+    
+    _urlString = [[fiveHundredPX_ENDPOINT_HOST stringByAppendingString:apiEndpointString] stringByAppendingString:fiveHundredPX_CONSUMER_KEY_PARAM];
   }
   
   return self;
@@ -72,6 +94,26 @@
 - (PhotoModel *)objectAtIndex:(NSUInteger)index
 {
   return [_photos objectAtIndex:index];
+}
+
+- (void)updatePhotoFeedModelTypeLocationCoordinates:(CLLocationCoordinate2D)coordinate radiusInMiles:(NSUInteger)radius;
+{
+  _location = coordinate;
+  _locationRadius = radius;
+  NSString *locationString = [NSString stringWithFormat:@"%f,%f,%lumi", coordinate.latitude, coordinate.longitude, radius];
+  
+  _urlString = [fiveHundredPX_ENDPOINT_HOST stringByAppendingString:fiveHundredPX_ENDPOINT_SEARCH];
+  _urlString = [[_urlString stringByAppendingString:locationString] stringByAppendingString:fiveHundredPX_CONSUMER_KEY_PARAM];
+}
+
+- (void)updatePhotoFeedModelTypeUserId:(NSUInteger)userID
+{
+  _userID = userID;
+  
+  NSString *userString = [NSString stringWithFormat:@"%lu", (long)userID];
+  _urlString = [fiveHundredPX_ENDPOINT_HOST stringByAppendingString:fiveHundredPX_ENDPOINT_USER];
+  _urlString = [[_urlString stringByAppendingString:userString] stringByAppendingString:@"&sort=created_at&image_size=3&include_store=store_download&include_states=voted"];
+  _urlString = [_urlString stringByAppendingString:fiveHundredPX_CONSUMER_KEY_PARAM];
 }
 
 - (void)clearFeed

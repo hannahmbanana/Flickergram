@@ -27,6 +27,8 @@
   UILabel      *_followersCountLabel;
   UILabel      *_followingCountLabel;
   UILabel      *_photoCountLabel;
+  
+  BOOL         _animating;
 }
 
 //- (instancetype)initWithMe
@@ -43,9 +45,6 @@
   if (self) {
     
     self.view.backgroundColor = [UIColor whiteColor];
-    
-    _avatarImageView               = [[UIImageView alloc] init];
-    [self.view addSubview:_avatarImageView];
 
     _followingStatusBtn            = [UIButton buttonWithType:UIButtonTypeCustom];
     _followingStatusBtn.adjustsImageWhenHighlighted = NO;
@@ -92,6 +91,10 @@
     _photoCountLabel.numberOfLines = 2;
     [self.view addSubview:_photoCountLabel];
     
+    // add to view last so that animation is on top
+    _avatarImageView               = [[UIImageView alloc] init];
+    [self.view addSubview:_avatarImageView];
+    
     // This is what we have available as soon as we're created, without fetching new metadata from the network.
     _fullNameLabel.text            = _user.fullName;
     _user                          = user;
@@ -102,6 +105,12 @@
     
     // get avatar image
     [self loadAvatarImage];
+    
+    
+    
+    UILongPressGestureRecognizer *lpgr = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(viewWasLongPressed:)];
+//    [self.view addGestureRecognizer:lpgr];
+    lpgr.minimumPressDuration = 0.01;
     
     if (DEBUG_LAYOUT) {
       _avatarImageView.backgroundColor      = [UIColor greenColor];
@@ -121,6 +130,10 @@
   [super viewDidLayoutSubviews];
   
   CGSize boundsSize = self.view.bounds.size;
+  
+  if (_animating) {
+    return;
+  }
   
   // user avatar
   CGFloat x = HEADER_HORIZONTAL_INSET;
@@ -204,14 +217,107 @@
 
 #pragma mark - Touch Events
 
+- (void)viewWasLongPressed:(UIGestureRecognizer *)sender
+{
+
+  if (sender.state == UIGestureRecognizerStateBegan) {
+    
+    // determine which area of cell was tapped
+    CGPoint tapPoint = [sender locationInView:_avatarImageView];
+    
+    if (tapPoint.y > 0) {
+      
+      NSLog(@"LONG PRESS STARTED");
+      
+      _animating = YES;
+      
+      // FIXME: use pinremote image to download higher res photo
+          
+      [UIView animateWithDuration:0.2
+                            delay:0
+           usingSpringWithDamping:0.5
+            initialSpringVelocity:1.0f
+                          options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionCurveEaseInOut
+                       animations:^{
+        
+        // FIXME: grey the background
+                         
+        _avatarImageView.frame = CGRectMake(100, 100, 100, 100);
+        
+      } completion:^(BOOL finished) {
+        _animating = NO;
+      }];
+    }
+  }
+  
+  if (sender.state == UIGestureRecognizerStateEnded) {
+    
+    // determine which area of cell was tapped
+    CGPoint tapPoint = [sender locationInView:_avatarImageView];
+    
+    if (tapPoint.y > 0) {   // FIXME: all long presses work here
+      
+      NSLog(@"LONG PRESS ENDED");
+      
+       _animating = YES;
+      
+      [UIView animateWithDuration:0.2
+                            delay:0
+           usingSpringWithDamping:0.5
+            initialSpringVelocity:1.0f
+                          options: UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionCurveEaseInOut
+                       animations:^{
+        
+        CGFloat x = HEADER_HORIZONTAL_INSET;
+        CGFloat originalY = CGRectGetMaxY(self.navigationController.navigationBar.frame) + HEADER_HORIZONTAL_INSET;
+        CGFloat y = originalY;
+        _avatarImageView.frame = CGRectMake(x,
+                                            y,
+                                            USER_AVATAR_HEIGHT,
+                                            USER_AVATAR_HEIGHT);
+        
+      } completion:^(BOOL finished) {
+        _animating = NO;
+        
+      }];
+      
+    }
+  }
+}
+
 - (void)toggleFollowing
 {
   // toggle button state
+  if (_followingStatusBtn.selected) {
+    
+    // stop following
+    NSString *urlString = [NSString stringWithFormat:@"https://api.500px.com/v1/users/%lu/friends?consumer_key=Fi13GVb8g53sGvHICzlram7QkKOlSDmAmp9s9aqC", (long)_user.userID];
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+    [request setHTTPMethod:@"DELETE"];
+    
+    // FIXME: update user model
+    // FIXME: check for success
+    
+  } else {
+    
+    // start following
+    NSString *urlString = [NSString stringWithFormat:@"https://api.500px.com/v1/users/%lu/friends?consumer_key=Fi13GVb8g53sGvHICzlram7QkKOlSDmAmp9s9aqC", (long)_user.userID];
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+    [request setHTTPMethod:@"POST"];
+  }
+
   _followingStatusBtn.selected = !_followingStatusBtn.selected;
-  
-  [self.view setNeedsLayout];
 }
 
+- (void)getFollowers
+{
+  NSString *urlString = [NSString stringWithFormat:@"https://api.500px.com/v1/users/%lu/friends?consumer_key=Fi13GVb8g53sGvHICzlram7QkKOlSDmAmp9s9aqC", (long)_user.userID];
+  NSURL *url = [NSURL URLWithString:urlString];
+  NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+  [request setHTTPMethod:@"GET"];
+}
 
 #pragma mark - Helper Methods
 

@@ -11,7 +11,8 @@
 
 typedef NS_ENUM(NSInteger, PhotoFeedModelType) {
   PhotoFeedModelTypePopular,
-  PhotoFeedModelTypePopular2
+  PhotoFeedModelTypeLocation,
+  PhotoFeedModelTypeUserPhotos
 };
 
 @interface PhotoFeedModel : NSObject
@@ -21,6 +22,9 @@ typedef NS_ENUM(NSInteger, PhotoFeedModelType) {
 
 - (NSUInteger)numberOfItemsInFeed;
 - (PhotoModel *)objectAtIndex:(NSUInteger)index;
+
+- (void)updatePhotoFeedModelTypeLocationCoordinates:(CLLocationCoordinate2D)coordinate radiusInMiles:(NSUInteger)radius;
+- (void)updatePhotoFeedModelTypeUserId:(NSUInteger)userID;
 
 - (void)clearFeed;
 - (void)requestPageWithCompletionBlock:(void (^)(NSArray *))block;
