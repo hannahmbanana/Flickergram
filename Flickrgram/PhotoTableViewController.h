@@ -1,5 +1,5 @@
 //
-//  PhotoFeedViewController.h
+//  PhotoTableViewController.h
 //  Flickrgram
 //
 //  Created by Hannah Troisi on 2/17/16.
@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface PhotoFeedViewController : UIViewController
+@interface PhotoTableViewController : UITableViewController
 
 
 @end

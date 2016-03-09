@@ -16,7 +16,7 @@
 		768C1DED1C745A470001EAD1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 768C1DEC1C745A470001EAD1 /* AppDelegate.m */; };
 		768C1DF51C745A470001EAD1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 768C1DF41C745A470001EAD1 /* Assets.xcassets */; };
 		768C1DF81C745A470001EAD1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 768C1DF61C745A470001EAD1 /* LaunchScreen.storyboard */; };
-		768C1E051C7461380001EAD1 /* PhotoFeedViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 768C1E041C7461380001EAD1 /* PhotoFeedViewController.m */; };
+		768C1E051C7461380001EAD1 /* PhotoTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 768C1E041C7461380001EAD1 /* PhotoTableViewController.m */; };
 		768C1E081C7463450001EAD1 /* PhotoTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 768C1E071C7463450001EAD1 /* PhotoTableViewCell.m */; };
 		768C1E0B1C75AAFB0001EAD1 /* UIImage+UIImage_Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 768C1E0A1C75AAFB0001EAD1 /* UIImage+UIImage_Additions.m */; };
 		768C1E0E1C7E7DF20001EAD1 /* UserProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 768C1E0D1C7E7DF20001EAD1 /* UserProfileViewController.m */; };
@@ -45,8 +45,8 @@
 		768C1DF41C745A470001EAD1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		768C1DF71C745A470001EAD1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		768C1DF91C745A470001EAD1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		768C1E031C7461380001EAD1 /* PhotoFeedViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoFeedViewController.h; sourceTree = "<group>"; };
-		768C1E041C7461380001EAD1 /* PhotoFeedViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoFeedViewController.m; sourceTree = "<group>"; };
+		768C1E031C7461380001EAD1 /* PhotoTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoTableViewController.h; sourceTree = "<group>"; };
+		768C1E041C7461380001EAD1 /* PhotoTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoTableViewController.m; sourceTree = "<group>"; };
 		768C1E061C7463450001EAD1 /* PhotoTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoTableViewCell.h; sourceTree = "<group>"; };
 		768C1E071C7463450001EAD1 /* PhotoTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoTableViewCell.m; sourceTree = "<group>"; };
 		768C1E091C75AAFB0001EAD1 /* UIImage+UIImage_Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+UIImage_Additions.h"; sourceTree = "<group>"; };
@@ -155,8 +155,8 @@
 		768C1E011C745C590001EAD1 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				768C1E031C7461380001EAD1 /* PhotoFeedViewController.h */,
-				768C1E041C7461380001EAD1 /* PhotoFeedViewController.m */,
+				768C1E031C7461380001EAD1 /* PhotoTableViewController.h */,
+				768C1E041C7461380001EAD1 /* PhotoTableViewController.m */,
 				768C1E0C1C7E7DF20001EAD1 /* UserProfileViewController.h */,
 				768C1E0D1C7E7DF20001EAD1 /* UserProfileViewController.m */,
 				768C1E121C7E84020001EAD1 /* LocationCollectionViewController.h */,
@@ -302,7 +302,7 @@
 				76DF9A381C83A00600580C2F /* PhotoFeedModel.m in Sources */,
 				768C1DED1C745A470001EAD1 /* AppDelegate.m in Sources */,
 				7629F88F1C81741D00BC44F0 /* UserModel.m in Sources */,
-				768C1E051C7461380001EAD1 /* PhotoFeedViewController.m in Sources */,
+				768C1E051C7461380001EAD1 /* PhotoTableViewController.m in Sources */,
 				768C1E0E1C7E7DF20001EAD1 /* UserProfileViewController.m in Sources */,
 				768C1E141C7E84020001EAD1 /* LocationCollectionViewController.m in Sources */,
 				768C1DEA1C745A470001EAD1 /* main.m in Sources */,

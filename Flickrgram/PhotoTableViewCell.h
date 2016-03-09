@@ -9,8 +9,6 @@
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CLLocation.h>
 #import "PhotoModel.h"
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
-
 
 @protocol PhotoTableViewCellProtocol <NSObject>
 - (void)userProfileWasTouchedWithUser:(UserModel *)user;
@@ -19,7 +17,7 @@
 @end
 
 
-@interface PhotoTableViewCell : ASCellNode
+@interface PhotoTableViewCell : UITableViewCell
 
 @property (nonatomic, strong, readwrite) id<PhotoTableViewCellProtocol> delegate;
 
