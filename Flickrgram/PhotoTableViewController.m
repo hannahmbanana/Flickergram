@@ -31,13 +31,19 @@
   if (self) {
     
     // PHOTO FEED OBJECT
-    _photoFeed = [[PhotoFeedModel alloc] initWithPhotoFeedModelType:PhotoFeedModelTypePopular];
+    CGRect screenRect   = [[UIScreen mainScreen] bounds];
+    CGFloat screenScale = [[UIScreen mainScreen] scale];
+    CGSize imageSize    = CGSizeMake(screenRect.size.width * screenScale, screenRect.size.width * screenScale);
+    
+    _photoFeed = [[PhotoFeedModel alloc] initWithPhotoFeedModelType:PhotoFeedModelTypePopular imageSize:imageSize];
     
     // start first small fetch
     [_photoFeed refreshFeedWithCompletionBlock:^(NSArray *newPhotos){
       
       // update the tableView
       [self.tableView reloadData];
+      
+      [self requestCommentsForPhotos:newPhotos];
       
       // immediately start second larger fetch
 //      [self loadPage];
@@ -83,15 +89,18 @@
     
     [self.tableView reloadData];
     
-    NSLog(@"_photoFeed number of items = %lu", [_photoFeed numberOfItemsInFeed]);
+    NSLog(@"_photoFeed number of items = %lu", (unsigned long)[_photoFeed numberOfItemsInFeed]);
     
     [self.refreshControl endRefreshing];
+    
+    [self requestCommentsForPhotos:newPhotos];
+
   }];
 }
 
 - (void)loadPage
 {
-  NSLog(@"_photoFeed number of items = %lu", [_photoFeed numberOfItemsInFeed]);
+  NSLog(@"_photoFeed number of items = %lu", (unsigned long)[_photoFeed numberOfItemsInFeed]);
   
   [self logPhotoIDsInPhotoFeed];
 
@@ -100,13 +109,40 @@
     [self insertNewRowsInTableView:newPhotos];
     
     [self logPhotoIDsInPhotoFeed];
-
+    
+    [self requestCommentsForPhotos:newPhotos];
   }];
+}
+
+- (void)requestCommentsForPhotos:(NSArray *)newPhotos
+{
+  // comment feed
+  for (PhotoModel *photo in newPhotos) {
+    
+    [photo.commentFeed refreshFeedWithCompletionBlock:^(NSArray *newComments) {
+      
+      // update PhotoModel with commentFeed
+      NSInteger rowNum = [_photoFeed indexOfPhotoModel:photo];
+      
+      [self.tableView reloadData];
+      
+      PhotoTableViewCell *cell = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:rowNum inSection:0]];
+      if (cell) {
+        [cell loadCommentsForPhoto:photo];
+      }
+      
+      // force heightForCellAtIndexPath...
+      [self.tableView beginUpdates];
+      [self.tableView endUpdates];
+      
+      // FIXME: adjust content offset - iterate over cells above to get heights...
+    }];
+  }
 }
 
 - (void)logPhotoIDsInPhotoFeed
 {
-  NSLog(@"_photoFeed number of items = %lu", [_photoFeed numberOfItemsInFeed]);
+  NSLog(@"_photoFeed number of items = %lu", (unsigned long)[_photoFeed numberOfItemsInFeed]);
   
   for (int i = 0; i < [_photoFeed numberOfItemsInFeed]; i++) {
     if (i % 4 == 0 && i > 0) {
@@ -178,8 +214,7 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(nonnull NSIndexPath *)indexPath
 {
   PhotoModel *photoModel = [_photoFeed objectAtIndex:indexPath.row];
-  CGFloat headerFooterCombinedHeight = [PhotoTableViewCell cellHeaderFooterHeightForDataModel:photoModel];
-  return headerFooterCombinedHeight + self.view.bounds.size.width; // + square photo height
+  return [PhotoTableViewCell heightForPhotoModel:photoModel withWidth:self.view.bounds.size.width];
 }
 
 

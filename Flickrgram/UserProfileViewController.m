@@ -7,7 +7,7 @@
 //
 
 #import "UserProfileViewController.h"
-#import "UIImage+UIImage_Additions.h"
+#import "Utilities.h"
 
 #define HEADER_HEIGHT           300
 #define USER_AVATAR_HEIGHT      70

@@ -21,8 +21,10 @@
 
 @property (nonatomic, strong, readwrite) id<PhotoTableViewCellProtocol> delegate;
 
-+ (CGFloat)cellHeaderFooterHeightForDataModel:(PhotoModel *)photo;
++ (CGFloat)heightForPhotoModel:(PhotoModel *)photo withWidth:(CGFloat)width;
 
 - (void)updateCellWithPhotoObject:(PhotoModel *)photo;
+- (void)loadCommentsForPhoto:(PhotoModel *)photo;
+
 
 @end

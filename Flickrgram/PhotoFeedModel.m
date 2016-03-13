@@ -7,6 +7,7 @@
 //
 
 #import "PhotoFeedModel.h"
+#import "ImageURLModel.h"
 
 #define fiveHundredPX_ENDPOINT_HOST      @"https://api.500px.com/v1/"
 #define fiveHundredPX_ENDPOINT_POPULAR   @"photos?feature=popular&sort=rating&image_size=3&include_store=store_download&include_states=voted"
@@ -22,6 +23,7 @@
   NSMutableArray *_photos;    // array of PhotoModel objects
   NSMutableArray *_ids;
   
+  CGSize         _imageSize;
   NSString       *_urlString;
   NSUInteger     _currentPage;
   NSUInteger     _totalPages;
@@ -45,13 +47,14 @@
 
 #pragma mark - Lifecycle
 
-- (instancetype)initWithPhotoFeedModelType:(PhotoFeedModelType)type
+- (instancetype)initWithPhotoFeedModelType:(PhotoFeedModelType)type imageSize:(CGSize)size
 {
   self = [super init];
   
   if (self) {
   
     _feedType    = type;
+    _imageSize   = size;
     _photos      = [[NSMutableArray alloc] init];
     _ids         = [[NSMutableArray alloc] init];
     _currentPage = 0;
@@ -96,11 +99,16 @@
   return [_photos objectAtIndex:index];
 }
 
+- (NSInteger)indexOfPhotoModel:(PhotoModel *)photoModel
+{
+  return [_photos indexOfObjectIdenticalTo:photoModel];
+}
+
 - (void)updatePhotoFeedModelTypeLocationCoordinates:(CLLocationCoordinate2D)coordinate radiusInMiles:(NSUInteger)radius;
 {
   _location = coordinate;
   _locationRadius = radius;
-  NSString *locationString = [NSString stringWithFormat:@"%f,%f,%lumi", coordinate.latitude, coordinate.longitude, radius];
+  NSString *locationString = [NSString stringWithFormat:@"%f,%f,%lumi", coordinate.latitude, coordinate.longitude, (unsigned long)radius];
   
   _urlString = [fiveHundredPX_ENDPOINT_HOST stringByAppendingString:fiveHundredPX_ENDPOINT_SEARCH];
   _urlString = [[_urlString stringByAppendingString:locationString] stringByAppendingString:fiveHundredPX_CONSUMER_KEY_PARAM];
@@ -190,8 +198,8 @@
     @synchronized(self) {
     
       NSUInteger nextPage = _currentPage + 1;
-      
-      NSString *urlAdditions = [NSString stringWithFormat:@"&page=%lu&rpp=40", (unsigned long)nextPage];
+      NSString *imageSizeParam = [ImageURLModel imageParameterForClosestImageSize:_imageSize];
+      NSString *urlAdditions = [NSString stringWithFormat:@"&page=%lu&rpp=40%@", (unsigned long)nextPage, imageSizeParam];
       
       NSURL *url = [NSURL URLWithString:[_urlString stringByAppendingString:urlAdditions]];
       
