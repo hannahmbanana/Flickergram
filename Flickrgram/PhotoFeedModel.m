@@ -199,7 +199,7 @@
     
       NSUInteger nextPage = _currentPage + 1;
       NSString *imageSizeParam = [ImageURLModel imageParameterForClosestImageSize:_imageSize];
-      NSString *urlAdditions = [NSString stringWithFormat:@"&page=%lu&rpp=40%@", (unsigned long)nextPage, imageSizeParam];
+      NSString *urlAdditions = [NSString stringWithFormat:@"&page=%lu&rpp=4%@", (unsigned long)nextPage, imageSizeParam];
       
       NSURL *url = [NSURL URLWithString:[_urlString stringByAppendingString:urlAdditions]];
       

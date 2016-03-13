@@ -36,7 +36,8 @@
 
 - (NSAttributedString *)commentAttributedString
 {
-  return [NSAttributedString colorizeFirstWordInString:[NSString stringWithFormat:@"%@ %@",[_commenterUsername lowercaseString], _body]];
+  NSString *commentString = [NSString stringWithFormat:@"%@ %@",[_commenterUsername lowercaseString], _body];
+  return [NSAttributedString attributedStringWithString:commentString fontSize:14 color:[UIColor darkGrayColor] firstWordColor:[UIColor darkBlueColor]];
 }
 
 @end

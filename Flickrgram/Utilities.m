@@ -9,14 +9,28 @@
 #import "Utilities.h"
 #import <UIKit/UIKit.h>
 
-#define DARK_BLUE [UIColor colorWithRed:18.0/255.0 green:86.0/255.0 blue:136.0/255.0 alpha:1.0]
+#define StrokeRoundedImages 0
+
+@implementation UIColor (Additions)
+
++ (UIColor *)darkBlueColor
+{
+  return [UIColor colorWithRed:18.0/255.0 green:86.0/255.0 blue:136.0/255.0 alpha:1.0];
+}
+
++ (UIColor *)lightBlueColor
+{
+  return [UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0];
+}
+
+@end
 
 @implementation UIImage (Additions)
 
-- (UIImage *)makeRoundImage
+- (UIImage *)makeCircularImageWithSize:(CGSize)size
 {
   // make a CGRect with the image's size
-  CGRect circleRect = (CGRect) {CGPointZero, self.size};
+  CGRect circleRect = (CGRect) {CGPointZero, size};
   
   // begin the image context since we're not in a drawRect:
   UIGraphicsBeginImageContextWithOptions(circleRect.size, NO, 0);
@@ -31,9 +45,11 @@
   [self drawInRect:circleRect];
   
   // create a border (for white background pictures)
+#if StrokeRoundedImages
   circle.lineWidth = 1;
   [[UIColor darkGrayColor] set];
   [circle stroke];
+#endif
   
   // get an image from the image context
   UIImage *roundedImage = UIGraphicsGetImageFromCurrentImageContext();
@@ -118,20 +134,19 @@
 
 @implementation NSAttributedString (Additions)
 
-+ (NSAttributedString *)colorizeFirstWordInString:(NSString *)string
++ (NSAttributedString *)attributedStringWithString:(NSString *)string fontSize:(CGFloat)size
+                                             color:(nullable UIColor *)color firstWordColor:(nullable UIColor *)firstWordColor
 {
-  NSDictionary *attributes                    = @{NSForegroundColorAttributeName: DARK_BLUE};
-  NSDictionary *restAttributes                = @{NSForegroundColorAttributeName: [UIColor darkGrayColor]};
-  
+  NSDictionary *attributes                    = @{NSForegroundColorAttributeName: color ? : [UIColor blackColor],
+                                                  NSFontAttributeName: [UIFont systemFontOfSize:size]};
   NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:string];
-  [attributedString addAttributes:restAttributes range:NSMakeRange(0, string.length)];
-
-  NSRange firstSpaceRange = [string rangeOfCharacterFromSet:[NSCharacterSet whitespaceCharacterSet]];
-  NSRange firstWordRange  = NSMakeRange(0, firstSpaceRange.location);
-  [attributedString addAttributes:attributes range:firstWordRange];
+  [attributedString addAttributes:attributes range:NSMakeRange(0, string.length)];
   
-//  NSRange restWordRange = NSMakeRange(firstSpaceRange.location, [string length]-1);
-//  [attributedString addAttributes:restAttributes range:restWordRange];
+  if (firstWordColor) {
+    NSRange firstSpaceRange = [string rangeOfCharacterFromSet:[NSCharacterSet whitespaceCharacterSet]];
+    NSRange firstWordRange  = NSMakeRange(0, firstSpaceRange.location);
+    [attributedString addAttribute:NSForegroundColorAttributeName value:firstWordColor range:firstWordRange];
+  }
   
   return attributedString;
 }

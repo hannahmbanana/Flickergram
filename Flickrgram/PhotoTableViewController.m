@@ -227,19 +227,21 @@
   [self.navigationController pushViewController:userProfileView animated:YES];
 }
 
-- (void)photoLocationWasTouchedWithCoordinate:(CLLocationCoordinate2D)coordiantes name:(NSString *)name
+- (void)photoLocationWasTouchedWithCoordinate:(CLLocationCoordinate2D)coordiantes name:(NSAttributedString *)name
 {
   UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
   layout.minimumInteritemSpacing = 1;
   layout.minimumLineSpacing = 1;
-  layout.headerReferenceSize = CGSizeMake(self.view.bounds.size.width, 200);
   
-  CGFloat numItemsLine = 3;
-  layout.itemSize = CGSizeMake((self.view.bounds.size.width - (numItemsLine - 1)) / numItemsLine,
-                               (self.view.bounds.size.width - (numItemsLine - 1)) / numItemsLine);
+  CGFloat boundsWidth = self.view.bounds.size.width;
+  layout.headerReferenceSize = CGSizeMake(boundsWidth, 200);
+  
+  CGFloat photoColumnCount = 3;
+  CGFloat photoSize = (boundsWidth - (photoColumnCount - 1)) / photoColumnCount;
+  layout.itemSize = CGSizeMake(photoSize, photoSize);
   
   LocationCollectionViewController *locationCVC = [[LocationCollectionViewController alloc] initWithCollectionViewLayout:layout coordinates:coordiantes];
-  locationCVC.navigationItem.title = name;
+  locationCVC.navigationItem.title = name.string;
   
   [self.navigationController pushViewController:locationCVC animated:YES];
 }

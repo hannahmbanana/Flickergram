@@ -49,8 +49,7 @@
     _followingStatusBtn            = [UIButton buttonWithType:UIButtonTypeCustom];
     _followingStatusBtn.adjustsImageWhenHighlighted = NO;
     [_followingStatusBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    UIColor *lightBlue = [UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0];
-    [_followingStatusBtn setTitleColor:lightBlue forState:UIControlStateSelected];
+    [_followingStatusBtn setTitleColor:[UIColor lightBlueColor] forState:UIControlStateSelected];
     [_followingStatusBtn setTitle:@"Follow" forState:UIControlStateNormal];
     [_followingStatusBtn setTitle:@"Following" forState:UIControlStateSelected];
     [_followingStatusBtn addTarget:self action:@selector(toggleFollowing) forControlEvents:UIControlEventTouchUpInside];
@@ -67,7 +66,7 @@
     
     _domainLabel                   = [[UILabel alloc] init];
     _domainLabel.font              = [_domainLabel.font fontWithSize:14];
-    _domainLabel.textColor         = [UIColor colorWithRed:18.0/255.0 green:86.0/255.0 blue:136.0/255.0 alpha:1.0];
+    _domainLabel.textColor         = [UIColor darkBlueColor];
     [self.view addSubview:_domainLabel];
 
     _followersCountLabel               = [[UILabel alloc] init];
@@ -144,6 +143,12 @@
                                       USER_AVATAR_HEIGHT,
                                       USER_AVATAR_HEIGHT);
   y += _avatarImageView.frame.size.height;
+  
+  if (!_avatarImageView.image) {
+    // We generate the rounded image at layout time (unusually late) so that we can know exactly how large
+    // it needs to be.  This is the only way to ensure the rounded curve is perfectly smoothed / antialiased.
+//    _avatarImageView.image = [avatar makeCircularImageWithSize:CGSizeMake(USER_AVATAR_HEIGHT, USER_AVATAR_HEIGHT)];
+  }
   
   if (_fullNameLabel.text) {
     [_fullNameLabel sizeToFit];
@@ -347,9 +352,6 @@
     
     // check that info returning from async download is still applicable to this view
     if (userModel == _user) {
-      
-      _avatarImageView.image = [avatar makeRoundImage];
-      
       [self.view setNeedsLayout];
     }
   }];

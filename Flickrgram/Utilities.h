@@ -9,9 +9,16 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
+@interface UIColor (Additions)
+
++ (UIColor *)darkBlueColor;
++ (UIColor *)lightBlueColor;
+
+@end
+
 @interface UIImage (Additions)
 
-- (UIImage *)makeRoundImage;
+- (UIImage *)makeCircularImageWithSize:(CGSize)size;
 
 @end
 
@@ -24,6 +31,7 @@
 
 @interface NSAttributedString (Additions)
 
-+ (NSAttributedString *)colorizeFirstWordInString:(NSString *)string;
++ (NSAttributedString *)attributedStringWithString:(NSString *)string fontSize:(CGFloat)size
+                                             color:(UIColor *)color firstWordColor:(UIColor *)firstWordColor;
 
 @end

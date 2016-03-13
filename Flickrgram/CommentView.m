@@ -24,16 +24,6 @@
 
 #pragma mark - Class Methods
 
-+ (NSAttributedString *)attributedStringWithString:(NSString *)string   //FIXME:
-{
-  NSDictionary *attributes                    = @{NSForegroundColorAttributeName: [UIColor lightGrayColor],
-                                                  NSFontAttributeName: [UIFont systemFontOfSize:14]};
-  NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:string];
-  [attributedString addAttributes:attributes range:NSMakeRange(0, string.length)];
-  
-  return attributedString;
-}
-
 + (CGFloat)heightForCommentFeedModel:(CommentFeedModel *)commentFeed withWidth:(CGFloat)width
 {
   CGFloat height = 0;
@@ -42,9 +32,11 @@
   NSUInteger numComments       = [commentFeed totalNumberOfCommentsForPhoto];
   if (numComments > 3) {
     NSString *countString      = [NSString stringWithFormat:@"View all %@ comments", [NSNumber numberWithUnsignedInteger:numComments]];
-    NSAttributedString *string = [CommentView attributedStringWithString:countString];
-    CGRect countStringRect     = [string boundingRectWithSize:CGSizeMake(width, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin context:nil];
-    height                    += countStringRect.size.height + INTER_COMMENT_SPACING;
+    NSAttributedString *string = [NSAttributedString attributedStringWithString:countString fontSize:14 color:nil firstWordColor:nil];
+    CGRect countStringRect     = [string boundingRectWithSize:CGSizeMake(width, CGFLOAT_MAX)
+                                                      options:NSStringDrawingUsesLineFragmentOrigin
+                                                      context:nil];
+    height                    += countStringRect.size.height;
   }
   
   NSUInteger numCommentsInFeed = [commentFeed numberOfItemsInFeed];
@@ -52,23 +44,24 @@
   for (int i = 0; i < numCommentsInFeed; i++) {
     
     CommentModel *comment      = [commentFeed objectAtIndex:i];
-    string                     = [CommentView attributedStringWithString:comment.body];
-    CGRect stringRect          = [string boundingRectWithSize:CGSizeMake(width, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin context:nil];
+    string                     = [NSAttributedString attributedStringWithString:comment.body fontSize:14 color:nil firstWordColor:nil];
+    CGRect stringRect          = [string boundingRectWithSize:CGSizeMake(width, CGFLOAT_MAX)
+                                                      options:NSStringDrawingUsesLineFragmentOrigin
+                                                      context:nil];
     height                    += stringRect.size.height + INTER_COMMENT_SPACING;
   }
 
-  return height;
+  return roundf(height);
 }
 
 #pragma mark - Lifecycle
 
 - (instancetype)init
 {
-  self = [super init];
+  self = [super init];        // FIXME: create array of UILabels, have helper method to do below 3 lines, call helper method in update:, not init (consider reuse - destroy array)
   
   if (self) {
     _commentCountLabel           = [[UILabel alloc] init];
-    _commentCountLabel.textColor = [UIColor lightGrayColor];
     [self addSubview:_commentCountLabel];
     
     _commentLabel1               = [[UILabel alloc] init];
@@ -92,33 +85,29 @@
 {
   [super layoutSubviews];
   
-  CGSize boundSize = self.bounds.size;
-  CGRect rect      = CGRectMake(0, 0, boundSize.width, 0);
+  CGSize boundsSize = self.bounds.size;
+  CGRect rect       = CGRectMake(0, 0, boundsSize.width, 0);
   
-  if (_commentCountLabel.text) {
-    [_commentCountLabel sizeToFit];
-    rect.size.height         = _commentCountLabel.frame.size.height;
+  if (_commentCountLabel.attributedText) {
+    rect.size = [_commentCountLabel sizeThatFits:CGSizeMake(boundsSize.width, CGFLOAT_MAX)];
     _commentCountLabel.frame = rect;
-    rect.origin.y           += _commentCountLabel.frame.size.height + INTER_COMMENT_SPACING;
   }
   
   if (_commentLabel1.attributedText) {
-    [_commentLabel1 sizeToFit];
-    rect.size.height     = _commentLabel1.frame.size.height;
+    rect.origin.y += rect.size.height + INTER_COMMENT_SPACING;
+    rect.size = [_commentLabel1 sizeThatFits:CGSizeMake(boundsSize.width, CGFLOAT_MAX)];
     _commentLabel1.frame = rect;
-    rect.origin.y       += _commentLabel1.frame.size.height + INTER_COMMENT_SPACING;
   }
   
   if (_commentLabel2.attributedText) {
-    [_commentLabel2 sizeToFit];
-    rect.size.height     = _commentLabel2.frame.size.height;
+    rect.origin.y += rect.size.height + INTER_COMMENT_SPACING;
+    rect.size = [_commentLabel2 sizeThatFits:CGSizeMake(boundsSize.width, CGFLOAT_MAX)];
     _commentLabel2.frame = rect;
-    rect.origin.y       += _commentLabel2.frame.size.height + INTER_COMMENT_SPACING;
   }
   
   if (_commentLabel3.attributedText) {
-    [_commentLabel3 sizeToFit];
-    rect.size.height     = _commentLabel3.frame.size.height;
+    rect.origin.y += rect.size.height + INTER_COMMENT_SPACING;
+    rect.size = [_commentLabel3 sizeThatFits:CGSizeMake(boundsSize.width, CGFLOAT_MAX)];
     _commentLabel3.frame = rect;
   }
 }
@@ -127,7 +116,7 @@
 
 - (void)prepareForReuse
 {
-  _commentCountLabel.text       = nil;
+  _commentCountLabel.attributedText       = nil;
   _commentLabel1.attributedText = nil;
   _commentLabel2.attributedText = nil;
   _commentLabel3.attributedText = nil;
@@ -135,18 +124,14 @@
   [self setNeedsLayout];
 }
 
-- (void)updateWithCommentFeedModel:(CommentFeedModel *)feed withFontSize:(CGFloat)size
+- (void)updateWithCommentFeedModel:(CommentFeedModel *)feed
 {
-  _commentCountLabel.font = [_commentCountLabel.font fontWithSize:size];
-  _commentLabel1.font = [_commentLabel1.font fontWithSize:size];
-  _commentLabel2.font = [_commentLabel2.font fontWithSize:size];
-  _commentLabel3.font = [_commentLabel3.font fontWithSize:size];
-  
   _commentFeed = feed;
   
   NSUInteger numComments          = [_commentFeed totalNumberOfCommentsForPhoto];
   if (numComments > 3) {
-    _commentCountLabel.text       = [NSString stringWithFormat:@"View all %@ comments", [NSNumber numberWithUnsignedInteger:numComments]];
+    NSString *string                  = [NSString stringWithFormat:@"View all %@ comments", [NSNumber numberWithUnsignedInteger:numComments]]; // FIXME: move to model
+    _commentCountLabel.attributedText = [NSAttributedString attributedStringWithString:string fontSize:14 color:[UIColor lightGrayColor] firstWordColor:nil];
   }
   
   NSUInteger numLoadedComments    = [_commentFeed numberOfItemsInFeed];
