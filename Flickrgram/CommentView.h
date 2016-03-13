@@ -11,7 +11,8 @@
 
 @interface CommentView : UIView
 
++ (CGFloat)heightForCommentFeedModel:(CommentFeedModel *)commentFeed withWidth:(CGFloat)width;
 - (void)prepareForReuse;
-- (void)updateWithCommentFeedModel:(CommentFeedModel *)feed;
+- (void)updateWithCommentFeedModel:(CommentFeedModel *)feed withFontSize:(CGFloat)size;
 
 @end

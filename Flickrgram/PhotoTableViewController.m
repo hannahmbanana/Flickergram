@@ -89,7 +89,7 @@
     
     [self.tableView reloadData];
     
-    NSLog(@"_photoFeed number of items = %lu", [_photoFeed numberOfItemsInFeed]);
+    NSLog(@"_photoFeed number of items = %lu", (unsigned long)[_photoFeed numberOfItemsInFeed]);
     
     [self.refreshControl endRefreshing];
     
@@ -100,7 +100,7 @@
 
 - (void)loadPage
 {
-  NSLog(@"_photoFeed number of items = %lu", [_photoFeed numberOfItemsInFeed]);
+  NSLog(@"_photoFeed number of items = %lu", (unsigned long)[_photoFeed numberOfItemsInFeed]);
   
   [self logPhotoIDsInPhotoFeed];
 
@@ -142,7 +142,7 @@
 
 - (void)logPhotoIDsInPhotoFeed
 {
-  NSLog(@"_photoFeed number of items = %lu", [_photoFeed numberOfItemsInFeed]);
+  NSLog(@"_photoFeed number of items = %lu", (unsigned long)[_photoFeed numberOfItemsInFeed]);
   
   for (int i = 0; i < [_photoFeed numberOfItemsInFeed]; i++) {
     if (i % 4 == 0 && i > 0) {
@@ -214,8 +214,7 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(nonnull NSIndexPath *)indexPath
 {
   PhotoModel *photoModel = [_photoFeed objectAtIndex:indexPath.row];
-  CGFloat headerFooterCombinedHeight = [PhotoTableViewCell cellHeaderFooterHeightForDataModel:photoModel];
-  return headerFooterCombinedHeight + self.view.bounds.size.width; // + square photo height
+  return [PhotoTableViewCell heightForPhotoModel:photoModel withWidth:self.view.bounds.size.width];
 }
 
 

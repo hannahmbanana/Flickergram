@@ -131,7 +131,7 @@
   }
 
   _userID                   = [[self guardJSONElement:[userDictionary objectForKey:@"id"]] integerValue];
-  _username                 = [self guardJSONElement:[userDictionary objectForKey:@"username"]];
+  _username                 = [[self guardJSONElement:[userDictionary objectForKey:@"username"]] lowercaseString];
   
   if ([_username isKindOfClass:[NSNumber class]]) {
     _username               = @"Anonymous";
@@ -150,7 +150,7 @@
   _affection                = [[self guardJSONElement:[userDictionary objectForKey:@"affection"]] integerValue];
   _friendsCount             = [[self guardJSONElement:[userDictionary objectForKey:@"friends_count"]] integerValue];
   _followersCount           = [[self guardJSONElement:[userDictionary objectForKey:@"followers_count"]] integerValue];
-  _following                = [self guardJSONElement:[userDictionary objectForKey:@"following"]];
+  _following                = [[self guardJSONElement:[userDictionary objectForKey:@"following"]] boolValue];
   _dictionaryRepresentation = userDictionary;
   
   NSString *urlString       = [self guardJSONElement:[userDictionary objectForKey:@"userpic_url"]];

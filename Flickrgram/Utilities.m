@@ -9,7 +9,7 @@
 #import "Utilities.h"
 #import <UIKit/UIKit.h>
 
-#define DARK_BLUE [UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0]
+#define DARK_BLUE [UIColor colorWithRed:18.0/255.0 green:86.0/255.0 blue:136.0/255.0 alpha:1.0]
 
 @implementation UIImage (Additions)
 
@@ -121,9 +121,17 @@
 + (NSAttributedString *)colorizeFirstWordInString:(NSString *)string
 {
   NSDictionary *attributes                    = @{NSForegroundColorAttributeName: DARK_BLUE};
-  NSRange firstWordRange                      = [string rangeOfCharacterFromSet:[NSCharacterSet whitespaceCharacterSet]];
+  NSDictionary *restAttributes                = @{NSForegroundColorAttributeName: [UIColor darkGrayColor]};
+  
   NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:string];
+  [attributedString addAttributes:restAttributes range:NSMakeRange(0, string.length)];
+
+  NSRange firstSpaceRange = [string rangeOfCharacterFromSet:[NSCharacterSet whitespaceCharacterSet]];
+  NSRange firstWordRange  = NSMakeRange(0, firstSpaceRange.location);
   [attributedString addAttributes:attributes range:firstWordRange];
+  
+//  NSRange restWordRange = NSMakeRange(firstSpaceRange.location, [string length]-1);
+//  [attributedString addAttributes:restAttributes range:restWordRange];
   
   return attributedString;
 }

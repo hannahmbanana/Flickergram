@@ -38,11 +38,13 @@
 
 #pragma mark - Class methods
 
-+ (CGFloat)cellHeaderFooterHeightForDataModel:(PhotoModel *)photo
++ (CGFloat)heightForPhotoModel:(PhotoModel *)photo withWidth:(CGFloat)width;
 {
   // count number of comments, lines of description
-  CGFloat height = CELL_HEADER_HEIGHT * 6;
-  return height;
+  CGFloat photoHeight = width;
+  CGFloat commentViewHeight = [CommentView heightForCommentFeedModel:photo.commentFeed withWidth:width];
+  NSLog(@"CommentViewHeight = %f", commentViewHeight);
+  return CELL_HEADER_HEIGHT * 2 + photoHeight + commentViewHeight + 5;
 }
 
 
@@ -56,8 +58,6 @@
     
     _userProfileImageView                      = [[UIImageView alloc] init];
 //    _userProfileImageView.backgroundColor      = [UIColor redColor];
-  
-    
     
     _userNameLabel                             = [[UILabel alloc] init];
     _userNameLabel.font                        = [_userNameLabel.font fontWithSize:floorf(USER_IMAGE_HEIGHT/2)-1];
@@ -199,7 +199,7 @@
   _photoLocationLabel.text              = nil;
   _photoTimeIntervalSincePostLabel.text = nil;
   _photoLikesLabel.text = nil;
-  _photoDescriptionLabel.text = nil;
+  _photoDescriptionLabel.attributedText = nil;
   
   [_photoCommentsView prepareForReuse];
 }
@@ -211,12 +211,17 @@
 {
   _photoModel                           = photo;
   _photoTimeIntervalSincePostLabel.text = photo.uploadDateString;
-  _photoDescriptionLabel.text           = photo.title;
+//  _photoDescriptionLabel.text           = photo.title;
   _userNameLabel.text                   = photo.ownerUserProfile.username;
-  _photoLikesLabel.text                 = [NSString stringWithFormat:@"♥︎ %@ likes", [[[NSNumber alloc] initWithUnsignedInteger:photo.likesCount] description]];
-  _photoDescriptionLabel.text           = [NSString stringWithFormat:@"%@ %@", photo.ownerUserProfile.username, photo.descriptionText];
+  
+  NSNumberFormatter *formatter1 = [[NSNumberFormatter alloc] init];
+  [formatter1 setNumberStyle:NSNumberFormatterDecimalStyle];
+  NSString * formattedAmount2 = [formatter1 stringFromNumber: [[NSNumber alloc] initWithUnsignedInteger:photo.likesCount]];
+  
+  _photoLikesLabel.text                 = [NSString stringWithFormat:@"♥︎ %@ likes", formattedAmount2];
+  _photoDescriptionLabel.attributedText = [NSAttributedString colorizeFirstWordInString:[NSString stringWithFormat:@"%@ %@", photo.ownerUserProfile.username, photo.descriptionText]];
 
-  [_photoCommentsView updateWithCommentFeedModel:photo.commentFeed];
+  [_photoCommentsView updateWithCommentFeedModel:photo.commentFeed withFontSize:floorf(USER_IMAGE_HEIGHT/2)-1];
   
   [photo.location reverseGeocodedLocationWithCompletionBlock:^(LocationModel *locationModel) {
     
@@ -243,7 +248,7 @@
 
 - (void)loadCommentsForPhoto:(PhotoModel *)photo
 {
-  [_photoCommentsView updateWithCommentFeedModel:photo.commentFeed];
+  [_photoCommentsView updateWithCommentFeedModel:photo.commentFeed withFontSize:floorf(USER_IMAGE_HEIGHT/2)-1];
   [self setNeedsLayout];
 }
   
