@@ -12,12 +12,12 @@
 #import "PINButton+PINRemoteImage.h"
 #import "CommentView.h"
 
-#define FONT_SIZE 14
-#define DEBUG_PHOTOCELL_LAYOUT 0
-#define HEADER_HEIGHT 50
-#define HORIZONTAL_BUFFER 10
-#define VERTICAL_BUFFER 5
-#define USER_IMAGE_HEIGHT 30
+#define DEBUG_PHOTOCELL_LAYOUT  0
+#define HEADER_HEIGHT           50
+#define USER_IMAGE_HEIGHT       30
+#define HORIZONTAL_BUFFER       10
+#define VERTICAL_BUFFER         5
+#define FONT_SIZE               14
 
 @interface PhotoTableViewCell () <UIActionSheetDelegate>
 @end
@@ -58,8 +58,6 @@
                                                                context:nil].size;
   
   CGFloat commentViewHeight = [CommentView heightForCommentFeedModel:photo.commentFeed withWidth:availableWidth];
-
-  NSLog(@"1 %f 2 %f 3 %f", likesHeight, descriptionSize.height, commentViewHeight);
   
   return HEADER_HEIGHT + photoHeight + likesHeight + descriptionSize.height + commentViewHeight + (4 * VERTICAL_BUFFER);
 }
@@ -109,6 +107,8 @@
     _photoLocationLabel.backgroundColor               = [UIColor greenColor];
     _photoTimeIntervalSincePostLabel.backgroundColor  = [UIColor greenColor];
     _photoCommentsView.backgroundColor                = [UIColor purpleColor];
+    _photoDescriptionLabel.backgroundColor            = [UIColor redColor];
+    _photoLikesLabel.backgroundColor                  = [UIColor greenColor];
 #endif
   }
   
@@ -167,10 +167,9 @@
   _photoDescriptionLabel.frame = rect;
 
   rect.size = _photoCommentsView.bounds.size;
+  rect.size.width = boundsSize.width - HORIZONTAL_BUFFER * 2;
   rect.origin.y = CGRectGetMaxY(_photoDescriptionLabel.frame) + VERTICAL_BUFFER;
   _photoCommentsView.frame = rect;
-  
-  NSLog(@"1 %@ 2 %@ 3 %@", NSStringFromCGRect(_photoLikesLabel.frame), NSStringFromCGRect(_photoDescriptionLabel.frame), NSStringFromCGRect(_photoCommentsView.frame));
 }
 
 - (void)prepareForReuse
@@ -183,12 +182,16 @@
   
   // remove label text
   _userNameLabel.attributedText                   = nil;
+  
   _photoLocationLabel.attributedText              = nil;
+  _photoLocationLabel.frame                       = CGRectZero;
+  
   _photoTimeIntervalSincePostLabel.attributedText = nil;
   _photoLikesLabel.attributedText = nil;
   _photoDescriptionLabel.attributedText = nil;
   
-  [_photoCommentsView prepareForReuse];
+  _photoCommentsView.frame = CGRectZero;
+  [_photoCommentsView updateWithCommentFeedModel:nil];
 }
 
 
@@ -238,9 +241,18 @@
   [_photoImageView pin_setImageFromURL:photo.URL];
   
   [_photoLikesLabel sizeToFit];
-  [_photoDescriptionLabel sizeToFit];
+  
+  CGRect rect = _photoLocationLabel.frame;
+  CGFloat availableWidth = (self.bounds.size.width - HORIZONTAL_BUFFER * 2);
+  rect.size = [_photoDescriptionLabel sizeThatFits:CGSizeMake(availableWidth, CGFLOAT_MAX)];
+  _photoDescriptionLabel.frame = rect;
+  
   [_photoTimeIntervalSincePostLabel sizeToFit];
   [_userNameLabel sizeToFit];
+  
+  if (photo.commentFeed.numberOfItemsInFeed > 0) {
+    [self loadCommentsForPhoto:photo];
+  }
 }
 
 - (void)loadCommentsForPhoto:(PhotoModel *)photo

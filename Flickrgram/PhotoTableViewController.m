@@ -53,6 +53,7 @@
     // TABLEVIEW CONFIG
     // disable tableView cell selection
     self.tableView.allowsSelection = NO;
+//    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     
     // register custom UITableViewCell subclass
     [self.tableView registerClass:[PhotoTableViewCell class] forCellReuseIdentifier:@"photoCell"];

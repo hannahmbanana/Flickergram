@@ -11,12 +11,15 @@
 
 @interface CommentFeedModel : NSObject
 
-//- (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithPhotoID:(NSString *)photoID;
+- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)initWithPhotoID:(NSString *)photoID NS_DESIGNATED_INITIALIZER;
 
 - (NSUInteger)numberOfItemsInFeed;
-- (NSUInteger)totalNumberOfCommentsForPhoto;
 - (CommentModel *)objectAtIndex:(NSUInteger)index;
+
+- (NSUInteger)numberOfCommentsForPhoto;
+- (BOOL)numberOfCommentsForPhotoExceedsInteger:(NSUInteger)number;
+- (NSAttributedString *)viewAllCommentsAttributedString;
 
 - (void)requestPageWithCompletionBlock:(void (^)(NSArray *))block;
 - (void)refreshFeedWithCompletionBlock:(void (^)(NSArray *))block;

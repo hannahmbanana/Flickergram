@@ -34,6 +34,8 @@
   return self;
 }
 
+#pragma mark - Instance Methods
+
 - (NSAttributedString *)commentAttributedString
 {
   NSString *commentString = [NSString stringWithFormat:@"%@ %@",[_commenterUsername lowercaseString], _body];
