@@ -33,7 +33,11 @@
 
   if (self) {
     
-    _photoFeed = [[PhotoFeedModel alloc] initWithPhotoFeedModelType:PhotoFeedModelTypeLocation];
+    CGRect screenRect   = [[UIScreen mainScreen] bounds];
+    CGFloat screenScale = [[UIScreen mainScreen] scale];
+    CGSize imageSize    = CGSizeMake(screenRect.size.width * screenScale / 3.0, screenRect.size.width * screenScale / 3.0);
+    
+    _photoFeed = [[PhotoFeedModel alloc] initWithPhotoFeedModelType:PhotoFeedModelTypeLocation imageSize:imageSize];
     [_photoFeed updatePhotoFeedModelTypeLocationCoordinates:coordiantes radiusInMiles:10];
     [_photoFeed refreshFeedWithCompletionBlock:^(NSArray *newPhotos) {
       [self.collectionView reloadData];

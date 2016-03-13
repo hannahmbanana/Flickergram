@@ -24,5 +24,7 @@
 + (CGFloat)cellHeaderFooterHeightForDataModel:(PhotoModel *)photo;
 
 - (void)updateCellWithPhotoObject:(PhotoModel *)photo;
+- (void)loadCommentsForPhoto:(PhotoModel *)photo;
+
 
 @end

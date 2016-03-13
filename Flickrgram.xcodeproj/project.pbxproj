@@ -12,17 +12,21 @@
 		7629F88C1C81737B00BC44F0 /* PhotoModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 7629F88B1C81737B00BC44F0 /* PhotoModel.m */; };
 		7629F88F1C81741D00BC44F0 /* UserModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 7629F88E1C81741D00BC44F0 /* UserModel.m */; };
 		7629F8931C81848700BC44F0 /* LocationModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 7629F8921C81848700BC44F0 /* LocationModel.m */; };
+		767965EA1C93EF9C004CA584 /* ImageURLModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 767965E91C93EF9C004CA584 /* ImageURLModel.m */; };
 		768C1DEA1C745A470001EAD1 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 768C1DE91C745A470001EAD1 /* main.m */; };
 		768C1DED1C745A470001EAD1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 768C1DEC1C745A470001EAD1 /* AppDelegate.m */; };
 		768C1DF51C745A470001EAD1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 768C1DF41C745A470001EAD1 /* Assets.xcassets */; };
 		768C1DF81C745A470001EAD1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 768C1DF61C745A470001EAD1 /* LaunchScreen.storyboard */; };
 		768C1E051C7461380001EAD1 /* PhotoTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 768C1E041C7461380001EAD1 /* PhotoTableViewController.m */; };
 		768C1E081C7463450001EAD1 /* PhotoTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 768C1E071C7463450001EAD1 /* PhotoTableViewCell.m */; };
-		768C1E0B1C75AAFB0001EAD1 /* UIImage+UIImage_Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 768C1E0A1C75AAFB0001EAD1 /* UIImage+UIImage_Additions.m */; };
 		768C1E0E1C7E7DF20001EAD1 /* UserProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 768C1E0D1C7E7DF20001EAD1 /* UserProfileViewController.m */; };
 		768C1E141C7E84020001EAD1 /* LocationCollectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 768C1E131C7E84020001EAD1 /* LocationCollectionViewController.m */; };
 		76B3B32B98E1FF27C019CEC8 /* libPods-Flickrgram.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B00BEEEFD3C8A3511817FAA9 /* libPods-Flickrgram.a */; };
 		76DF9A381C83A00600580C2F /* PhotoFeedModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 76DF9A371C83A00600580C2F /* PhotoFeedModel.m */; };
+		76F8D5341C90277800E5545F /* CommentModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 76F8D5331C90277800E5545F /* CommentModel.m */; };
+		76F8D5371C9029BD00E5545F /* Utilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 76F8D5361C9029BD00E5545F /* Utilities.m */; };
+		76F8D53A1C90324400E5545F /* CommentFeedModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 76F8D5391C90324400E5545F /* CommentFeedModel.m */; };
+		76F8D53D1C903D6A00E5545F /* CommentView.m in Sources */ = {isa = PBXBuildFile; fileRef = 76F8D53C1C903D6A00E5545F /* CommentView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +42,8 @@
 		7629F8901C817A5400BC44F0 /* Flickrgram.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Flickrgram.pch; sourceTree = "<group>"; };
 		7629F8911C81848700BC44F0 /* LocationModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocationModel.h; sourceTree = "<group>"; };
 		7629F8921C81848700BC44F0 /* LocationModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationModel.m; sourceTree = "<group>"; };
+		767965E81C93EF9C004CA584 /* ImageURLModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageURLModel.h; sourceTree = "<group>"; };
+		767965E91C93EF9C004CA584 /* ImageURLModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageURLModel.m; sourceTree = "<group>"; };
 		768C1DE51C745A470001EAD1 /* Flickrgram.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Flickrgram.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		768C1DE91C745A470001EAD1 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		768C1DEB1C745A470001EAD1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -49,14 +55,20 @@
 		768C1E041C7461380001EAD1 /* PhotoTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoTableViewController.m; sourceTree = "<group>"; };
 		768C1E061C7463450001EAD1 /* PhotoTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoTableViewCell.h; sourceTree = "<group>"; };
 		768C1E071C7463450001EAD1 /* PhotoTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoTableViewCell.m; sourceTree = "<group>"; };
-		768C1E091C75AAFB0001EAD1 /* UIImage+UIImage_Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+UIImage_Additions.h"; sourceTree = "<group>"; };
-		768C1E0A1C75AAFB0001EAD1 /* UIImage+UIImage_Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+UIImage_Additions.m"; sourceTree = "<group>"; };
 		768C1E0C1C7E7DF20001EAD1 /* UserProfileViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserProfileViewController.h; sourceTree = "<group>"; };
 		768C1E0D1C7E7DF20001EAD1 /* UserProfileViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserProfileViewController.m; sourceTree = "<group>"; };
 		768C1E121C7E84020001EAD1 /* LocationCollectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocationCollectionViewController.h; sourceTree = "<group>"; };
 		768C1E131C7E84020001EAD1 /* LocationCollectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationCollectionViewController.m; sourceTree = "<group>"; };
 		76DF9A361C83A00600580C2F /* PhotoFeedModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoFeedModel.h; sourceTree = "<group>"; };
 		76DF9A371C83A00600580C2F /* PhotoFeedModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoFeedModel.m; sourceTree = "<group>"; };
+		76F8D5321C90277800E5545F /* CommentModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommentModel.h; sourceTree = "<group>"; };
+		76F8D5331C90277800E5545F /* CommentModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommentModel.m; sourceTree = "<group>"; };
+		76F8D5351C9029BD00E5545F /* Utilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utilities.h; sourceTree = "<group>"; };
+		76F8D5361C9029BD00E5545F /* Utilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Utilities.m; sourceTree = "<group>"; };
+		76F8D5381C90324400E5545F /* CommentFeedModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommentFeedModel.h; sourceTree = "<group>"; };
+		76F8D5391C90324400E5545F /* CommentFeedModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommentFeedModel.m; sourceTree = "<group>"; };
+		76F8D53B1C903D6A00E5545F /* CommentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommentView.h; sourceTree = "<group>"; };
+		76F8D53C1C903D6A00E5545F /* CommentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommentView.m; sourceTree = "<group>"; };
 		86E62D171C0AB31E923BAB75 /* Pods-Flickrgram.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Flickrgram.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Flickrgram/Pods-Flickrgram.debug.xcconfig"; sourceTree = "<group>"; };
 		B00BEEEFD3C8A3511817FAA9 /* libPods-Flickrgram.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Flickrgram.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -131,12 +143,18 @@
 				76DF9A371C83A00600580C2F /* PhotoFeedModel.m */,
 				7629F88A1C81737B00BC44F0 /* PhotoModel.h */,
 				7629F88B1C81737B00BC44F0 /* PhotoModel.m */,
+				767965E81C93EF9C004CA584 /* ImageURLModel.h */,
+				767965E91C93EF9C004CA584 /* ImageURLModel.m */,
+				76F8D5381C90324400E5545F /* CommentFeedModel.h */,
+				76F8D5391C90324400E5545F /* CommentFeedModel.m */,
+				76F8D5321C90277800E5545F /* CommentModel.h */,
+				76F8D5331C90277800E5545F /* CommentModel.m */,
 				7629F88D1C81741D00BC44F0 /* UserModel.h */,
 				7629F88E1C81741D00BC44F0 /* UserModel.m */,
 				7629F8911C81848700BC44F0 /* LocationModel.h */,
 				7629F8921C81848700BC44F0 /* LocationModel.m */,
-				768C1E091C75AAFB0001EAD1 /* UIImage+UIImage_Additions.h */,
-				768C1E0A1C75AAFB0001EAD1 /* UIImage+UIImage_Additions.m */,
+				76F8D5351C9029BD00E5545F /* Utilities.h */,
+				76F8D5361C9029BD00E5545F /* Utilities.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -144,6 +162,8 @@
 		768C1E001C745C530001EAD1 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				76F8D53B1C903D6A00E5545F /* CommentView.h */,
+				76F8D53C1C903D6A00E5545F /* CommentView.m */,
 				768C1E061C7463450001EAD1 /* PhotoTableViewCell.h */,
 				768C1E071C7463450001EAD1 /* PhotoTableViewCell.m */,
 				76094E711C8800320007321B /* PhotoCollectionViewCell.h */,
@@ -300,16 +320,20 @@
 				768C1E081C7463450001EAD1 /* PhotoTableViewCell.m in Sources */,
 				76094E731C8800320007321B /* PhotoCollectionViewCell.m in Sources */,
 				76DF9A381C83A00600580C2F /* PhotoFeedModel.m in Sources */,
+				76F8D53A1C90324400E5545F /* CommentFeedModel.m in Sources */,
 				768C1DED1C745A470001EAD1 /* AppDelegate.m in Sources */,
 				7629F88F1C81741D00BC44F0 /* UserModel.m in Sources */,
+				76F8D53D1C903D6A00E5545F /* CommentView.m in Sources */,
 				768C1E051C7461380001EAD1 /* PhotoTableViewController.m in Sources */,
 				768C1E0E1C7E7DF20001EAD1 /* UserProfileViewController.m in Sources */,
 				768C1E141C7E84020001EAD1 /* LocationCollectionViewController.m in Sources */,
 				768C1DEA1C745A470001EAD1 /* main.m in Sources */,
+				76F8D5371C9029BD00E5545F /* Utilities.m in Sources */,
 				76094E761C880F0C0007321B /* PhotoMapViewController.m in Sources */,
-				768C1E0B1C75AAFB0001EAD1 /* UIImage+UIImage_Additions.m in Sources */,
 				7629F88C1C81737B00BC44F0 /* PhotoModel.m in Sources */,
 				7629F8931C81848700BC44F0 /* LocationModel.m in Sources */,
+				76F8D5341C90277800E5545F /* CommentModel.m in Sources */,
+				767965EA1C93EF9C004CA584 /* ImageURLModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -10,6 +10,7 @@
 #import "CoreGraphics/CoreGraphics.h"
 #import "UserModel.h"
 #import "LocationModel.h"
+#import "CommentFeedModel.h"
 
 @interface PhotoModel : NSObject
 
@@ -18,8 +19,11 @@
 @property (nonatomic, strong, readonly) NSString               *uploadDateString;
 @property (nonatomic, strong, readonly) NSString               *title;
 @property (nonatomic, strong, readonly) NSString               *descriptionText;
+@property (nonatomic, assign, readonly) NSUInteger             commentsCount;
+@property (nonatomic, assign, readonly) NSUInteger             likesCount;
 @property (nonatomic, strong, readonly) LocationModel          *location;
 @property (nonatomic, strong, readonly) UserModel              *ownerUserProfile;
+@property (nonatomic, strong, readonly) CommentFeedModel       *commentFeed;
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWith500pxPhoto:(NSDictionary *)photoDictionary NS_DESIGNATED_INITIALIZER;

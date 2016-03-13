@@ -7,10 +7,10 @@
 //
 
 #import "PhotoTableViewCell.h"
-#import "UIImage+UIImage_Additions.h"
+#import "Utilities.h"
 #import "PINImageView+PINRemoteImage.h"
 #import "PINButton+PINRemoteImage.h"
-
+#import "CommentView.h"
 
 #define CELL_HEADER_HEIGHT 50
 #define CELL_HEADER_HORIZONTAL_INSET 10
@@ -24,18 +24,15 @@
   PhotoModel   *_photoModel;
   
   UIImageView  *_userProfileImageView;
-  
   UILabel      *_userNameLabel;
-  
   UILabel      *_photoLocationLabel;
-
   UILabel      *_photoTimeIntervalSincePostLabel;
   
   UIImageView  *_photoImageView;
   
   UILabel      *_photoLikesLabel;
   UILabel      *_photoDescriptionLabel;
-  UILabel      *_photoCommentsLabel;
+  CommentView  *_photoCommentsView;
 }
 
 
@@ -43,7 +40,8 @@
 
 + (CGFloat)cellHeaderFooterHeightForDataModel:(PhotoModel *)photo
 {
-  CGFloat height = CELL_HEADER_HEIGHT;
+  // count number of comments, lines of description
+  CGFloat height = CELL_HEADER_HEIGHT * 6;
   return height;
 }
 
@@ -59,6 +57,7 @@
     _userProfileImageView                      = [[UIImageView alloc] init];
 //    _userProfileImageView.backgroundColor      = [UIColor redColor];
   
+    
     
     _userNameLabel                             = [[UILabel alloc] init];
     _userNameLabel.font                        = [_userNameLabel.font fontWithSize:floorf(USER_IMAGE_HEIGHT/2)-1];
@@ -84,8 +83,14 @@
     _photoImageView.contentMode                = UIViewContentModeScaleAspectFill;
     
     _photoLikesLabel                           = [[UILabel alloc] init];
+    _photoLikesLabel.font                        = [_photoLikesLabel.font fontWithSize:floorf(USER_IMAGE_HEIGHT/2)-1];
+    _photoLikesLabel.textColor                   = [UIColor colorWithRed:18.0/255.0 green:86.0/255.0 blue:136.0/255.0 alpha:1.0];
+    
     _photoDescriptionLabel                     = [[UILabel alloc] init];
-    _photoCommentsLabel                        = [[UILabel alloc] init];
+    _photoDescriptionLabel.font                = [_photoDescriptionLabel.font fontWithSize:floorf(USER_IMAGE_HEIGHT/2)-1];
+    _photoDescriptionLabel.numberOfLines       = 3;
+
+    _photoCommentsView                         = [[CommentView alloc] init];
     
     UILongPressGestureRecognizer *lpgr = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(cellWasLongPressed:)];
     [self addGestureRecognizer:lpgr];
@@ -158,22 +163,27 @@
   [self addSubview:_photoImageView];
   
   // bottom of cell
-//  [_photoLikesLabel sizeToFit];
-//  _photoLikesLabel.frame = CGRectMake(CELL_HEADER_HORIZONTAL_INSET,
-//                                     CGRectGetMaxY(_photoImageView.frame),
-//                                     _photoLikesLabel.frame.size.width,
-//                                     _photoLikesLabel.frame.size.height);
-//  [self addSubview:_photoLikesLabel];
-//  
-//  [_photoDescriptionLabel sizeToFit];
-//  _photoLikesLabel.frame = CGRectMake(CELL_HEADER_HORIZONTAL_INSET,
-//                                      CGRectGetMaxY(_photoLikesLabel.frame) + 5,
-//                                      _photoDescriptionLabel.frame.size.width,
-//                                      _photoDescriptionLabel.frame.size.height);
-////  [self addSubview:_photoDescriptionLabel];
-//  
-//  [_photoCommentsLabel sizeToFit];
-//  [self addSubview:_photoCommentsLabel];
+  [_photoLikesLabel sizeToFit];
+  _photoLikesLabel.frame = CGRectMake(CELL_HEADER_HORIZONTAL_INSET,
+                                     CGRectGetMaxY(_photoImageView.frame)+ 5,
+                                     _photoLikesLabel.frame.size.width,
+                                     _photoLikesLabel.frame.size.height);
+  [self addSubview:_photoLikesLabel];
+
+  [_photoDescriptionLabel sizeToFit];
+  _photoDescriptionLabel.frame = CGRectMake(CELL_HEADER_HORIZONTAL_INSET,
+                                      CGRectGetMaxY(_photoLikesLabel.frame) + 5,
+                                      self.bounds.size.width - CELL_HEADER_HORIZONTAL_INSET * 2,
+                                      _photoDescriptionLabel.frame.size.height);
+  [self addSubview:_photoDescriptionLabel];
+
+  [_photoCommentsView sizeToFit];
+  _photoCommentsView.frame = CGRectMake(CELL_HEADER_HORIZONTAL_INSET,
+                                            CGRectGetMaxY(_photoDescriptionLabel.frame) + 5,
+                                            self.bounds.size.width - CELL_HEADER_HORIZONTAL_INSET * 2,
+                                            _photoCommentsView.frame.size.height);
+  
+  [self addSubview:_photoCommentsView];
 }
 
 - (void)prepareForReuse
@@ -188,6 +198,10 @@
   _userNameLabel.text                   = nil;
   _photoLocationLabel.text              = nil;
   _photoTimeIntervalSincePostLabel.text = nil;
+  _photoLikesLabel.text = nil;
+  _photoDescriptionLabel.text = nil;
+  
+  [_photoCommentsView prepareForReuse];
 }
 
 
@@ -199,6 +213,10 @@
   _photoTimeIntervalSincePostLabel.text = photo.uploadDateString;
   _photoDescriptionLabel.text           = photo.title;
   _userNameLabel.text                   = photo.ownerUserProfile.username;
+  _photoLikesLabel.text                 = [NSString stringWithFormat:@"♥︎ %@ likes", [[[NSNumber alloc] initWithUnsignedInteger:photo.likesCount] description]];
+  _photoDescriptionLabel.text           = [NSString stringWithFormat:@"%@ %@", photo.ownerUserProfile.username, photo.descriptionText];
+
+  [_photoCommentsView updateWithCommentFeedModel:photo.commentFeed];
   
   [photo.location reverseGeocodedLocationWithCompletionBlock:^(LocationModel *locationModel) {
     
@@ -212,7 +230,6 @@
     }
   }];
 
-
   // async download of photo using PINRemoteImage
   [_photoImageView pin_setImageFromURL:photo.URL];
   
@@ -224,7 +241,12 @@
   }];
 }
 
-
+- (void)loadCommentsForPhoto:(PhotoModel *)photo
+{
+  [_photoCommentsView updateWithCommentFeedModel:photo.commentFeed];
+  [self setNeedsLayout];
+}
+  
 #pragma mark - Helper Methods
 
 
