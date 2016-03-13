@@ -8,6 +8,7 @@
 
 #import "UserModel.h"
 #import <UIKit/UIKit.h>
+#import "Utilities.h"
 
 @implementation UserModel
 {
@@ -36,6 +37,14 @@
 
 
 #pragma mark - Instance Methods
+
+- (NSAttributedString *)usernameAttributedStringWithFontSize:(CGFloat)size
+{
+  return [NSAttributedString attributedStringWithString:self.username
+                                               fontSize:size
+                                                  color:[UIColor darkBlueColor]
+                                         firstWordColor:nil];
+}
 
 - (void)fetchAvatarImageWithCompletionBlock:(void(^)(UserModel *, UIImage *))block
 {

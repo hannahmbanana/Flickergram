@@ -26,5 +26,4 @@
 - (void)updateCellWithPhotoObject:(PhotoModel *)photo;
 - (void)loadCommentsForPhoto:(PhotoModel *)photo;
 
-
 @end
