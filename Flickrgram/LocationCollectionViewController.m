@@ -32,7 +32,7 @@
   self = [super initWithCollectionViewLayout:layout];
 
   if (self) {
-    
+        
     CGRect screenRect   = [[UIScreen mainScreen] bounds];
     CGFloat screenScale = [[UIScreen mainScreen] scale];
     CGSize imageSize    = CGSizeMake(screenRect.size.width * screenScale / 3.0, screenRect.size.width * screenScale / 3.0);

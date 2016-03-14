@@ -12,6 +12,7 @@
 #import "UserProfileViewController.h"
 #import "LocationCollectionViewController.h"
 #import "PhotoFeedModel.h"
+#import "Utilities.h"
 
 
 #define AUTO_TAIL_LOADING_NUM_SCREENFULS  2.5
@@ -22,6 +23,7 @@
 @implementation PhotoTableViewController
 {
   PhotoFeedModel *_photoFeed;
+  UIView         *_statusBarOpaqueUnderlayView;
 }
 
 
@@ -32,50 +34,49 @@
   self = [super initWithStyle:style];
   
   if (self) {
-    
+      
     self.navigationItem.title      = @"500pixgram";
+    [self.navigationController setNavigationBarHidden:YES];
     
     self.refreshControl            = [[UIRefreshControl alloc] init];
     [self.refreshControl addTarget:self action:@selector(refreshFeed) forControlEvents:UIControlEventValueChanged];
     
-    self.tableView.allowsSelection = NO;
-    self.tableView.separatorStyle  = UITableViewCellSeparatorStyleNone;
-    [self.tableView registerClass:[PhotoTableViewCell class] forCellReuseIdentifier:@"photoCell"];
-  
-    _photoFeed = [[PhotoFeedModel alloc] initWithPhotoFeedModelType:PhotoFeedModelTypePopular imageSize:[self imageSizeForScreenWidth]];
+    _photoFeed                     = [[PhotoFeedModel alloc] initWithPhotoFeedModelType:PhotoFeedModelTypePopular imageSize:[self imageSizeForScreenWidth]];
     [self refreshFeed];
+    
+    _statusBarOpaqueUnderlayView                 = [[UIView alloc] init];
+    _statusBarOpaqueUnderlayView.backgroundColor = [UIColor darkBlueColor];
+    [[[UIApplication sharedApplication] keyWindow] addSubview:_statusBarOpaqueUnderlayView];
   }
   
   return self;
 }
 
-
-#pragma mark - Helper Methods
-
-- (CGSize)imageSizeForScreenWidth
+- (void)viewDidLoad  // anything involving the view should go here, not init
 {
-  CGRect screenRect   = [[UIScreen mainScreen] bounds];
-  CGFloat screenScale = [[UIScreen mainScreen] scale];
-  return CGSizeMake(screenRect.size.width * screenScale, screenRect.size.width * screenScale);
+  [super viewDidLoad];
+  
+  self.tableView.allowsSelection = NO;
+  self.tableView.separatorStyle  = UITableViewCellSeparatorStyleNone;
+  [self.tableView registerClass:[PhotoTableViewCell class] forCellReuseIdentifier:@"photoCell"];
+  
 }
 
-- (void)insertNewRowsInTableView:(NSArray *)newPhotos
+- (void)viewWillAppear:(BOOL)animated
 {
-  NSLog(@"_photoFeed number of items = %lu (%lu total)", (unsigned long)[_photoFeed numberOfItemsInFeed], (long)[_photoFeed totalNumberOfPhotos]);
-
-  // instead of doing tableView reloadData, use table editing commands
-  NSMutableArray *indexPaths = [NSMutableArray array];
+  [super viewWillAppear:animated];
   
-  NSInteger section = 0;
-  NSUInteger newTotalNumberOfPhotos = [_photoFeed numberOfItemsInFeed];
-  for (NSUInteger row = newTotalNumberOfPhotos - newPhotos.count; row < newTotalNumberOfPhotos; row++) {
-    
-    NSIndexPath *path = [NSIndexPath indexPathForRow:row inSection:section];
-    [indexPaths addObject:path];
-  }
-  
-  [self.tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
+  self.navigationController.hidesBarsOnSwipe = YES;
 }
+
+- (void)viewWillLayoutSubviews
+{
+  [super viewWillLayoutSubviews];
+  
+  _statusBarOpaqueUnderlayView.frame = [[UIApplication sharedApplication] statusBarFrame];
+}
+
+#pragma mark - Instance Methods
 
 - (void)refreshFeed
 {
@@ -88,9 +89,16 @@
     
     // immediately start second larger fetch
     [self loadPage];
-
+    
   } numResultsToReturn:4];
 }
+
+- (UIStatusBarStyle)preferredStatusBarStyle
+{
+  return UIStatusBarStyleLightContent;
+}
+
+#pragma mark - Helper Methods
 
 - (void)loadPage
 {
@@ -119,6 +127,31 @@
   }
 }
 
+- (CGSize)imageSizeForScreenWidth
+{
+  CGRect screenRect   = [[UIScreen mainScreen] bounds];
+  CGFloat screenScale = [[UIScreen mainScreen] scale];
+  return CGSizeMake(screenRect.size.width * screenScale, screenRect.size.width * screenScale);
+}
+
+- (void)insertNewRowsInTableView:(NSArray *)newPhotos
+{
+  NSLog(@"_photoFeed number of items = %lu (%lu total)", (unsigned long)[_photoFeed numberOfItemsInFeed], (long)[_photoFeed totalNumberOfPhotos]);
+
+  // instead of doing tableView reloadData, use table editing commands
+  NSMutableArray *indexPaths = [NSMutableArray array];
+  
+  NSInteger section = 0;
+  NSUInteger newTotalNumberOfPhotos = [_photoFeed numberOfItemsInFeed];
+  for (NSUInteger row = newTotalNumberOfPhotos - newPhotos.count; row < newTotalNumberOfPhotos; row++) {
+    
+    NSIndexPath *path = [NSIndexPath indexPathForRow:row inSection:section];
+    [indexPaths addObject:path];
+  }
+  
+  [self.tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
+}
+
 //- (void)logPhotoIDsInPhotoFeed
 //{
 //  NSLog(@"_photoFeed number of items = %lu", (unsigned long)[_photoFeed numberOfItemsInFeed]);
@@ -138,16 +171,17 @@
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-    // automatic tail loading
-    CGFloat currentOffSetY = scrollView.contentOffset.y;
-    CGFloat contentHeight  = scrollView.contentSize.height;
-    CGFloat screenHeight   = [UIScreen mainScreen].bounds.size.height;
   
-    CGFloat screenfullsBeforeBottom = (contentHeight - currentOffSetY) / screenHeight;
-    if (screenfullsBeforeBottom < AUTO_TAIL_LOADING_NUM_SCREENFULS) {
-      NSLog(@"AUTOMATIC TAIL LOADING BEGIN");
-      [self loadPage];
-    }
+  CGFloat currentOffSetY = scrollView.contentOffset.y;
+  CGFloat contentHeight  = scrollView.contentSize.height;
+  CGFloat screenHeight   = [UIScreen mainScreen].bounds.size.height;
+
+  // automatic tail loading
+  CGFloat screenfullsBeforeBottom = (contentHeight - currentOffSetY) / screenHeight;
+  if (screenfullsBeforeBottom < AUTO_TAIL_LOADING_NUM_SCREENFULS) {
+    NSLog(@"AUTOMATIC TAIL LOADING BEGIN");
+    [self loadPage];
+  }
 }
 
 

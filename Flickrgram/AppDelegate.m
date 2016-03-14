@@ -10,6 +10,7 @@
 #import "PhotoTableViewController.h"
 #import "UserProfileViewController.h"
 #import "PhotoMapViewController.h"
+#import "Utilities.h"
 
 @interface AppDelegate ()
 
@@ -21,8 +22,16 @@
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    
+  
+  [[UINavigationBar appearance] setBarTintColor:[UIColor darkBlueColor]];
+  [[UINavigationBar appearance] setTranslucent:NO];
+  NSDictionary *attributes = @{NSForegroundColorAttributeName:[UIColor whiteColor]};
+  [[UINavigationBar appearance] setTitleTextAttributes:attributes];
+
   self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+  UITabBarController *tabBarController    = [[UITabBarController alloc] init];
+  self.window.rootViewController          = tabBarController;
+  [self.window makeKeyAndVisible];
   
   // create Home Feed viewController & navController
   _viewController                          = [[PhotoTableViewController alloc] init];
@@ -31,6 +40,12 @@
                                                                            image:[UIImage imageNamed:@"home"]
                                                                              tag:0];
   
+  // UINavigationController does not forward on preferredStatusBarStyle calls to its child view controllers.
+  // Instead it manages its own state...
+  //http://stackoverflow.com/questions/19022210/preferredstatusbarstyle-isnt-called/19513714#19513714
+  homeFeedNavCtrl.navigationBar.barStyle = UIBarStyleBlack;
+
+
   // create Profile viewController & navController
 //  UserProfileViewController *myProfileVC   = [[UserProfileViewController alloc] initWithMe];
   UIViewController *VC                         = [[UIViewController alloc] init];
@@ -58,15 +73,9 @@
                                                                              image:[UIImage imageNamed:@"earth"]
                                                                                tag:0];
   
-  // create UITabBarController and add viewControllers
-  UITabBarController *tabBarController    = [[UITabBarController alloc] init];
+  // configure UITabBarController and add viewControllers
   tabBarController.viewControllers        = @[homeFeedNavCtrl, photoNearMeNavCtrl, photoUploadNavCtrl, profileNavController];
   tabBarController.selectedViewController = homeFeedNavCtrl;
-  
-  self.window.rootViewController = tabBarController;
-  
-  [self.window makeKeyAndVisible];
-  
   return YES;
 }
 
