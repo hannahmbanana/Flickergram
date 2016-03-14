@@ -335,9 +335,9 @@
     if (userModel == _user) {
       
       _followingStatusBtn.selected = userModel.following;
-      _followersCountLabel.text    = [NSString stringWithFormat:@"%lu\nfollowers", userModel.followersCount];
-      _followingCountLabel.text    = [NSString stringWithFormat:@"%lu\nfollowing", userModel.friendsCount];
-      _photoCountLabel.text        = [NSString stringWithFormat:@"%lu\nphotos", userModel.photoCount];
+      _followersCountLabel.text    = [NSString stringWithFormat:@"%lu\nfollowers", (long)userModel.followersCount];
+      _followingCountLabel.text    = [NSString stringWithFormat:@"%lu\nfollowing", (long)userModel.friendsCount];
+      _photoCountLabel.text        = [NSString stringWithFormat:@"%lu\nphotos", (long)userModel.photoCount];
       _aboutLabel.text             = userModel.about;
       _domainLabel.text            = userModel.domain;
       

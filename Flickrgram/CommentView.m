@@ -96,14 +96,15 @@
     if (addViewAllCommentsLabel) {
       commentLabelString        = [_commentFeed viewAllCommentsAttributedString];
       [[_commentLabels objectAtIndex:labelsIndex] setAttributedText:commentLabelString];
+      labelsIndex++;
     }
     
     NSUInteger numCommentsInFeed = [_commentFeed numberOfItemsInFeed];
     
     for (int feedIndex = 0; feedIndex < numCommentsInFeed; feedIndex++) {
-      labelsIndex++;
       commentLabelString         = [[_commentFeed objectAtIndex:feedIndex] commentAttributedString];
       [[_commentLabels objectAtIndex:labelsIndex] setAttributedText:commentLabelString];
+      labelsIndex++;
     }
     
     [self setNeedsLayout];

@@ -41,7 +41,7 @@
     [_photoFeed updatePhotoFeedModelTypeLocationCoordinates:coordiantes radiusInMiles:10];
     [_photoFeed refreshFeedWithCompletionBlock:^(NSArray *newPhotos) {
       [self.collectionView reloadData];
-    }];
+    } numResultsToReturn:20];
     
     // set collection view dataSource and delegate
     self.collectionView.delegate = self;

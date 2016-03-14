@@ -20,6 +20,7 @@ typedef NS_ENUM(NSInteger, PhotoFeedModelType) {
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithPhotoFeedModelType:(PhotoFeedModelType)type imageSize:(CGSize)size NS_DESIGNATED_INITIALIZER;
 
+- (NSUInteger)totalNumberOfPhotos;
 - (NSUInteger)numberOfItemsInFeed;
 - (PhotoModel *)objectAtIndex:(NSUInteger)index;
 - (NSInteger)indexOfPhotoModel:(PhotoModel *)photoModel;
@@ -28,7 +29,7 @@ typedef NS_ENUM(NSInteger, PhotoFeedModelType) {
 - (void)updatePhotoFeedModelTypeUserId:(NSUInteger)userID;
 
 - (void)clearFeed;
-- (void)requestPageWithCompletionBlock:(void (^)(NSArray *))block;
-- (void)refreshFeedWithCompletionBlock:(void (^)(NSArray *))block;
+- (void)requestPageWithCompletionBlock:(void (^)(NSArray *))block numResultsToReturn:(NSUInteger)numResults;
+- (void)refreshFeedWithCompletionBlock:(void (^)(NSArray *))block numResultsToReturn:(NSUInteger)numResults;
 
 @end

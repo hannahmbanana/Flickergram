@@ -16,15 +16,17 @@
 @end
 
 @implementation AppDelegate
-
+{
+  PhotoTableViewController *_viewController;
+}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     
   self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
   
   // create Home Feed viewController & navController
-  PhotoTableViewController *viewController = [[PhotoTableViewController alloc] init];
-  UINavigationController *homeFeedNavCtrl  = [[UINavigationController alloc] initWithRootViewController:viewController];
+  _viewController                          = [[PhotoTableViewController alloc] init];
+  UINavigationController *homeFeedNavCtrl  = [[UINavigationController alloc] initWithRootViewController:_viewController];
   homeFeedNavCtrl.tabBarItem               = [[UITabBarItem alloc] initWithTitle:@"Home Feed"
                                                                            image:[UIImage imageNamed:@"home"]
                                                                              tag:0];
@@ -83,6 +85,8 @@
 - (void)applicationWillEnterForeground:(UIApplication *)application {
   // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
   
+  [_viewController refreshFeed];
+  NSLog(@"applicationWillEnterForeground - refreshing feed");
   [self getData];
 }
 

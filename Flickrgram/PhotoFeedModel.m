@@ -89,6 +89,11 @@
 
 #pragma mark - Instance Methods
 
+- (NSUInteger)totalNumberOfPhotos
+{
+  return _totalItems;
+}
+
 - (NSUInteger)numberOfItemsInFeed
 {
   return [_photos count];
@@ -130,7 +135,7 @@
   _ids    = [[NSMutableArray alloc] init];
 }
 
-- (void)requestPageWithCompletionBlock:(void (^)(NSArray *))block
+- (void)requestPageWithCompletionBlock:(void (^)(NSArray *))block numResultsToReturn:(NSUInteger)numResults
 {
   // only one fetch at a time
   if (_fetchPageInProgress) {
@@ -143,11 +148,11 @@
     _fetchPageInProgress = YES;
     
     NSLog(@"Request: SUCCESS");
-    [self fetchPageWithCompletionBlock:block];
+    [self fetchPageWithCompletionBlock:block numResultsToReturn:numResults];
   }
 }
 
-- (void)refreshFeedWithCompletionBlock:(void (^)(NSArray *))block
+- (void)refreshFeedWithCompletionBlock:(void (^)(NSArray *))block numResultsToReturn:(NSUInteger)numResults
 {
   // only one fetch at a time
   if (_refreshFeedInProgress) {
@@ -171,17 +176,17 @@
       }
       
       _refreshFeedInProgress = NO;
-    } replaceData:YES];
+    } numResultsToReturn:numResults replaceData:YES];
   }
 }
 
 #pragma mark - Helper Methods
-- (void)fetchPageWithCompletionBlock:(void (^)(NSArray *))block
+- (void)fetchPageWithCompletionBlock:(void (^)(NSArray *))block numResultsToReturn:(NSUInteger)numResults
 {
-  [self fetchPageWithCompletionBlock:block replaceData:NO];
+  [self fetchPageWithCompletionBlock:block numResultsToReturn:numResults replaceData:NO];
 }
 
-- (void)fetchPageWithCompletionBlock:(void (^)(NSArray *))block replaceData:(BOOL)replaceData
+- (void)fetchPageWithCompletionBlock:(void (^)(NSArray *))block numResultsToReturn:(NSUInteger)numResults replaceData:(BOOL)replaceData
 {
   // early return if reached end of pages
   if (_totalPages) {
@@ -189,6 +194,9 @@
       return;
     }
   }
+  
+  // rpp cannot be over 100
+  NSUInteger numPhotos = (numResults < 100) ? numResults : 100;
     
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     
@@ -199,7 +207,7 @@
     
       NSUInteger nextPage = _currentPage + 1;
       NSString *imageSizeParam = [ImageURLModel imageParameterForClosestImageSize:_imageSize];
-      NSString *urlAdditions = [NSString stringWithFormat:@"&page=%lu&rpp=4%@", (unsigned long)nextPage, imageSizeParam];
+      NSString *urlAdditions = [NSString stringWithFormat:@"&page=%lu&rpp=%lu%@", (unsigned long)nextPage, (long)numPhotos, imageSizeParam];
       
       NSURL *url = [NSURL URLWithString:[_urlString stringByAppendingString:urlAdditions]];
       
