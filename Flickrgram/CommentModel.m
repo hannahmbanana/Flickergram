@@ -24,11 +24,11 @@
     
     _dictionaryRepresentation   = photoDictionary;
     
-    _ID              = [[photoDictionary objectForKey:@"id"] integerValue];
-    _commenterID     = [[photoDictionary objectForKey:@"user_id"] integerValue];
+    _ID                = [[photoDictionary objectForKey:@"id"] integerValue];
+    _commenterID       = [[photoDictionary objectForKey:@"user_id"] integerValue];
     _commenterUsername = [photoDictionary valueForKeyPath:@"user.username"];
-    _body            = [photoDictionary objectForKey:@"body"];
-    _dateString      = [NSString elapsedTimeStringSinceDate:[photoDictionary valueForKeyPath:@"created_at"]];
+    _body              = [photoDictionary objectForKey:@"body"];
+    _dateString        = [NSString elapsedTimeStringSinceDate:[photoDictionary valueForKeyPath:@"created_at"]];
   }
   
   return self;

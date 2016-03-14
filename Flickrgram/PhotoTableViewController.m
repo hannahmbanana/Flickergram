@@ -215,6 +215,9 @@
 {
   UserProfileViewController *userProfileView = [[UserProfileViewController alloc] initWithUser:user];
   [self.navigationController pushViewController:userProfileView animated:YES];
+  
+  // force navigationController visible
+  [self.navigationController setNavigationBarHidden:NO];
 }
 
 - (void)photoLocationWasTouchedWithCoordinate:(CLLocationCoordinate2D)coordiantes name:(NSAttributedString *)name

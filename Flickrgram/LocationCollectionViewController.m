@@ -41,7 +41,7 @@
     [_photoFeed updatePhotoFeedModelTypeLocationCoordinates:coordiantes radiusInMiles:10];
     [_photoFeed refreshFeedWithCompletionBlock:^(NSArray *newPhotos) {
       [self.collectionView reloadData];
-    } numResultsToReturn:20];
+    } numResultsToReturn:21];
     
     // set collection view dataSource and delegate
     self.collectionView.delegate = self;
@@ -57,7 +57,6 @@
     _mapView = [[MKMapView alloc] init];
     _mapView.showsUserLocation = YES;
   
-
     // set coordinates
     _coordinates = coordiantes;
   
@@ -66,9 +65,9 @@
   return self;
 }
 
-- (void)viewWillLayoutSubviews
+- (void)viewWillAppear:(BOOL)animated
 {
-  [super viewWillLayoutSubviews];
+  [super viewWillAppear:animated];
   
   // add annotation for coordinates
   MKPointAnnotation *photoLocationAnnotation = [[MKPointAnnotation alloc] init];
@@ -81,18 +80,13 @@
   // set map span and region
   MKCoordinateSpan span = MKCoordinateSpanMake(5, 5);
   MKCoordinateRegion region = MKCoordinateRegionMake(_coordinates, span);
-  [_mapView setRegion:region animated:YES];
-  
-//  // layout MKMapView
-//  _mapView.frame = CGRectMake(0,
-//                              0,
-//                              self.view.bounds.size.width,
-//                              self.view.bounds.size.height * MAP_HEIGHT_VERTICAL_SCREEN_RATIO);
-//  
-
-  
+  [_mapView setRegion:region animated:NO];
 }
 
+- (void)viewWillLayoutSubviews
+{
+  [super viewWillLayoutSubviews];
+}
 
 #pragma mark - UICollectionViewDataSource
 

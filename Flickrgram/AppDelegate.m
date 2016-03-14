@@ -56,14 +56,14 @@
                                                                                image:[UIImage imageNamed:@"profile"]
                                                                                  tag:0];
 
-  // create Photo Upload viewController & navController
-  UIViewController *VC1                      = [[UIViewController alloc] init];
-  VC1.view.backgroundColor                   = [UIColor redColor];
-  
-  UINavigationController *photoUploadNavCtrl = [[UINavigationController alloc] initWithRootViewController:VC1];
-  photoUploadNavCtrl.tabBarItem              = [[UITabBarItem alloc] initWithTitle:@"Upload"
-                                                                             image:[UIImage imageNamed:@"camera"]
-                                                                               tag:0];
+//  // create Photo Upload viewController & navController
+//  UIViewController *VC1                      = [[UIViewController alloc] init];
+//  VC1.view.backgroundColor                   = [UIColor redColor];
+//  
+//  UINavigationController *photoUploadNavCtrl = [[UINavigationController alloc] initWithRootViewController:VC1];
+//  photoUploadNavCtrl.tabBarItem              = [[UITabBarItem alloc] initWithTitle:@"Upload"
+//                                                                             image:[UIImage imageNamed:@"camera"]
+//                                                                               tag:0];
 
   // create Photos Near Me viewController & navController
   PhotoMapViewController *photoNearMeVC      = [[PhotoMapViewController alloc] init];
@@ -74,7 +74,7 @@
                                                                                tag:0];
   
   // configure UITabBarController and add viewControllers
-  tabBarController.viewControllers        = @[homeFeedNavCtrl, photoNearMeNavCtrl, photoUploadNavCtrl, profileNavController];
+  tabBarController.viewControllers        = @[homeFeedNavCtrl, photoNearMeNavCtrl, profileNavController];
   tabBarController.selectedViewController = homeFeedNavCtrl;
   return YES;
 }
@@ -94,8 +94,8 @@
 - (void)applicationWillEnterForeground:(UIApplication *)application {
   // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
   
-  [_viewController refreshFeed];
-  NSLog(@"applicationWillEnterForeground - refreshing feed");
+//  [_viewController refreshFeed]; 
+//  NSLog(@"applicationWillEnterForeground - refreshing feed");
   [self getData];
 }
 
