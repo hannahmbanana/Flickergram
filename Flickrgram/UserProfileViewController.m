@@ -97,7 +97,7 @@
     // This is what we have available as soon as we're created, without fetching new metadata from the network.
     _fullNameLabel.text            = _user.fullName;
     _user                          = user;
-    self.navigationItem.title      = user.username;
+    self.navigationItem.title      = [user.username uppercaseString];
     
     // get full set of user data
     [self loadAdditionalProfileFields];

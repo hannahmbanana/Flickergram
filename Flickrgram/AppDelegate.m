@@ -29,6 +29,7 @@
   [[UINavigationBar appearance] setTitleTextAttributes:attributes];
 
   self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+  self.window.backgroundColor = [UIColor whiteColor];
   UITabBarController *tabBarController    = [[UITabBarController alloc] init];
   self.window.rootViewController          = tabBarController;
   [self.window makeKeyAndVisible];

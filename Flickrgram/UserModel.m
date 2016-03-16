@@ -46,6 +46,14 @@
                                          firstWordColor:nil];
 }
 
+- (NSAttributedString *)fullNameAttributedStringWithFontSize:(CGFloat)size
+{
+  return [NSAttributedString attributedStringWithString:self.fullName
+                                               fontSize:size
+                                                  color:[UIColor lightGrayColor]
+                                         firstWordColor:nil];
+}
+
 - (void)fetchAvatarImageWithCompletionBlock:(void(^)(UserModel *, UIImage *))block
 {
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{

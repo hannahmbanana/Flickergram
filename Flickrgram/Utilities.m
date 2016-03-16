@@ -27,6 +27,40 @@
 
 @implementation UIImage (Additions)
 
++ (UIImage *)followingButtonStretchableImageForCornerRadius:(CGFloat)cornerRadius following:(BOOL)followingEnabled
+{
+  CGSize unstretchedSize  = CGSizeMake(2 * cornerRadius + 1, 2 * cornerRadius + 1);
+  CGRect rect             = (CGRect) {CGPointZero, unstretchedSize};
+  UIBezierPath *path      = [UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:cornerRadius];
+  
+  // create a graphics context for the following status button
+  UIGraphicsBeginImageContextWithOptions(unstretchedSize, NO, 0);
+  
+  [path addClip];
+  
+  if (followingEnabled) {
+    
+    [[UIColor whiteColor] setFill];
+    [path fill];
+    
+    path.lineWidth = 3;
+    [[UIColor lightBlueColor] setStroke];
+    [path stroke];
+    
+  } else {
+    
+    [[UIColor lightBlueColor] setFill];
+    [path fill];
+  }
+  
+  UIImage *followingBtnImage = UIGraphicsGetImageFromCurrentImageContext();
+  UIGraphicsEndImageContext();
+  
+  UIImage *followingBtnImageStretchable = [followingBtnImage stretchableImageWithLeftCapWidth:cornerRadius
+                                                                                 topCapHeight:cornerRadius];
+  return followingBtnImageStretchable;
+}
+
 - (UIImage *)makeCircularImageWithSize:(CGSize)size
 {
   // make a CGRect with the image's size

@@ -249,6 +249,22 @@
   }];
 }
 
+- (void)startDownloadingLikesForPhoto:_photoModel
+{
+//  [_photoModel.likesFeed refreshFeedWithCompletionBlock:^(NSArray *newComments) {
+//    
+//    NSInteger rowNum         = [_photoFeed indexOfPhotoModel:photo];
+//    PhotoTableViewCell *cell = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:rowNum inSection:0]];
+//    
+//    if (cell) {
+//      [cell loadCommentsForPhoto:photo];
+//      [self.tableView beginUpdates];
+//      [self.tableView endUpdates];
+//      // FIXME: adjust content offset - iterate over cells above to get heights...
+//    }
+//  }];
+}
+
 
 #pragma mark - Gesture Handling
 
@@ -280,10 +296,18 @@
   // determine which area of cell was tapped
   CGPoint tapPoint = [sender locationInView:self];
   
-  if (tapPoint.y > HEADER_HEIGHT) {
+  if (tapPoint.y > HEADER_HEIGHT && tapPoint.y < (HEADER_HEIGHT + self.bounds.size.width)) {
     
     // photo tapped
     NSLog(@"TAP: photo");
+    
+  } else if (tapPoint.y > (HEADER_HEIGHT + self.bounds.size.width)) {
+    
+    [self.delegate photoLikesWasTouchedWithPhoto:_photoModel];
+    [_photoModel.commentFeed requestPageWithCompletionBlock:^(NSArray *newcomments) {}];   //FIXME: make comments likes :)
+    
+    // photo tapped
+    NSLog(@"TAP: photo likes");
     
   } else if (tapPoint.x <= CGRectGetMaxX(_userAvatarImageView.frame)) {
     
@@ -291,6 +315,9 @@
     NSLog(@"TAP: Buddy Icon");
     
     [self.delegate userProfileWasTouchedWithUser:_photoModel.ownerUserProfile];
+    
+    // start downloading likes
+    [self startDownloadingLikesForPhoto:_photoModel];
     
   } else if (tapPoint.x < CGRectGetMinX(_photoTimeIntervalSincePostLabel.frame)) {
     

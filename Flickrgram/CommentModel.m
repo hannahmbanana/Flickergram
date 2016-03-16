@@ -12,6 +12,7 @@
 @implementation CommentModel
 {
   NSDictionary *_dictionaryRepresentation;
+  NSString     *_uploadDateRaw;
 }
 
 #pragma mark - Lifecycle
@@ -27,8 +28,10 @@
     _ID                = [[photoDictionary objectForKey:@"id"] integerValue];
     _commenterID       = [[photoDictionary objectForKey:@"user_id"] integerValue];
     _commenterUsername = [photoDictionary valueForKeyPath:@"user.username"];
+    _commenterAvatarURL= [photoDictionary valueForKeyPath:@"user.userpic_url"];
     _body              = [photoDictionary objectForKey:@"body"];
-    _dateString        = [NSString elapsedTimeStringSinceDate:[photoDictionary valueForKeyPath:@"created_at"]];
+    _uploadDateRaw     = [photoDictionary valueForKeyPath:@"created_at"];
+    _uploadDateString  = [NSString elapsedTimeStringSinceDate:_uploadDateRaw];
   }
   
   return self;
@@ -40,6 +43,14 @@
 {
   NSString *commentString = [NSString stringWithFormat:@"%@ %@",[_commenterUsername lowercaseString], _body];
   return [NSAttributedString attributedStringWithString:commentString fontSize:14 color:[UIColor darkGrayColor] firstWordColor:[UIColor darkBlueColor]];
+}
+
+- (NSAttributedString *)uploadDateAttributedStringWithFontSize:(CGFloat)size;
+{
+  return [NSAttributedString attributedStringWithString:self.uploadDateString
+                                               fontSize:size
+                                                  color:[UIColor lightGrayColor]
+                                         firstWordColor:nil];
 }
 
 @end

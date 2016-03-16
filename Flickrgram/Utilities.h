@@ -18,6 +18,8 @@
 
 @interface UIImage (Additions)
 
++ (UIImage *)followingButtonStretchableImageForCornerRadius:(CGFloat)cornerRadius following:(BOOL)followingEnabled;
+
 - (UIImage *)makeCircularImageWithSize:(CGSize)size;
 
 @end

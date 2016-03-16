@@ -14,6 +14,7 @@
 - (void)userProfileWasTouchedWithUser:(UserModel *)user;
 - (void)photoLocationWasTouchedWithCoordinate:(CLLocationCoordinate2D)coordiantes name:(NSAttributedString *)name;
 - (void)cellWasLongPressedWithPhoto:(PhotoModel *)photo;
+- (void)photoLikesWasTouchedWithPhoto:(PhotoModel *)photo;
 @end
 
 

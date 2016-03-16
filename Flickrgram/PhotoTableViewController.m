@@ -7,9 +7,9 @@
 //
 
 #import "PhotoTableViewController.h"
-#import "PhotoModel.h"
 #import "PhotoTableViewCell.h"
 #import "UserProfileViewController.h"
+#import "LikersViewController.h"
 #import "LocationCollectionViewController.h"
 #import "PhotoFeedModel.h"
 #import "Utilities.h"
@@ -224,7 +224,7 @@
 {
   UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
   layout.minimumInteritemSpacing = 1;
-  layout.minimumLineSpacing = 1;
+  layout.minimumLineSpacing  = 1;
   
   CGFloat boundsWidth = self.view.bounds.size.width;
   layout.headerReferenceSize = CGSizeMake(boundsWidth, 200);
@@ -260,6 +260,14 @@
   [alert addAction:cancelAction];
   
   [self presentViewController:alert animated:YES completion:^{}];
+}
+
+- (void)photoLikesWasTouchedWithPhoto:(PhotoModel *)photo
+{
+  LikersViewController *vc = [[LikersViewController alloc] initWithPhoto:photo];
+  [self.navigationController pushViewController:vc animated:YES];
+  
+  // force navigationController visible
 }
 
 @end

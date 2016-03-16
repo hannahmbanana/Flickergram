@@ -34,6 +34,7 @@
 - (instancetype)initWith500pxPhoto:(NSDictionary *)dictionary NS_DESIGNATED_INITIALIZER;
 
 - (NSAttributedString *)usernameAttributedStringWithFontSize:(CGFloat)size;
+- (NSAttributedString *)fullNameAttributedStringWithFontSize:(CGFloat)size;
 
 - (void)fetchAvatarImageWithCompletionBlock:(void(^)(UserModel *, UIImage *))block;
 
