@@ -12,6 +12,7 @@
 @implementation CommentModel
 {
   NSDictionary *_dictionaryRepresentation;
+  NSString     *_uploadDateRaw;
 }
 
 #pragma mark - Lifecycle
@@ -24,19 +25,32 @@
     
     _dictionaryRepresentation   = photoDictionary;
     
-    _ID              = [[photoDictionary objectForKey:@"id"] integerValue];
-    _commenterID     = [[photoDictionary objectForKey:@"user_id"] integerValue];
+    _ID                = [[photoDictionary objectForKey:@"id"] integerValue];
+    _commenterID       = [[photoDictionary objectForKey:@"user_id"] integerValue];
     _commenterUsername = [photoDictionary valueForKeyPath:@"user.username"];
-    _body            = [photoDictionary objectForKey:@"body"];
-    _dateString      = [NSString elapsedTimeStringSinceDate:[photoDictionary valueForKeyPath:@"created_at"]];
+    _commenterAvatarURL= [photoDictionary valueForKeyPath:@"user.userpic_url"];
+    _body              = [photoDictionary objectForKey:@"body"];
+    _uploadDateRaw     = [photoDictionary valueForKeyPath:@"created_at"];
+    _uploadDateString  = [NSString elapsedTimeStringSinceDate:_uploadDateRaw];
   }
   
   return self;
 }
 
+#pragma mark - Instance Methods
+
 - (NSAttributedString *)commentAttributedString
 {
-  return [NSAttributedString colorizeFirstWordInString:[NSString stringWithFormat:@"%@ %@",[_commenterUsername lowercaseString], _body]];
+  NSString *commentString = [NSString stringWithFormat:@"%@ %@",[_commenterUsername lowercaseString], _body];
+  return [NSAttributedString attributedStringWithString:commentString fontSize:14 color:[UIColor darkGrayColor] firstWordColor:[UIColor darkBlueColor]];
+}
+
+- (NSAttributedString *)uploadDateAttributedStringWithFontSize:(CGFloat)size;
+{
+  return [NSAttributedString attributedStringWithString:self.uploadDateString
+                                               fontSize:size
+                                                  color:[UIColor lightGrayColor]
+                                         firstWordColor:nil];
 }
 
 @end

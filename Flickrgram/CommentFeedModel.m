@@ -7,6 +7,8 @@
 //
 
 #import "CommentFeedModel.h"
+#import <UIKit/UIKit.h>
+#import "Utilities.h"
 
 #define fiveHundredPX_ENDPOINT_HOST      @"https://api.500px.com/v1/"
 #define fiveHundredPX_ENDPOINT_COMMENTS  @"photos/4928401/comments"
@@ -65,14 +67,26 @@
   return [_comments count];
 }
 
-- (NSUInteger)totalNumberOfCommentsForPhoto
+- (CommentModel *)objectAtIndex:(NSUInteger)index
+{
+  return [_comments objectAtIndex:index];
+}
+
+- (NSUInteger)numberOfCommentsForPhoto
 {
   return _totalItems;
 }
 
-- (CommentModel *)objectAtIndex:(NSUInteger)index
+- (BOOL)numberOfCommentsForPhotoExceedsInteger:(NSUInteger)number
 {
-  return [_comments objectAtIndex:index];
+  return (_totalItems > number);
+}
+
+- (NSAttributedString *)viewAllCommentsAttributedString
+{
+  NSString *string               = [NSString stringWithFormat:@"View all %@ comments", [NSNumber numberWithUnsignedInteger:_totalItems]];
+  NSAttributedString *attrString = [NSAttributedString attributedStringWithString:string fontSize:14 color:[UIColor lightGrayColor] firstWordColor:nil];
+  return attrString;
 }
 
 - (void)requestPageWithCompletionBlock:(void (^)(NSArray *))block

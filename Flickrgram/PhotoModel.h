@@ -28,4 +28,9 @@
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWith500pxPhoto:(NSDictionary *)photoDictionary NS_DESIGNATED_INITIALIZER;
 
+- (NSAttributedString *)descriptionAttributedStringWithFontSize:(CGFloat)size;
+- (NSAttributedString *)uploadDateAttributedStringWithFontSize:(CGFloat)size;
+- (NSAttributedString *)likesAttributedStringWithFontSize:(CGFloat)size;
+- (NSAttributedString *)locationAttributedStringWithFontSize:(CGFloat)size;
+
 @end

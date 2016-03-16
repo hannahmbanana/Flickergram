@@ -13,6 +13,8 @@
 		7629F88F1C81741D00BC44F0 /* UserModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 7629F88E1C81741D00BC44F0 /* UserModel.m */; };
 		7629F8931C81848700BC44F0 /* LocationModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 7629F8921C81848700BC44F0 /* LocationModel.m */; };
 		767965EA1C93EF9C004CA584 /* ImageURLModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 767965E91C93EF9C004CA584 /* ImageURLModel.m */; };
+		767965ED1C9682E1004CA584 /* UserRowView.m in Sources */ = {isa = PBXBuildFile; fileRef = 767965EC1C9682E1004CA584 /* UserRowView.m */; };
+		767965F01C96A089004CA584 /* LikersViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 767965EF1C96A089004CA584 /* LikersViewController.m */; };
 		768C1DEA1C745A470001EAD1 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 768C1DE91C745A470001EAD1 /* main.m */; };
 		768C1DED1C745A470001EAD1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 768C1DEC1C745A470001EAD1 /* AppDelegate.m */; };
 		768C1DF51C745A470001EAD1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 768C1DF41C745A470001EAD1 /* Assets.xcassets */; };
@@ -44,6 +46,10 @@
 		7629F8921C81848700BC44F0 /* LocationModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationModel.m; sourceTree = "<group>"; };
 		767965E81C93EF9C004CA584 /* ImageURLModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageURLModel.h; sourceTree = "<group>"; };
 		767965E91C93EF9C004CA584 /* ImageURLModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageURLModel.m; sourceTree = "<group>"; };
+		767965EB1C9682E1004CA584 /* UserRowView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserRowView.h; sourceTree = "<group>"; };
+		767965EC1C9682E1004CA584 /* UserRowView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserRowView.m; sourceTree = "<group>"; };
+		767965EE1C96A089004CA584 /* LikersViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LikersViewController.h; sourceTree = "<group>"; };
+		767965EF1C96A089004CA584 /* LikersViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LikersViewController.m; sourceTree = "<group>"; };
 		768C1DE51C745A470001EAD1 /* Flickrgram.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Flickrgram.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		768C1DE91C745A470001EAD1 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		768C1DEB1C745A470001EAD1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -168,6 +174,8 @@
 				768C1E071C7463450001EAD1 /* PhotoTableViewCell.m */,
 				76094E711C8800320007321B /* PhotoCollectionViewCell.h */,
 				76094E721C8800320007321B /* PhotoCollectionViewCell.m */,
+				767965EB1C9682E1004CA584 /* UserRowView.h */,
+				767965EC1C9682E1004CA584 /* UserRowView.m */,
 			);
 			name = View;
 			sourceTree = "<group>";
@@ -183,6 +191,8 @@
 				768C1E131C7E84020001EAD1 /* LocationCollectionViewController.m */,
 				76094E741C880F0C0007321B /* PhotoMapViewController.h */,
 				76094E751C880F0C0007321B /* PhotoMapViewController.m */,
+				767965EE1C96A089004CA584 /* LikersViewController.h */,
+				767965EF1C96A089004CA584 /* LikersViewController.m */,
 			);
 			name = Controller;
 			sourceTree = "<group>";
@@ -326,9 +336,11 @@
 				76F8D53D1C903D6A00E5545F /* CommentView.m in Sources */,
 				768C1E051C7461380001EAD1 /* PhotoTableViewController.m in Sources */,
 				768C1E0E1C7E7DF20001EAD1 /* UserProfileViewController.m in Sources */,
+				767965F01C96A089004CA584 /* LikersViewController.m in Sources */,
 				768C1E141C7E84020001EAD1 /* LocationCollectionViewController.m in Sources */,
 				768C1DEA1C745A470001EAD1 /* main.m in Sources */,
 				76F8D5371C9029BD00E5545F /* Utilities.m in Sources */,
+				767965ED1C9682E1004CA584 /* UserRowView.m in Sources */,
 				76094E761C880F0C0007321B /* PhotoMapViewController.m in Sources */,
 				7629F88C1C81737B00BC44F0 /* PhotoModel.m in Sources */,
 				7629F8931C81848700BC44F0 /* LocationModel.m in Sources */,

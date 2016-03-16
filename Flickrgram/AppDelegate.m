@@ -10,25 +10,43 @@
 #import "PhotoTableViewController.h"
 #import "UserProfileViewController.h"
 #import "PhotoMapViewController.h"
+#import "Utilities.h"
 
 @interface AppDelegate ()
 
 @end
 
 @implementation AppDelegate
-
+{
+  PhotoTableViewController *_viewController;
+}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    
+  
+  [[UINavigationBar appearance] setBarTintColor:[UIColor darkBlueColor]];
+  [[UINavigationBar appearance] setTranslucent:NO];
+  NSDictionary *attributes = @{NSForegroundColorAttributeName:[UIColor whiteColor]};
+  [[UINavigationBar appearance] setTitleTextAttributes:attributes];
+
   self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+  self.window.backgroundColor = [UIColor whiteColor];
+  UITabBarController *tabBarController    = [[UITabBarController alloc] init];
+  self.window.rootViewController          = tabBarController;
+  [self.window makeKeyAndVisible];
   
   // create Home Feed viewController & navController
-  PhotoTableViewController *viewController = [[PhotoTableViewController alloc] init];
-  UINavigationController *homeFeedNavCtrl  = [[UINavigationController alloc] initWithRootViewController:viewController];
+  _viewController                          = [[PhotoTableViewController alloc] init];
+  UINavigationController *homeFeedNavCtrl  = [[UINavigationController alloc] initWithRootViewController:_viewController];
   homeFeedNavCtrl.tabBarItem               = [[UITabBarItem alloc] initWithTitle:@"Home Feed"
                                                                            image:[UIImage imageNamed:@"home"]
                                                                              tag:0];
   
+  // UINavigationController does not forward on preferredStatusBarStyle calls to its child view controllers.
+  // Instead it manages its own state...
+  //http://stackoverflow.com/questions/19022210/preferredstatusbarstyle-isnt-called/19513714#19513714
+  homeFeedNavCtrl.navigationBar.barStyle = UIBarStyleBlack;
+
+
   // create Profile viewController & navController
 //  UserProfileViewController *myProfileVC   = [[UserProfileViewController alloc] initWithMe];
   UIViewController *VC                         = [[UIViewController alloc] init];
@@ -39,14 +57,14 @@
                                                                                image:[UIImage imageNamed:@"profile"]
                                                                                  tag:0];
 
-  // create Photo Upload viewController & navController
-  UIViewController *VC1                      = [[UIViewController alloc] init];
-  VC1.view.backgroundColor                   = [UIColor redColor];
-  
-  UINavigationController *photoUploadNavCtrl = [[UINavigationController alloc] initWithRootViewController:VC1];
-  photoUploadNavCtrl.tabBarItem              = [[UITabBarItem alloc] initWithTitle:@"Upload"
-                                                                             image:[UIImage imageNamed:@"camera"]
-                                                                               tag:0];
+//  // create Photo Upload viewController & navController
+//  UIViewController *VC1                      = [[UIViewController alloc] init];
+//  VC1.view.backgroundColor                   = [UIColor redColor];
+//  
+//  UINavigationController *photoUploadNavCtrl = [[UINavigationController alloc] initWithRootViewController:VC1];
+//  photoUploadNavCtrl.tabBarItem              = [[UITabBarItem alloc] initWithTitle:@"Upload"
+//                                                                             image:[UIImage imageNamed:@"camera"]
+//                                                                               tag:0];
 
   // create Photos Near Me viewController & navController
   PhotoMapViewController *photoNearMeVC      = [[PhotoMapViewController alloc] init];
@@ -56,15 +74,9 @@
                                                                              image:[UIImage imageNamed:@"earth"]
                                                                                tag:0];
   
-  // create UITabBarController and add viewControllers
-  UITabBarController *tabBarController    = [[UITabBarController alloc] init];
-  tabBarController.viewControllers        = @[homeFeedNavCtrl, photoNearMeNavCtrl, photoUploadNavCtrl, profileNavController];
+  // configure UITabBarController and add viewControllers
+  tabBarController.viewControllers        = @[homeFeedNavCtrl, photoNearMeNavCtrl, profileNavController];
   tabBarController.selectedViewController = homeFeedNavCtrl;
-  
-  self.window.rootViewController = tabBarController;
-  
-  [self.window makeKeyAndVisible];
-  
   return YES;
 }
 
@@ -83,6 +95,8 @@
 - (void)applicationWillEnterForeground:(UIApplication *)application {
   // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
   
+//  [_viewController refreshFeed]; 
+//  NSLog(@"applicationWillEnterForeground - refreshing feed");
   [self getData];
 }
 

@@ -12,8 +12,9 @@
 
 @protocol PhotoTableViewCellProtocol <NSObject>
 - (void)userProfileWasTouchedWithUser:(UserModel *)user;
-- (void)photoLocationWasTouchedWithCoordinate:(CLLocationCoordinate2D)coordiantes name:(NSString *)name;
+- (void)photoLocationWasTouchedWithCoordinate:(CLLocationCoordinate2D)coordiantes name:(NSAttributedString *)name;
 - (void)cellWasLongPressedWithPhoto:(PhotoModel *)photo;
+- (void)photoLikesWasTouchedWithPhoto:(PhotoModel *)photo;
 @end
 
 
@@ -25,6 +26,5 @@
 
 - (void)updateCellWithPhotoObject:(PhotoModel *)photo;
 - (void)loadCommentsForPhoto:(PhotoModel *)photo;
-
 
 @end

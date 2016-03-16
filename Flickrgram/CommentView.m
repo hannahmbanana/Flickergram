@@ -11,54 +11,45 @@
 #import "Utilities.h"
 
 #define INTER_COMMENT_SPACING 5
-#define NUM_COMMENTS_TO_SHOW_UNEXPANDED 3
+#define NUM_COMMENTS_TO_SHOW 3
 
 @implementation CommentView
 {
-  CommentFeedModel *_commentFeed;
-  UILabel          *_commentCountLabel;
-  UILabel          *_commentLabel1;
-  UILabel          *_commentLabel2;
-  UILabel          *_commentLabel3;
+  CommentFeedModel           *_commentFeed;
+  NSMutableArray <UILabel *> *_commentLabels;
 }
 
 #pragma mark - Class Methods
 
-+ (NSAttributedString *)attributedStringWithString:(NSString *)string   //FIXME:
++ (CGFloat)heightForCommentFeedModel:(CommentFeedModel *)feed withWidth:(CGFloat)width
 {
-  NSDictionary *attributes                    = @{NSForegroundColorAttributeName: [UIColor lightGrayColor],
-                                                  NSFontAttributeName: [UIFont systemFontOfSize:14]};
-  NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:string];
-  [attributedString addAttributes:attributes range:NSMakeRange(0, string.length)];
-  
-  return attributedString;
-}
-
-+ (CGFloat)heightForCommentFeedModel:(CommentFeedModel *)commentFeed withWidth:(CGFloat)width
-{
-  CGFloat height = 0;
   NSAttributedString *string;
+  CGRect rect;
+  CGFloat height = 0;
   
-  NSUInteger numComments       = [commentFeed totalNumberOfCommentsForPhoto];
-  if (numComments > 3) {
-    NSString *countString      = [NSString stringWithFormat:@"View all %@ comments", [NSNumber numberWithUnsignedInteger:numComments]];
-    NSAttributedString *string = [CommentView attributedStringWithString:countString];
-    CGRect countStringRect     = [string boundingRectWithSize:CGSizeMake(width, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin context:nil];
-    height                    += countStringRect.size.height + INTER_COMMENT_SPACING;
+  BOOL addViewAllCommentsLabel = [feed numberOfCommentsForPhotoExceedsInteger:NUM_COMMENTS_TO_SHOW];
+  if (addViewAllCommentsLabel) {
+    string  = [feed viewAllCommentsAttributedString];
+    rect    = [string boundingRectWithSize:CGSizeMake(width, CGFLOAT_MAX)
+                                                      options:NSStringDrawingUsesLineFragmentOrigin
+                                                      context:nil];
+    height += rect.size.height;
   }
   
-  NSUInteger numCommentsInFeed = [commentFeed numberOfItemsInFeed];
+  NSUInteger numCommentsInFeed = [feed numberOfItemsInFeed];
 
   for (int i = 0; i < numCommentsInFeed; i++) {
     
-    CommentModel *comment      = [commentFeed objectAtIndex:i];
-    string                     = [CommentView attributedStringWithString:comment.body];
-    CGRect stringRect          = [string boundingRectWithSize:CGSizeMake(width, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin context:nil];
-    height                    += stringRect.size.height + INTER_COMMENT_SPACING;
+    string  = [[feed objectAtIndex:i] commentAttributedString];
+    rect    = [string boundingRectWithSize:CGSizeMake(width, CGFLOAT_MAX)
+                                   options:NSStringDrawingUsesLineFragmentOrigin
+                                   context:nil];
+    height += rect.size.height + INTER_COMMENT_SPACING;
   }
 
-  return height;
+  return roundf(height);
 }
+
 
 #pragma mark - Lifecycle
 
@@ -67,100 +58,86 @@
   self = [super init];
   
   if (self) {
-    _commentCountLabel           = [[UILabel alloc] init];
-    _commentCountLabel.textColor = [UIColor lightGrayColor];
-    [self addSubview:_commentCountLabel];
-    
-    _commentLabel1               = [[UILabel alloc] init];
-    _commentLabel1.numberOfLines = 3;
-    [self addSubview:_commentLabel1];
-    
-    _commentLabel2               = [[UILabel alloc] init];
-    _commentLabel2.numberOfLines = 3;
-    [self addSubview:_commentLabel2];
-    
-    _commentLabel3               = [[UILabel alloc] init];
-    _commentLabel3.numberOfLines = 3;
-    [self addSubview:_commentLabel3];
+    _commentLabels = [[NSMutableArray alloc] init];
   }
   
   return self;
 }
 
-
 - (void)layoutSubviews
 {
   [super layoutSubviews];
   
-  CGSize boundSize = self.bounds.size;
-  CGRect rect      = CGRectMake(0, 0, boundSize.width, 0);
+  CGSize boundsSize     = self.bounds.size;
+  CGRect rect           = CGRectMake(0, 0, boundsSize.width, -INTER_COMMENT_SPACING);
   
-  if (_commentCountLabel.text) {
-    [_commentCountLabel sizeToFit];
-    rect.size.height         = _commentCountLabel.frame.size.height;
-    _commentCountLabel.frame = rect;
-    rect.origin.y           += _commentCountLabel.frame.size.height + INTER_COMMENT_SPACING;
-  }
-  
-  if (_commentLabel1.attributedText) {
-    [_commentLabel1 sizeToFit];
-    rect.size.height     = _commentLabel1.frame.size.height;
-    _commentLabel1.frame = rect;
-    rect.origin.y       += _commentLabel1.frame.size.height + INTER_COMMENT_SPACING;
-  }
-  
-  if (_commentLabel2.attributedText) {
-    [_commentLabel2 sizeToFit];
-    rect.size.height     = _commentLabel2.frame.size.height;
-    _commentLabel2.frame = rect;
-    rect.origin.y       += _commentLabel2.frame.size.height + INTER_COMMENT_SPACING;
-  }
-  
-  if (_commentLabel3.attributedText) {
-    [_commentLabel3 sizeToFit];
-    rect.size.height     = _commentLabel3.frame.size.height;
-    _commentLabel3.frame = rect;
+  for (UILabel *commentsLabel in _commentLabels) {
+    rect.origin.y       += rect.size.height + INTER_COMMENT_SPACING;
+    rect.size           = [commentsLabel sizeThatFits:CGSizeMake(boundsSize.width, CGFLOAT_MAX)];
+    commentsLabel.frame = rect;
   }
 }
+
 
 #pragma mark - Instance Methods
 
-- (void)prepareForReuse
+- (void)updateWithCommentFeedModel:(CommentFeedModel *)feed
 {
-  _commentCountLabel.text       = nil;
-  _commentLabel1.attributedText = nil;
-  _commentLabel2.attributedText = nil;
-  _commentLabel3.attributedText = nil;
+  _commentFeed = feed;
+  [self removeCommentLabels];
   
-  [self setNeedsLayout];
+  if (_commentFeed) {
+    [self createCommentLabels];
+    
+    BOOL addViewAllCommentsLabel = [feed numberOfCommentsForPhotoExceedsInteger:NUM_COMMENTS_TO_SHOW];
+    NSAttributedString *commentLabelString;
+    int labelsIndex = 0;
+    
+    if (addViewAllCommentsLabel) {
+      commentLabelString        = [_commentFeed viewAllCommentsAttributedString];
+      [[_commentLabels objectAtIndex:labelsIndex] setAttributedText:commentLabelString];
+      labelsIndex++;
+    }
+    
+    NSUInteger numCommentsInFeed = [_commentFeed numberOfItemsInFeed];
+    
+    for (int feedIndex = 0; feedIndex < numCommentsInFeed; feedIndex++) {
+      commentLabelString         = [[_commentFeed objectAtIndex:feedIndex] commentAttributedString];
+      [[_commentLabels objectAtIndex:labelsIndex] setAttributedText:commentLabelString];
+      labelsIndex++;
+    }
+    
+    [self setNeedsLayout];
+  }
 }
 
-- (void)updateWithCommentFeedModel:(CommentFeedModel *)feed withFontSize:(CGFloat)size
-{
-  _commentCountLabel.font = [_commentCountLabel.font fontWithSize:size];
-  _commentLabel1.font = [_commentLabel1.font fontWithSize:size];
-  _commentLabel2.font = [_commentLabel2.font fontWithSize:size];
-  _commentLabel3.font = [_commentLabel3.font fontWithSize:size];
-  
-  _commentFeed = feed;
-  
-  NSUInteger numComments          = [_commentFeed totalNumberOfCommentsForPhoto];
-  if (numComments > 3) {
-    _commentCountLabel.text       = [NSString stringWithFormat:@"View all %@ comments", [NSNumber numberWithUnsignedInteger:numComments]];
-  }
-  
-  NSUInteger numLoadedComments    = [_commentFeed numberOfItemsInFeed];
-  if (numLoadedComments >= 3) {
-    _commentLabel3.attributedText = [[_commentFeed objectAtIndex:2] commentAttributedString];
-  }
-  if (numLoadedComments >= 2){
-    _commentLabel2.attributedText = [[_commentFeed objectAtIndex:1] commentAttributedString];
-  }
-  if (numLoadedComments >= 1) {
-    _commentLabel1.attributedText = [[_commentFeed objectAtIndex:0] commentAttributedString];
-  }
 
-  [self setNeedsLayout];
+#pragma mark - Helper Methods
+
+- (void)removeCommentLabels
+{
+  for (UILabel *commentLabel in _commentLabels) {
+    [commentLabel removeFromSuperview];
+  }
+  
+  [_commentLabels removeAllObjects];
+}
+
+- (void)createCommentLabels
+{
+  BOOL addViewAllCommentsLabel = [_commentFeed numberOfCommentsForPhotoExceedsInteger:NUM_COMMENTS_TO_SHOW];
+  NSUInteger numCommentsInFeed = [_commentFeed numberOfItemsInFeed];
+
+  NSUInteger numLabelsToAdd    = (addViewAllCommentsLabel) ? numCommentsInFeed + 1 : numCommentsInFeed;
+  
+  for (NSUInteger i = 0; i < numLabelsToAdd; i++) {
+    
+    UILabel *commentLabel      = [[UILabel alloc] init];
+    commentLabel.numberOfLines = 3;
+    
+    [_commentLabels addObject:commentLabel];
+    [self addSubview:commentLabel];
+  }
 }
 
 @end

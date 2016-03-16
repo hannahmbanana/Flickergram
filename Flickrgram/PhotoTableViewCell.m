@@ -12,9 +12,13 @@
 #import "PINButton+PINRemoteImage.h"
 #import "CommentView.h"
 
-#define CELL_HEADER_HEIGHT 50
-#define CELL_HEADER_HORIZONTAL_INSET 10
-#define USER_IMAGE_HEIGHT 30
+#define DEBUG_PHOTOCELL_LAYOUT  0
+
+#define HEADER_HEIGHT           50
+#define USER_IMAGE_HEIGHT       30
+#define HORIZONTAL_BUFFER       10
+#define VERTICAL_BUFFER         5
+#define FONT_SIZE               14
 
 @interface PhotoTableViewCell () <UIActionSheetDelegate>
 @end
@@ -22,29 +26,35 @@
 @implementation PhotoTableViewCell
 {
   PhotoModel   *_photoModel;
-  
-  UIImageView  *_userProfileImageView;
+  CommentView  *_photoCommentsView;
+  UIImageView  *_userAvatarImageView;
+  UIImageView  *_photoImageView;
   UILabel      *_userNameLabel;
   UILabel      *_photoLocationLabel;
   UILabel      *_photoTimeIntervalSincePostLabel;
-  
-  UIImageView  *_photoImageView;
-  
   UILabel      *_photoLikesLabel;
   UILabel      *_photoDescriptionLabel;
-  CommentView  *_photoCommentsView;
 }
 
 
-#pragma mark - Class methods
+#pragma mark - Class Methods
 
 + (CGFloat)heightForPhotoModel:(PhotoModel *)photo withWidth:(CGFloat)width;
 {
-  // count number of comments, lines of description
   CGFloat photoHeight = width;
-  CGFloat commentViewHeight = [CommentView heightForCommentFeedModel:photo.commentFeed withWidth:width];
-  NSLog(@"CommentViewHeight = %f", commentViewHeight);
-  return CELL_HEADER_HEIGHT * 2 + photoHeight + commentViewHeight + 5;
+  
+  UIFont *font        = [UIFont systemFontOfSize:FONT_SIZE];
+  CGFloat likesHeight = roundf([font lineHeight]);
+  
+  NSAttributedString *descriptionAttrString = [photo descriptionAttributedStringWithFontSize:FONT_SIZE];
+  CGFloat availableWidth                    = (width - HORIZONTAL_BUFFER * 2);
+  CGFloat descriptionHeight                 = [descriptionAttrString boundingRectWithSize:CGSizeMake(availableWidth, CGFLOAT_MAX)
+                                                                                  options:NSStringDrawingUsesLineFragmentOrigin
+                                                                                  context:nil].size.height;
+  
+  CGFloat commentViewHeight = [CommentView heightForCommentFeedModel:photo.commentFeed withWidth:availableWidth];
+  
+  return HEADER_HEIGHT + photoHeight + likesHeight + descriptionHeight + commentViewHeight + (4 * VERTICAL_BUFFER);
 }
 
 
@@ -56,48 +66,43 @@
   
   if (self) {
     
-    _userProfileImageView                      = [[UIImageView alloc] init];
-//    _userProfileImageView.backgroundColor      = [UIColor redColor];
-    
-    _userNameLabel                             = [[UILabel alloc] init];
-    _userNameLabel.font                        = [_userNameLabel.font fontWithSize:floorf(USER_IMAGE_HEIGHT/2)-1];
-    _userNameLabel.textColor                   = [UIColor colorWithRed:18.0/255.0 green:86.0/255.0 blue:136.0/255.0 alpha:1.0];
-//    _userNameLabel.backgroundColor             = [UIColor purpleColor];
+    _photoCommentsView                   = [[CommentView alloc] init];
 
-    _photoLocationLabel                        = [[UILabel alloc] init];
-    _photoLocationLabel.font                   = [_photoLocationLabel.font fontWithSize:floorf(USER_IMAGE_HEIGHT/2)-1];
-    _photoLocationLabel.textColor              = [UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0];
-//    _photoLocationLabel.backgroundColor             = [UIColor greenColor];
-
-    _photoTimeIntervalSincePostLabel           = [[UILabel alloc] init];
-    _photoTimeIntervalSincePostLabel.font      = [_photoTimeIntervalSincePostLabel.font fontWithSize:floorf(USER_IMAGE_HEIGHT/2)-1];
-    _photoTimeIntervalSincePostLabel.textColor = [UIColor lightGrayColor];
-//    _photoTimeIntervalSincePostLabel.backgroundColor             = [UIColor greenColor];
-
-
-    _photoImageView                            = [[UIImageView alloc] init];
+    _userAvatarImageView                 = [[UIImageView alloc] init];
+    _photoImageView                      = [[UIImageView alloc] init];
     [_photoImageView setPin_updateWithProgress:YES];
-    
-    // make the UIImage fill the UIImageView correctly
-    _photoImageView.clipsToBounds              = YES;
-    _photoImageView.contentMode                = UIViewContentModeScaleAspectFill;
-    
-    _photoLikesLabel                           = [[UILabel alloc] init];
-    _photoLikesLabel.font                        = [_photoLikesLabel.font fontWithSize:floorf(USER_IMAGE_HEIGHT/2)-1];
-    _photoLikesLabel.textColor                   = [UIColor colorWithRed:18.0/255.0 green:86.0/255.0 blue:136.0/255.0 alpha:1.0];
-    
-    _photoDescriptionLabel                     = [[UILabel alloc] init];
-    _photoDescriptionLabel.font                = [_photoDescriptionLabel.font fontWithSize:floorf(USER_IMAGE_HEIGHT/2)-1];
-    _photoDescriptionLabel.numberOfLines       = 3;
 
-    _photoCommentsView                         = [[CommentView alloc] init];
+    _userNameLabel                       = [[UILabel alloc] init];
+    _photoLocationLabel                  = [[UILabel alloc] init];
+    _photoTimeIntervalSincePostLabel     = [[UILabel alloc] init];
+    _photoLikesLabel                     = [[UILabel alloc] init];
+    _photoDescriptionLabel               = [[UILabel alloc] init];
+    _photoDescriptionLabel.numberOfLines = 3;
+
+    [self addSubview:_photoCommentsView];
+    [self addSubview:_userAvatarImageView];
+    [self addSubview:_photoImageView];
+    [self addSubview:_userNameLabel];
+    [self addSubview:_photoLocationLabel];
+    [self addSubview:_photoTimeIntervalSincePostLabel];
+    [self addSubview:_photoLikesLabel];
+    [self addSubview:_photoDescriptionLabel];
     
     UILongPressGestureRecognizer *lpgr = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(cellWasLongPressed:)];
     [self addGestureRecognizer:lpgr];
     
-    // tap gesture recognizer
     UITapGestureRecognizer *tgr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(cellWasTapped:)];
     [self addGestureRecognizer:tgr];
+
+#if DEBUG_PHOTOCELL_LAYOUT
+    _userAvatarImageView.backgroundColor              = [UIColor redColor];
+    _userNameLabel.backgroundColor                    = [UIColor purpleColor];
+    _photoLocationLabel.backgroundColor               = [UIColor greenColor];
+    _photoTimeIntervalSincePostLabel.backgroundColor  = [UIColor greenColor];
+    _photoCommentsView.backgroundColor                = [UIColor purpleColor];
+    _photoDescriptionLabel.backgroundColor            = [UIColor redColor];
+    _photoLikesLabel.backgroundColor                  = [UIColor greenColor];
+#endif
   }
   
   return self;
@@ -107,101 +112,74 @@
 {
   [super layoutSubviews];
   
-  // user avatar
-  _userProfileImageView.frame = CGRectMake(CELL_HEADER_HORIZONTAL_INSET,
-                                           (CELL_HEADER_HEIGHT - USER_IMAGE_HEIGHT) / 2,
-                                           USER_IMAGE_HEIGHT,
-                                           USER_IMAGE_HEIGHT);
-  [self addSubview:_userProfileImageView];
+  CGSize boundsSize = self.bounds.size;
+  
+  // FIXME: Make PhotoCellHeaderView
+  
+  CGRect rect = CGRectMake(HORIZONTAL_BUFFER, (HEADER_HEIGHT - USER_IMAGE_HEIGHT) / 2.0, USER_IMAGE_HEIGHT, USER_IMAGE_HEIGHT);
+  _userAvatarImageView.frame = rect;
 
-  // post time elapsed
-  [_photoTimeIntervalSincePostLabel sizeToFit];
-  
-  CGFloat x = self.bounds.size.width - _photoTimeIntervalSincePostLabel.frame.size.width - CELL_HEADER_HORIZONTAL_INSET;
-  CGFloat y = (CELL_HEADER_HEIGHT - _photoTimeIntervalSincePostLabel.frame.size.height) / 2;
-  
-  _photoTimeIntervalSincePostLabel.frame = (CGRect) { CGPointMake(x,y), _photoTimeIntervalSincePostLabel.frame.size };
-  [self addSubview:_photoTimeIntervalSincePostLabel];
-  
-  // username & photo location
-  [_userNameLabel sizeToFit];       
-  [_photoLocationLabel sizeToFit];
+  rect.size = _photoTimeIntervalSincePostLabel.bounds.size;
+  rect.origin.x = boundsSize.width - HORIZONTAL_BUFFER - rect.size.width;
+  rect.origin.y = (HEADER_HEIGHT - rect.size.height) / 2.0;
+  _photoTimeIntervalSincePostLabel.frame = rect;
 
-  x = CGRectGetMaxX(_userProfileImageView.frame) + CELL_HEADER_HORIZONTAL_INSET;
-  CGFloat maxX = CGRectGetMinX(_photoTimeIntervalSincePostLabel.frame) - CELL_HEADER_HORIZONTAL_INSET;
+  CGFloat availableWidth = CGRectGetMinX(_photoTimeIntervalSincePostLabel.frame) - HORIZONTAL_BUFFER;
+  rect.size = _userNameLabel.bounds.size;
+  rect.size.width = MIN(availableWidth, rect.size.width);
+
+  rect.origin.x = HORIZONTAL_BUFFER + USER_IMAGE_HEIGHT + HORIZONTAL_BUFFER;
   
-  if (_photoLocationLabel.text) {
+  if (_photoLocationLabel.attributedText) {
+    CGSize locationSize = _photoLocationLabel.bounds.size;
+    locationSize.width = MIN(availableWidth, locationSize.width);
     
-    y = CELL_HEADER_HEIGHT / 2 - _userNameLabel.frame.size.height;
+    rect.origin.y = (HEADER_HEIGHT - rect.size.height - locationSize.height) / 2.0;
+    _userNameLabel.frame = rect;
     
-    
-    
-    _userNameLabel.frame = CGRectMake(x,
-                                      y,
-                                      maxX - x,
-                                      _userNameLabel.frame.size.height);
-    
-    _photoLocationLabel.frame = CGRectMake(x,
-                                           CELL_HEADER_HEIGHT / 2,
-                                           maxX - x,
-                                           _photoLocationLabel.frame.size.height);
+    // FIXME: Name rects at least for this sub-condition
+    rect.origin.y += rect.size.height;
+    rect.size = locationSize;
+    _photoLocationLabel.frame = rect;
   } else {
-    _userNameLabel.frame = CGRectMake(x,
-                                      (CELL_HEADER_HEIGHT - _userNameLabel.frame.size.height) / 2,
-                                      maxX - x,
-                                      _userNameLabel.frame.size.height);
+    rect.origin.y = (HEADER_HEIGHT - rect.size.height) / 2.0;
+    _userNameLabel.frame = rect;
   }
 
-  [self addSubview:_userNameLabel];
-  [self addSubview:_photoLocationLabel];
-
-  // middle of cell
-  _photoImageView.frame = CGRectMake(0,
-                                     CELL_HEADER_HEIGHT,
-                                     self.bounds.size.width,
-                                     self.bounds.size.width);
-  [self addSubview:_photoImageView];
+  _photoImageView.frame = CGRectMake(0, HEADER_HEIGHT, boundsSize.width, boundsSize.width);
   
-  // bottom of cell
-  [_photoLikesLabel sizeToFit];
-  _photoLikesLabel.frame = CGRectMake(CELL_HEADER_HORIZONTAL_INSET,
-                                     CGRectGetMaxY(_photoImageView.frame)+ 5,
-                                     _photoLikesLabel.frame.size.width,
-                                     _photoLikesLabel.frame.size.height);
-  [self addSubview:_photoLikesLabel];
-
-  [_photoDescriptionLabel sizeToFit];
-  _photoDescriptionLabel.frame = CGRectMake(CELL_HEADER_HORIZONTAL_INSET,
-                                      CGRectGetMaxY(_photoLikesLabel.frame) + 5,
-                                      self.bounds.size.width - CELL_HEADER_HORIZONTAL_INSET * 2,
-                                      _photoDescriptionLabel.frame.size.height);
-  [self addSubview:_photoDescriptionLabel];
-
-  [_photoCommentsView sizeToFit];
-  _photoCommentsView.frame = CGRectMake(CELL_HEADER_HORIZONTAL_INSET,
-                                            CGRectGetMaxY(_photoDescriptionLabel.frame) + 5,
-                                            self.bounds.size.width - CELL_HEADER_HORIZONTAL_INSET * 2,
-                                            _photoCommentsView.frame.size.height);
+  // FIXME: Make PhotoCellFooterView
   
-  [self addSubview:_photoCommentsView];
+  rect.size = _photoLikesLabel.bounds.size;
+  rect.origin = CGPointMake(HORIZONTAL_BUFFER, CGRectGetMaxY(_photoImageView.frame) + VERTICAL_BUFFER);
+  _photoLikesLabel.frame = rect;
+
+  rect.size = _photoDescriptionLabel.bounds.size;
+  rect.size.width = MIN(boundsSize.width - HORIZONTAL_BUFFER * 2, rect.size.width);
+  rect.origin.y = CGRectGetMaxY(_photoLikesLabel.frame) + VERTICAL_BUFFER;
+  _photoDescriptionLabel.frame = rect;
+
+  rect.size = _photoCommentsView.bounds.size;
+  rect.size.width = boundsSize.width - HORIZONTAL_BUFFER * 2;
+  rect.origin.y = CGRectGetMaxY(_photoDescriptionLabel.frame) + VERTICAL_BUFFER;
+  _photoCommentsView.frame = rect;
 }
 
 - (void)prepareForReuse
 {
   [super prepareForReuse];
   
-  // remove images so that the old content doesn't appear before the new content is loaded
-  _userProfileImageView.image           = nil;
-  _photoImageView.image                 = nil;
+  _photoCommentsView.frame                        = CGRectZero;   // next cell might not have a _photoCommentsView
+  [_photoCommentsView updateWithCommentFeedModel:nil];
   
-  // remove label text
-  _userNameLabel.text                   = nil;
-  _photoLocationLabel.text              = nil;
-  _photoTimeIntervalSincePostLabel.text = nil;
-  _photoLikesLabel.text = nil;
-  _photoDescriptionLabel.attributedText = nil;
-  
-  [_photoCommentsView prepareForReuse];
+  _userAvatarImageView.image                      = nil;
+  _photoImageView.image                           = nil;
+  _userNameLabel.attributedText                   = nil;
+  _photoLocationLabel.attributedText              = nil;
+  _photoLocationLabel.frame                       = CGRectZero;   // next cell might not have a _photoLocationLabel
+  _photoTimeIntervalSincePostLabel.attributedText = nil;
+  _photoLikesLabel.attributedText                 = nil;
+  _photoDescriptionLabel.attributedText           = nil;
 }
 
 
@@ -209,50 +187,83 @@
 
 - (void)updateCellWithPhotoObject:(PhotoModel *)photo
 {
-  _photoModel                           = photo;
-  _photoTimeIntervalSincePostLabel.text = photo.uploadDateString;
-//  _photoDescriptionLabel.text           = photo.title;
-  _userNameLabel.text                   = photo.ownerUserProfile.username;
+  _photoModel                                     = photo;
+  _userNameLabel.attributedText                   = [photo.ownerUserProfile usernameAttributedStringWithFontSize:FONT_SIZE];
+  _photoTimeIntervalSincePostLabel.attributedText = [photo uploadDateAttributedStringWithFontSize:FONT_SIZE];
+  _photoLikesLabel.attributedText                 = [photo likesAttributedStringWithFontSize:FONT_SIZE];
+  _photoDescriptionLabel.attributedText           = [photo descriptionAttributedStringWithFontSize:FONT_SIZE];
   
-  NSNumberFormatter *formatter1 = [[NSNumberFormatter alloc] init];
-  [formatter1 setNumberStyle:NSNumberFormatterDecimalStyle];
-  NSString * formattedAmount2 = [formatter1 stringFromNumber: [[NSNumber alloc] initWithUnsignedInteger:photo.likesCount]];
-  
-  _photoLikesLabel.text                 = [NSString stringWithFormat:@"♥︎ %@ likes", formattedAmount2];
-  _photoDescriptionLabel.attributedText = [NSAttributedString colorizeFirstWordInString:[NSString stringWithFormat:@"%@ %@", photo.ownerUserProfile.username, photo.descriptionText]];
+  [_userNameLabel sizeToFit];
+  [_photoTimeIntervalSincePostLabel sizeToFit];
+  [_photoLikesLabel sizeToFit];
+  [_photoDescriptionLabel sizeToFit];
+  CGRect rect                  = _photoDescriptionLabel.frame;
+  CGFloat availableWidth       = (self.bounds.size.width - HORIZONTAL_BUFFER * 2);
+  rect.size                    = [_photoDescriptionLabel sizeThatFits:CGSizeMake(availableWidth, CGFLOAT_MAX)];
+  _photoDescriptionLabel.frame = rect;
 
-  [_photoCommentsView updateWithCommentFeedModel:photo.commentFeed withFontSize:floorf(USER_IMAGE_HEIGHT/2)-1];
-  
+  [_photoImageView pin_setImageFromURL:photo.URL];
+  [self downloadAndProcessUserAvatarForPhoto:photo];
+  [self loadCommentsForPhoto:photo];
+  [self reverseGeocodeLocationForPhoto:photo];
+}
+
+- (void)loadCommentsForPhoto:(PhotoModel *)photo
+{
+  if (photo.commentFeed.numberOfItemsInFeed > 0) {
+    [_photoCommentsView updateWithCommentFeedModel:photo.commentFeed];
+    
+    CGRect frame             = _photoCommentsView.frame;
+    CGFloat availableWidth   = (self.bounds.size.width - HORIZONTAL_BUFFER * 2);
+    frame.size.width         = availableWidth;
+    frame.size.height        = [CommentView heightForCommentFeedModel:photo.commentFeed withWidth:availableWidth];
+    _photoCommentsView.frame = frame;
+    
+    [self setNeedsLayout];
+  }
+}
+
+
+#pragma mark - Helper Methods
+
+- (void)downloadAndProcessUserAvatarForPhoto:(PhotoModel *)photo
+{
+  [_userAvatarImageView pin_setImageFromURL:_photoModel.ownerUserProfile.userPicURL processorKey:@"custom" processor:^UIImage * _Nullable(PINRemoteImageManagerResult * _Nonnull result, NSUInteger * _Nonnull cost) {
+    CGSize profileImageSize = CGSizeMake(USER_IMAGE_HEIGHT, USER_IMAGE_HEIGHT);
+    return [result.image makeCircularImageWithSize:profileImageSize];
+  }];
+}
+
+- (void)reverseGeocodeLocationForPhoto:(PhotoModel *)photo
+{
   [photo.location reverseGeocodedLocationWithCompletionBlock:^(LocationModel *locationModel) {
     
     // check and make sure this is still relevant for this cell (and not an old cell)
     // make sure to use _photoModel instance variable as photo may change when cell is reused,
     // where as local variable will never change
     if (locationModel == _photoModel.location) {
-      _photoLocationLabel.text = photo.location.locationString;
-      
+      _photoLocationLabel.attributedText = [photo locationAttributedStringWithFontSize:FONT_SIZE];
+      [_photoLocationLabel sizeToFit];
       [self setNeedsLayout];
     }
   }];
-
-  // async download of photo using PINRemoteImage
-  [_photoImageView pin_setImageFromURL:photo.URL];
-  
-  // async download of buddy icon using PINRemoteImage
-  [_userProfileImageView pin_setImageFromURL:photo.ownerUserProfile.userPicURL processorKey:@"rounded" processor:^UIImage * _Nullable(PINRemoteImageManagerResult * _Nonnull result, NSUInteger * _Nonnull cost) {
-    
-    // make user profile image round
-    return [result.image makeRoundImage];
-  }];
 }
 
-- (void)loadCommentsForPhoto:(PhotoModel *)photo
+- (void)startDownloadingLikesForPhoto:_photoModel
 {
-  [_photoCommentsView updateWithCommentFeedModel:photo.commentFeed withFontSize:floorf(USER_IMAGE_HEIGHT/2)-1];
-  [self setNeedsLayout];
+//  [_photoModel.likesFeed refreshFeedWithCompletionBlock:^(NSArray *newComments) {
+//    
+//    NSInteger rowNum         = [_photoFeed indexOfPhotoModel:photo];
+//    PhotoTableViewCell *cell = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:rowNum inSection:0]];
+//    
+//    if (cell) {
+//      [cell loadCommentsForPhoto:photo];
+//      [self.tableView beginUpdates];
+//      [self.tableView endUpdates];
+//      // FIXME: adjust content offset - iterate over cells above to get heights...
+//    }
+//  }];
 }
-  
-#pragma mark - Helper Methods
 
 
 #pragma mark - Gesture Handling
@@ -285,26 +296,37 @@
   // determine which area of cell was tapped
   CGPoint tapPoint = [sender locationInView:self];
   
-  if (tapPoint.y > CELL_HEADER_HEIGHT) {
+  if (tapPoint.y > HEADER_HEIGHT && tapPoint.y < (HEADER_HEIGHT + self.bounds.size.width)) {
     
     // photo tapped
     NSLog(@"TAP: photo");
     
-  } else if (tapPoint.x <= CGRectGetMaxX(_userProfileImageView.frame)) {
+  } else if (tapPoint.y > (HEADER_HEIGHT + self.bounds.size.width)) {
+    
+    [self.delegate photoLikesWasTouchedWithPhoto:_photoModel];
+    [_photoModel.commentFeed requestPageWithCompletionBlock:^(NSArray *newcomments) {}];   //FIXME: make comments likes :)
+    
+    // photo tapped
+    NSLog(@"TAP: photo likes");
+    
+  } else if (tapPoint.x <= CGRectGetMaxX(_userAvatarImageView.frame)) {
     
     // user avatar tapped
     NSLog(@"TAP: Buddy Icon");
     
     [self.delegate userProfileWasTouchedWithUser:_photoModel.ownerUserProfile];
     
+    // start downloading likes
+    [self startDownloadingLikesForPhoto:_photoModel];
+    
   } else if (tapPoint.x < CGRectGetMinX(_photoTimeIntervalSincePostLabel.frame)) {
     
     // check if location exists
-    if (_photoLocationLabel.text) {
+    if (_photoLocationLabel.attributedText) {
       
       if (tapPoint.y > CGRectGetMinY(_photoLocationLabel.frame)) {
         NSLog(@"TAP: Location Label");
-        [self.delegate photoLocationWasTouchedWithCoordinate:_photoModel.location.coordinates name:_photoLocationLabel.text];
+        [self.delegate photoLocationWasTouchedWithCoordinate:_photoModel.location.coordinates name:_photoLocationLabel.attributedText];
         
       } else {
         
@@ -322,9 +344,5 @@
     }
   }
 }
-
-
-#pragma mark - UIActionSheetDelegate 
-
 
 @end

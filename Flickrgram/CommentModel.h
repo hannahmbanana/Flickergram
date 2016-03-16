@@ -7,18 +7,21 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 @interface CommentModel : NSObject
 
 @property (nonatomic, assign, readonly) NSUInteger             ID;
 @property (nonatomic, assign, readonly) NSUInteger             commenterID;
 @property (nonatomic, strong, readonly) NSString               *commenterUsername;
+@property (nonatomic, strong, readonly) NSString               *commenterAvatarURL;
 @property (nonatomic, strong, readonly) NSString               *body;
-@property (nonatomic, strong, readonly) NSString               *dateString;
+@property (nonatomic, strong, readonly) NSString               *uploadDateString;
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithDictionary:(NSDictionary *)photoDictionary NS_DESIGNATED_INITIALIZER;
 
 - (NSAttributedString *)commentAttributedString;
+- (NSAttributedString *)uploadDateAttributedStringWithFontSize:(CGFloat)size;
 
 @end

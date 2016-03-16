@@ -66,8 +66,48 @@
 
 }
 
+
+#pragma mark - Instance Methods
+
+- (NSAttributedString *)descriptionAttributedStringWithFontSize:(CGFloat)size
+{
+  NSString *string               = [NSString stringWithFormat:@"%@ %@", self.ownerUserProfile.username, self.descriptionText];
+  NSAttributedString *attrString = [NSAttributedString attributedStringWithString:string
+                                                                         fontSize:size
+                                                                            color:[UIColor darkGrayColor]
+                                                                   firstWordColor:[UIColor darkBlueColor]];
+  return attrString;
+}
+
+- (NSAttributedString *)uploadDateAttributedStringWithFontSize:(CGFloat)size
+{
+  return [NSAttributedString attributedStringWithString:self.uploadDateString
+                                               fontSize:size
+                                                  color:[UIColor lightGrayColor]
+                                         firstWordColor:nil];
+}
+
+- (NSAttributedString *)likesAttributedStringWithFontSize:(CGFloat)size
+{
+  NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
+  [formatter setNumberStyle:NSNumberFormatterDecimalStyle];
+  NSString *formattedLikesNumber = [formatter stringFromNumber:[[NSNumber alloc] initWithUnsignedInteger:self.likesCount]];
   
-#pragma mark - Helper Methods
+  NSString *likesString = [NSString stringWithFormat:@"♥︎ %@ likes", formattedLikesNumber];
+
+  return [NSAttributedString attributedStringWithString:likesString
+                                               fontSize:size
+                                                  color:[UIColor darkBlueColor]
+                                         firstWordColor:nil];
+}
+
+- (NSAttributedString *)locationAttributedStringWithFontSize:(CGFloat)size
+{
+  return [NSAttributedString attributedStringWithString:self.location.locationString
+                                               fontSize:size
+                                                  color:[UIColor lightBlueColor]
+                                         firstWordColor:nil];
+}
 
 - (NSString *)description
 {
